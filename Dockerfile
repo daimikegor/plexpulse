@@ -1,11 +1,11 @@
-FROM node:20-slim AS base
+FROM node:20.18.0-slim AS base
 WORKDIR /app
 
 FROM base AS deps
 ENV npm_config_build_from_source=true
 COPY package.json package-lock.json* ./
-RUN apt-get update && apt-get install -y python3 make g++ && npm ci
-RUN npm rebuild better-sqlite3 --build-from-source
+RUN apt-get update && apt-get install -y python3 make g++ \
+    && npm ci
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
@@ -18,7 +18,7 @@ WORKDIR /app
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-# better-sqlite3 requires native bindings to be present in production
+# better-sqlite3 native bindings must be copied explicitly for standalone mode
 COPY --from=deps /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 
 EXPOSE 3000
