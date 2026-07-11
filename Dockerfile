@@ -3,6 +3,7 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json package-lock.json* .npmrc ./
+RUN ls -la /app && cat /app/.npmrc || echo ".npmrc NOT FOUND"
 RUN apt-get update && apt-get install -y python3 make g++ \
     && npm ci --build-from-source
 
