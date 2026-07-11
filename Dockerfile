@@ -5,6 +5,7 @@ FROM base AS deps
 ENV npm_config_build_from_source=true
 COPY package.json package-lock.json* ./
 RUN apk add --no-cache python3 make g++ && npm ci
+RUN npm rebuild better-sqlite3 --build-from-source
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
