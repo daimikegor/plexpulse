@@ -1,10 +1,10 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 WORKDIR /app
 
 FROM base AS deps
 ENV npm_config_build_from_source=true
 COPY package.json package-lock.json* ./
-RUN apk add --no-cache python3 make g++ && npm ci
+RUN apt-get update && apt-get install -y python3 make g++ && npm ci
 RUN npm rebuild better-sqlite3 --build-from-source
 
 FROM base AS builder
