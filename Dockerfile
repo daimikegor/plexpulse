@@ -2,10 +2,9 @@ FROM node:20.18.0-slim AS base
 WORKDIR /app
 
 FROM base AS deps
-ENV npm_config_build_from_source=true
 COPY package.json package-lock.json* ./
 RUN apt-get update && apt-get install -y python3 make g++ \
-    && npm ci
+    && npm ci --build-from-source
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
