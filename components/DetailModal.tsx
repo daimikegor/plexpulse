@@ -62,13 +62,13 @@ export function DetailModal({
         <div className="relative">
           {/* Backdrop banner */}
           {item.backdrop_path && (
-            <div className="relative h-64 md:h-80 w-full overflow-hidden">
+            <div className="relative h-[250px] w-full overflow-hidden">
               <img 
                 src={`https://image.tmdb.org/t/p/w1280${item.backdrop_path}`} 
                 alt={item.title || item.name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0E1015] to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0E1015] to-transparent"></div>
             </div>
           )}
           
@@ -83,7 +83,10 @@ export function DetailModal({
               </div>
               
               <div className="md:w-2/3">
-                <h2 className="text-2xl font-bold mb-2 text-teal-300">{item.title || item.name}</h2>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Available</span>
+                  <h2 className="text-2xl font-bold text-teal-300">{item.title || item.name}</h2>
+                </div>
                 
                 <div className="flex items-center gap-2 mb-4">
                   <Star className="text-yellow-400 fill-current" size={20} />
