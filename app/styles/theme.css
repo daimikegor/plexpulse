@@ -1310,6 +1310,13 @@ main {
 
 .sidebar__logout-btn {
   width: 100%;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .sidebar__brand-row {
