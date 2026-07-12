@@ -10,7 +10,7 @@ services:
     depends_on:
       - redis
     volumes:
-      - ./data:/app/data
+      - app_data:/app/data
 
   redis:
     image: redis:7-alpine
@@ -21,3 +21,4 @@ services:
 
 volumes:
   redis_data:
+  app_data:
