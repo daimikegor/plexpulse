@@ -104,11 +104,6 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
                       {(item.release_date || item.first_air_date) &&
                         ` (${new Date(item.release_date || item.first_air_date).getFullYear()})`}
                     </p>
-                    {item.release_date || item.first_air_date ? (
-                      <span className="ticket__meta">
-                        ({new Date(item.release_date || item.first_air_date).getFullYear()})
-                      </span>
-                    ) : null}
                   </div>
                 </div>
               </div>
