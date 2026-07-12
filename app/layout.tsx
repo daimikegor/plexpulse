@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Inter } from 'next/font/google';
+import { SiteHeader } from '@/components/SiteHeader';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,7 +17,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-plex-dark text-white antialiased`}>
+      <body className={`${inter.className} bg-[#0E1015] text-white antialiased`}>
+        <SiteHeader />
         {children}
       </body>
     </html>
