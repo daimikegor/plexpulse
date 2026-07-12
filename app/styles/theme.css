@@ -420,8 +420,6 @@ html, body {
 main {
   position: relative;
   z-index: 1;
-  max-width: 1080px;
-  margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
 }
 
