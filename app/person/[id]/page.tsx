@@ -1,8 +1,11 @@
+import { requireAuth } from '@/lib/session';
 import { getTrendingContent } from '@/lib/tmdb';
 import { PosterImage } from '@/components/PosterImage';
 import { FilmographyGrid } from '@/components/FilmographyGrid';
 
 export default async function PersonPage({ params }: { params: { id: string } }) {
+  await requireAuth();
+  
   const personId = params.id;
   
   try {

@@ -1,22 +1,9 @@
-import { getSession } from '@/lib/session';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { requireAuth } from '@/lib/session';
 import { getTrendingContent } from '@/lib/tmdb';
 import { TrendingSection } from '@/components/TrendingSection';
 
 export default async function Dashboard() {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  
-  if (!sessionToken) {
-    redirect('/');
-  }
-  
-  const session = await getSession(sessionToken);
-  
-  if (!session) {
-    redirect('/');
-  }
+  const session = await requireAuth();
   
   const trendingData = await getTrendingContent();
   
