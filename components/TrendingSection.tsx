@@ -76,7 +76,7 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
                   <span className={`text-white text-xs px-2 py-1 rounded-full ${
                     item.media_type === 'movie' ? 'bg-[#1f4fbc]' : 'bg-[#a329bb]'
                   }`}>
-                    {item.media_type === 'movie' ? 'Movie' : 'TV'}
+                    {item.media_type === 'movie' ? 'Movie' : 'Series'}
                   </span>
                 </div>
                 <PosterImage 
