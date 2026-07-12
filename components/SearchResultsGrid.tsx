@@ -71,6 +71,7 @@ export function SearchResultsGrid({ items }: { items: any[] }) {
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
                   alt={item.name || item.title}
                   mediaType={item.media_type}
+                  title={item.name || item.title}
                 />
               ) : (
                 <div className="bg-gray-700 rounded-lg w-full h-48 flex items-center justify-center relative">
