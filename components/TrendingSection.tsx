@@ -89,16 +89,10 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
                 className="flex-shrink-0 w-48 relative cursor-pointer"
                 onClick={() => handlePosterClick(item)}
               >
-                <div className="absolute top-2 left-2 z-10">
-                  <span className={`text-white text-xs px-2 py-1 rounded-full ${
-                    item.media_type === 'movie' ? 'bg-[#1f4fbc]' : 'bg-[#a329bb]'
-                  }`}>
-                    {item.media_type === 'movie' ? 'Movie' : 'Series'}
-                  </span>
-                </div>
                 <PosterImage 
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
                   alt={item.name || item.title}
+                  mediaType={item.media_type}
                 />
                 <p className="mt-2 text-sm truncate">
                   {item.name || item.title}
