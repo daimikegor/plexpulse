@@ -115,30 +115,28 @@ export default async function SearchPage({
   }
   
   return (
-    <div className="min-h-screen bg-[#0E1015] text-[#F3F1EA] p-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-teal-300">Search Results</h1>
-        
-        {query ? (
-          <p className="mb-4 text-gray-400">
-            Showing results for: <span className="text-white">{query}</span>
-          </p>
-        ) : null}
-        
-        {personName && (
-          <p className="mb-4 text-teal-300">
-            Results for <span className="font-semibold">{personName}</span>
-          </p>
-        )}
-        
-        {results.length > 0 ? (
-          <SearchResultsGrid items={results} />
-        ) : (
-          <p className="text-gray-400">
-            {query ? 'No results found.' : 'Enter a search term to begin.'}
-          </p>
-        )}
-      </div>
-    </div>
+    <main>
+      <h1 className="search-context-heading">Search Results</h1>
+      
+      {query ? (
+        <p>
+          Showing results for: <span className="text-white">{query}</span>
+        </p>
+      ) : null}
+      
+      {personName && (
+        <p>
+          Results for <span className="font-semibold">{personName}</span>
+        </p>
+      )}
+      
+      {results.length > 0 ? (
+        <SearchResultsGrid items={results} />
+      ) : (
+        <p>
+          {query ? 'No results found.' : 'Enter a search term to begin.'}
+        </p>
+      )}
+    </main>
   );
 }
