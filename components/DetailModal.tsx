@@ -62,7 +62,7 @@ export function DetailModal({
         <div className="relative">
           {/* Backdrop banner */}
           {item.backdrop_path && (
-            <div className="relative h-[250px] w-full overflow-hidden">
+            <div className="relative h-[250px] w-full overflow-hidden hidden md:block">
               <img 
                 src={`https://image.tmdb.org/t/p/w1280${item.backdrop_path}`} 
                 alt={item.title || item.name}
