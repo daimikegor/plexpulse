@@ -69,13 +69,6 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
           <div 
             className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide" 
             id="trending-row"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              '&::-webkit-scrollbar': {
-                display: 'none'
-              }
-            }}
           >
             {trendingData.results.map((item: any) => (
               <div key={item.id} className="flex-shrink-0 w-48 relative">
