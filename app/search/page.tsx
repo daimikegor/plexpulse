@@ -1,5 +1,4 @@
 import { requireAuth } from '@/lib/session';
-import { getTrendingContent } from '@/lib/tmdb';
 import { SearchResultsGrid } from '@/components/SearchResultsGrid';
 
 export default async function SearchPage({
@@ -37,7 +36,7 @@ export default async function SearchPage({
       }
       
       const data = await response.json();
-      results = data.results || [];
+      results = (data.results || []).filter((item: any) => item.media_type !== 'person');
     } catch (error) {
       console.error('Error fetching search results:', error);
     }
@@ -53,6 +52,36 @@ export default async function SearchPage({
             Showing results for: <span className="text-white">{query}</span>
           </p>
         ) : null}
+        
+        <div className="flex gap-2 mb-6">
+          <button
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              type === 'all'
+                ? 'bg-teal-500 text-white'
+                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
+            }`}
+          >
+            All
+          </button>
+          <button
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              type === 'movie'
+                ? 'bg-teal-500 text-white'
+                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
+            }`}
+          >
+            Movies
+          </button>
+          <button
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              type === 'tv'
+                ? 'bg-teal-500 text-white'
+                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
+            }`}
+          >
+            Series
+          </button>
+        </div>
         
         {results.length > 0 ? (
           <SearchResultsGrid items={results} />

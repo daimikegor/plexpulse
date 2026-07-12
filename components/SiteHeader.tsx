@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Search } from 'lucide-react';
 
 export function SiteHeader() {
   const [query, setQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'movie' | 'tv'>('all');
   const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query)}&type=${activeFilter}`);
+      router.push(`/search?q=${encodeURIComponent(query)}&type=all`);
     }
   };
 
@@ -33,43 +33,10 @@ export function SiteHeader() {
               type="submit"
               className="absolute left-3 top-2.5 text-gray-400 hover:text-white"
             >
-              🔍
+              <Search size={20} />
             </button>
           </div>
         </form>
-
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeFilter === 'all'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setActiveFilter('movie')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeFilter === 'movie'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
-          >
-            Movies
-          </button>
-          <button
-            onClick={() => setActiveFilter('tv')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeFilter === 'tv'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
-          >
-            Series
-          </button>
-        </div>
       </div>
     </header>
   );
