@@ -224,8 +224,29 @@ export async function getUpcomingContent() {
       media_type: 'tv'
     }));
 
+    // Filter movies to only include those within the last 30 days through next 90 days
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(now.getDate() - 30);
+    
+    const ninetyDaysFromNow = new Date(now);
+    ninetyDaysFromNow.setDate(now.getDate() + 90);
+    
+    const filteredMovies = moviesWithMediaType.filter((item: any) => {
+      if (!item.release_date) return false;
+      const releaseDate = new Date(item.release_date);
+      return releaseDate >= thirtyDaysAgo && releaseDate <= ninetyDaysFromNow;
+    });
+
+    // Filter TV shows to only include those within the last 30 days through next 90 days
+    const filteredTV = tvsWithMediaType.filter((item: any) => {
+      if (!item.first_air_date) return false;
+      const firstAirDate = new Date(item.first_air_date);
+      return firstAirDate >= thirtyDaysAgo && firstAirDate <= ninetyDaysFromNow;
+    });
+
     // Merge and sort by release date
-    const mergedResults = [...moviesWithMediaType, ...tvsWithMediaType]
+    const mergedResults = [...filteredMovies, ...filteredTV]
       .sort((a: any, b: any) => {
         const dateA = a.release_date || a.first_air_date;
         const dateB = b.release_date || b.first_air_date;
