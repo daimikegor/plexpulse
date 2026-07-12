@@ -37,8 +37,8 @@ export default async function SearchPage({
   }
   
   return (
-    <div className="min-h-screen bg-[#0E1015] text-[#F3F1EA] p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#0E1015] text-[#F3F1EA] flex flex-col items-center justify-center p-4">
+      <div className="max-w-6xl w-full">
         <h1 className="text-3xl font-bold mb-6 text-teal-300">Search Results</h1>
         
         {query ? (
