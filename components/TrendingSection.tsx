@@ -57,51 +57,58 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
   };
 
   return (
-    <div className="mb-12">
-      <div className="flex justify-between items-center mb-4 relative">
-        <h2 className="text-2xl font-bold text-teal-300">Trending This Week</h2>
+    <div className="shelf">
+      <div className="shelf__head">
+        <h2 className="shelf__heading">Trending This Week</h2>
         {showScrollButtons && (
-          <>
+          <div className="shelf__nav-group">
             <button 
               onClick={() => handleScroll('left')}
-              className="absolute right-12 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors"
+              className="shelf__nav"
             >
               <ChevronLeft size={16} />
             </button>
             <button 
               onClick={() => handleScroll('right')}
-              className="absolute right-0 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors"
+              className="shelf__nav"
             >
               <ChevronRight size={16} />
             </button>
-          </>
+          </div>
         )}
       </div>
       {trendingData && trendingData.results ? (
         <div className="relative">
           <div 
-            className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide pt-6 -mt-6" 
+            className="shelf__row" 
             id="trending-row"
           >
             {trendingData.results.map((item: any) => (
               <div 
                 key={item.id} 
-                className="flex-shrink-0 w-48 relative cursor-pointer"
+                className="ticket-wrap ticket-wrap--compact"
                 onClick={() => handlePosterClick(item)}
               >
-                <PosterImage 
-                  src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
-                  alt={item.name || item.title}
-                  mediaType={item.media_type}
-                />
-                <p className="mt-2 text-sm truncate">
-                  {item.name || item.title}
-                  {item.release_date || item.first_air_date ? (
-                    <span className="text-gray-400 text-xs block">
-                      ({new Date(item.release_date || item.first_air_date).getFullYear()})
-                    </span>
-                  ) : null}
-                </p>
+                <div className="ticket ticket--compact">
+                  <div className="ticket__poster-wrap">
+                    <PosterImage 
+                      src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
+                      alt={item.name || item.title}
+                      mediaType={item.media_type}
+                      className="ticket__poster"
+                    />
+                  </div>
+                  <div className="ticket__stub">
+                    <p className="ticket__title">
+                      {item.name || item.title}
+                    </p>
+                    {item.release_date || item.first_air_date ? (
+                      <span className="ticket__meta">
+                        ({new Date(item.release_date || item.first_air_date).getFullYear()})
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             ))}
           </div>

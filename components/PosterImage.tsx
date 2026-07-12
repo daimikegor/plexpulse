@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-export function PosterImage({ src, alt, mediaType }: { src: string; alt: string; mediaType?: 'movie' | 'tv' }) {
+export function PosterImage({ src, alt, mediaType, className }: { src: string; alt: string; mediaType?: 'movie' | 'tv'; className?: string }) {
   const [imageSrc, setImageSrc] = useState(src);
 
   const handleError = () => {
@@ -22,7 +22,7 @@ export function PosterImage({ src, alt, mediaType }: { src: string; alt: string;
         width={342}
         height={513}
         onError={handleError}
-        className="w-full h-auto rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105"
+        className={`w-full h-auto rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 ${className || ''}`}
       />
       {mediaType && (
         <div className="absolute top-2 left-2 z-10">

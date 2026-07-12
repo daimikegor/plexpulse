@@ -17,43 +17,33 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="bg-[#1A1D25] p-4 z-50">
-      {/* Decorative dotted border */}
-      <div className="border-t border-dotted border-amber-500 mb-4"></div>
+    <header className="marquee">
+      <div className="marquee__bulbs"></div>
       
-      <div className="max-w-6xl mx-auto text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Ticket size={32} className="text-teal-400" />
-          <Link href="/dashboard" className="text-4xl font-bold text-teal-400 hover:text-teal-300 transition-colors">
-            PlexPulse
-          </Link>
-        </div>
-        
-        <p className="text-gray-400 mb-4">Discover. Request. Watch.</p>
-        
-        <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-          <div className="relative">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search movies, TV shows..."
-              className="w-full bg-[#0E1015] border border-[#2A2D35] rounded-lg py-2 px-4 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-            <button 
-              type="submit"
-              className="absolute left-3 top-2.5 text-gray-400 hover:text-white"
-            >
-              <Search size={20} />
-            </button>
-            <button 
-              type="button"
-              onClick={handleSearch}
-              className="absolute right-3 top-2.5 text-gray-400 hover:text-white"
-            >
-              <Search size={20} />
-            </button>
-          </div>
+      <div className="marquee__brand">
+        <Ticket size={32} className="marquee__mark" />
+        <Link href="/dashboard" className="marquee__title">
+          PlexPulse
+        </Link>
+      </div>
+      
+      <p className="marquee__subtitle">Discover. Request. Watch.</p>
+      
+      <div className="search-bar">
+        <form onSubmit={handleSearch} className="search-bar__row">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search movies, TV shows..."
+            id="search-input"
+          />
+          <button 
+            type="submit"
+            className="btn btn--gold search-submit-btn"
+          >
+            <Search size={20} />
+          </button>
         </form>
       </div>
     </header>
