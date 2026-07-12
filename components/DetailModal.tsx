@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Star, Play } from 'lucide-react';
 
 export function DetailModal({ 
@@ -15,6 +15,10 @@ export function DetailModal({
   const [isClient, setIsClient] = useState(false);
   const [extendedItem, setExtendedItem] = useState<any>(null);
   const [showTrailer, setShowTrailer] = useState(false);
+  const castRowRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
 
   useEffect(() => {
     setIsClient(true);
@@ -36,6 +40,44 @@ export function DetailModal({
       fetchExtendedDetails();
     }
   }, [isOpen, item]);
+
+  useEffect(() => {
+    const castRow = castRowRef.current;
+    if (!castRow) return;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      isDraggingRef.current = true;
+      startXRef.current = e.pageX - castRow.offsetLeft;
+      scrollLeftRef.current = castRow.scrollLeft;
+      castRow.style.cursor = 'grabbing';
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      e.preventDefault();
+      const x = e.pageX - castRow.offsetLeft;
+      const walk = (x - startXRef.current) * 2; // Adjust scroll speed
+      castRow.scrollLeft = scrollLeftRef.current - walk;
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      if (castRow) {
+        castRow.style.cursor = 'grab';
+      }
+    };
+
+    // Add event listeners
+    castRow.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      castRow.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   if (!isClient || !isOpen) return null;
 
@@ -166,7 +208,10 @@ export function DetailModal({
                     {extendedItem?.credits?.cast && extendedItem.credits.cast.length > 0 && (
                       <div className="mt-6">
                         <h3 className="text-xl font-bold mb-4 text-teal-300">Cast</h3>
-                        <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
+                        <div 
+                          ref={castRowRef}
+                          className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide cursor-grab"
+                        >
                           {extendedItem.credits.cast.slice(0, 10).map((actor: any) => (
                             <div 
                               key={actor.id} 
