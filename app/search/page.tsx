@@ -9,8 +9,6 @@ export default async function SearchPage({
   await requireAuth();
   
   const query = searchParams.q || '';
-  const type = searchParams.type || 'all';
-  
   let results = [];
   
   if (query) {
@@ -21,13 +19,7 @@ export default async function SearchPage({
         throw new Error('TMDB_API_KEY is not set in environment variables');
       }
       
-      let url = '';
-      
-      if (type === 'all') {
-        url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
-      } else {
-        url = `https://api.themoviedb.org/3/search/${type}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
-      }
+      const url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
       
       const response = await fetch(url);
       
@@ -54,36 +46,6 @@ export default async function SearchPage({
             Showing results for: <span className="text-white">{query}</span>
           </p>
         ) : null}
-        
-        <div className="flex gap-2 mb-6">
-          <button
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              type === 'all'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
-          >
-            All
-          </button>
-          <button
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              type === 'movie'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
-          >
-            Movies
-          </button>
-          <button
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              type === 'tv'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
-          >
-            Series
-          </button>
-        </div>
         
         {results.length > 0 ? (
           <SearchResultsGrid items={results} />
