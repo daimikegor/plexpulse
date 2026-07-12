@@ -105,16 +105,17 @@ export function DetailModal({
               
               <div className="modal-body">
                 <div>
-                  <div className="modal-body__poster">
-                    <img src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                      alt={item.title || item.name} />
+                  <div className="modal-body__poster-col">
+                    <div className="modal-body__poster">
+                      <img src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                        alt={item.title || item.name} />
+                    </div>
+                    {trailer && (
+                      <button className="trailer-play-btn" onClick={() => setShowTrailer(true)}>
+                        <Play size={16} /> Play Trailer
+                      </button>
+                    )}
                   </div>
-                  {trailer && (
-                    <button className="trailer-play-btn" onClick={() => setShowTrailer(true)}>
-                      <Play size={16} /> Play Trailer
-                    </button>
-                  )}
-                </div>
                 <div>
                   <p className="modal-meta">
                     {item.media_type === 'movie' ? 'FILM' : 'SERIES'} · {itemYear} · {runtime ? `${runtime} MIN` : ''} · ★
