@@ -1,0 +1,1196 @@
+/* ---------------------------------------------------------------------
+   Design tokens
+   Palette: near-black marquee night, warm bulb-gold accent, muted teal
+   for confirmed states. Display face is Fraunces (a marquee has real
+   character); body/UI is Inter for legibility on small screens; metadata
+   tags use IBM Plex Mono for a ticket-stub, printed feel.
+--------------------------------------------------------------------- */
+
+:root {
+  --bg: #0E1015;
+  --surface: #171A21;
+  --surface-2: #1D212A;
+  --border: #2A2E38;
+  --text: #F3F1EA;
+  --text-muted: #8D919B;
+  --gold: #E8A33D;
+  --gold-dim: #B87F2C;
+  --teal: #4FB6A0;
+  --pending: #6E9BC9;
+  --radius: 10px;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+* { box-sizing: border-box; }
+
+.is-hidden { display: none; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+/* Faint film-reel sprocket motif down each edge -- signature detail,
+   quiet enough not to fight the content. Hidden on narrow screens where
+   there's no room for it. */
+.reel-edge {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  background-image: radial-gradient(circle, var(--surface-2) 5px, transparent 5.5px);
+  background-size: 22px 34px;
+  background-repeat: repeat-y;
+  opacity: 0.5;
+  z-index: 0;
+}
+.reel-edge--left { left: 0; }
+.reel-edge--right { right: 0; }
+@media (max-width: 700px) {
+  .reel-edge { display: none; }
+}
+
+/* ---------------------------------------------------------------------
+   Marquee header
+--------------------------------------------------------------------- */
+
+.marquee {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.marquee__bulbs {
+  height: 4px;
+  max-width: 420px;
+  margin: 0 auto 1.75rem;
+  background-image: radial-gradient(circle, var(--gold) 2px, transparent 2.5px);
+  background-size: 18px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.85;
+}
+
+.marquee__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.marquee__mark {
+  width: clamp(28px, 4vw, 38px);
+  height: clamp(28px, 4vw, 38px);
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.marquee__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.marquee__subtitle {
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin: 0.5rem 0 1.75rem;
+}
+
+.auth-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.auth-area__user {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.auth-area__user strong {
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------------
+   Buttons
+--------------------------------------------------------------------- */
+
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease, opacity 0.15s ease;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn--gold {
+  background: var(--gold);
+  color: #1A1305;
+}
+.btn--gold:hover { background: #F0B457; }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+.btn--ghost:hover { color: var(--text); border-color: var(--text-muted); }
+
+/* ---------------------------------------------------------------------
+   Discover shelves (trending/popular/upcoming rows)
+--------------------------------------------------------------------- */
+
+.discover-shelves,
+.category-view {
+  margin-bottom: 2rem;
+}
+.discover-shelves.is-hidden,
+.category-view.is-hidden { display: none; }
+
+.category-view__back {
+  margin-bottom: 1rem;
+}
+.category-view__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.category-view__heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.filter-toggle {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.filter-toggle__btn {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.filter-toggle__btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+.filter-toggle__btn.is-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1206;
+}
+
+.shelf {
+  margin-bottom: 1.75rem;
+}
+
+.shelf__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.shelf__row {
+  display: flex;
+  gap: 1rem;
+  padding-top: 8px;
+  margin-top: -8px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+.shelf__row::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge -- native scroll stays, just no visible bar */
+}
+
+.shelf__nav-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.shelf__nav {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+.shelf__nav:hover:not(:disabled),
+.shelf__nav:focus-visible:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.shelf__nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.shelf__heading {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.15s ease;
+}
+.heading-arrow {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.shelf__heading:hover .heading-arrow,
+.shelf__heading:focus-visible .heading-arrow {
+  transform: translateX(2px);
+  border-color: var(--gold);
+  background: rgba(232, 163, 61, 0.12);
+  color: var(--gold);
+}
+
+/* ticket-wrap: outer container holding the card + button as separate siblings.
+   The button lives here, below the card border, so its position is completely
+   independent of title/genre text length inside the card. */
+.ticket-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ticket-wrap--compact {
+  flex: 0 0 185px;
+  scroll-snap-align: start;
+}
+.results-grid .ticket-wrap--compact {
+  flex: unset;
+  width: 100%;
+}
+/* ticket must fill the wrapper so aspect-ratio on poster-wrap works */
+.ticket-wrap > .ticket {
+  flex: 1;
+}
+
+/* Remove the min-height hack from the stub now that the button is outside */
+.ticket--compact .ticket__stub {
+  padding: 0.6rem 0.7rem 0.8rem;
+  gap: 0.25rem;
+}
+.ticket--compact .ticket__perforation {
+  display: none;
+}
+/* Button sits below the card border in the wrapper, not inside the card */
+.ticket-wrap .ticket__request-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  border-radius: 8px;
+}
+.ticket--compact .ticket__title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em; /* keeps titles vertically aligned even at 1 line */
+}
+.ticket--compact .ticket__meta {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  overflow: hidden;
+  line-height: 1.3;
+  min-height: 1.76em; /* reserves space for 2 lines so the button below stays aligned */
+}
+.ticket--compact .ticket__request-btn {
+  font-size: 0.66rem;
+  padding: 0.35rem 0.55rem;
+  margin-top: 0.15rem;
+}
+
+@media (max-width: 560px) {
+  .ticket--compact { flex-basis: 135px; }
+}
+
+/* ---------------------------------------------------------------------
+   Search + gate
+--------------------------------------------------------------------- */
+
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.gate {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 3rem 1rem;
+  font-size: 1.05rem;
+}
+
+.search-bar {
+  margin-bottom: 2rem;
+}
+
+.search-bar__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-submit-btn {
+  flex-shrink: 0;
+}
+
+#search-input {
+  flex: 1;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+#search-input:focus {
+  border-color: var(--gold-dim);
+}
+#search-input::placeholder { color: var(--text-muted); }
+
+.search-clear-btn {
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.search-clear-btn:hover {
+  color: var(--text);
+  border-color: var(--gold-dim);
+}
+
+.search-context-heading {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: -0.75rem 0 1.25rem;
+  color: var(--text);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 3rem;
+}
+.empty-state.is-hidden { display: none; }
+
+/* ---------------------------------------------------------------------
+   Chip rows (genres, streaming services) -- same scrollable-row mechanism
+   as the poster shelves (see .shelf__row), just holding cards instead of
+   ticket components. .shelf__row--chips only adjusts height/alignment.
+--------------------------------------------------------------------- */
+
+.shelf__row--chips {
+  align-items: stretch;
+}
+
+.card-chip {
+  flex: 0 0 170px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0.6rem;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+  scroll-snap-align: start;
+}
+.card-chip:hover,
+.card-chip:focus-visible {
+  border-color: var(--gold-dim);
+  transform: translateY(-2px);
+}
+.card-chip__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.genre-chip {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+.genre-chip__label {
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Distinct, desaturated accent color per genre, similar spirit to Seerr's
+   tinted genre cards. */
+.genre-chip--action { background: linear-gradient(145deg, #6b2432, #3a141c); }
+.genre-chip--comedy { background: linear-gradient(145deg, #8a6a1f, #4a3810); }
+.genre-chip--horror { background: linear-gradient(145deg, #3d1010, #1a0808); }
+.genre-chip--scifi_fantasy { background: linear-gradient(145deg, #24406b, #14223a); }
+.genre-chip--romance { background: linear-gradient(145deg, #7a2f52, #3f172a); }
+.genre-chip--animation { background: linear-gradient(145deg, #1f6b60, #123a33); }
+.genre-chip--drama { background: linear-gradient(145deg, #4a2f6b, #271a3a); }
+.genre-chip--family { background: linear-gradient(145deg, #2f6b35, #1a3a1e); }
+
+/* ---------------------------------------------------------------------
+   Results grid + ticket-stub cards (signature element)
+--------------------------------------------------------------------- */
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+@media (max-width: 1400px) {
+  .results-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 1000px) {
+  .results-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .results-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.9rem;
+  }
+}
+
+.ticket {
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.ticket:hover { transform: translateY(-3px); border-color: var(--gold-dim); }
+
+.ticket__poster-wrap {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: var(--surface-2);
+  cursor: pointer;
+  overflow: hidden;
+}
+.ticket__poster-wrap:hover .ticket__poster {
+  filter: brightness(1.08);
+  transform: scale(1.06);
+}
+.ticket__poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+.ticket__poster-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.media-type-badge {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(14, 16, 21, 0.82);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.in-library-badge {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.in-library-badge--available {
+  background: var(--teal);
+  color: #06231d;
+}
+.in-library-badge--requested {
+  background: var(--pending);
+  color: #0c1a26;
+}
+
+/* Perforated tear line between poster and stub, like a real ticket */
+.ticket__perforation {
+  height: 0;
+  border-top: 2px dashed var(--border);
+  margin: 0;
+  position: relative;
+}
+.ticket__perforation::before,
+.ticket__perforation::after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  background: var(--bg);
+  border-radius: 50%;
+}
+.ticket__perforation::before { left: -7px; }
+.ticket__perforation::after { right: -7px; }
+
+.ticket__stub {
+  padding: 0.9rem 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.ticket__title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1.02rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.ticket__meta {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ticket__request-btn {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border: 1px dashed var(--gold-dim);
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.ticket__request-btn:hover {
+  background: rgba(232, 163, 61, 0.1);
+}
+.ticket__request-btn:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.ticket__request-btn.is-added {
+  border-style: solid;
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgba(79, 182, 160, 0.1);
+}
+.ticket__request-btn.is-requested {
+  border-style: solid;
+  border-color: var(--pending);
+  color: var(--pending);
+  background: rgba(110, 155, 201, 0.12);
+}
+.ticket__request-btn.is-error {
+  border-color: #C2554B;
+  color: #C2554B;
+}
+
+/* ---------------------------------------------------------------------
+   Details modal
+--------------------------------------------------------------------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 7, 10, 0.78);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 20;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: min(900px, 96%);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-loading {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(14, 16, 21, 0.75);
+  color: var(--text);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+.modal-close:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+.modal-backdrop {
+  height: 200px;
+  background-size: cover;
+  background-position: center 20%;
+  border-radius: 14px 14px 0 0;
+  position: relative;
+}
+.modal-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--surface) 0%, transparent 60%);
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+@media (max-width: 560px) {
+  .modal-body { grid-template-columns: 100px 1fr; }
+}
+
+.modal-body__poster {
+  position: relative;
+}
+.modal-body__poster img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.trailer-play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.15rem 0 0.9rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--gold-dim);
+  background: rgba(232, 163, 61, 0.1);
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.trailer-play-btn:hover,
+.trailer-play-btn:focus-visible {
+  background: var(--gold);
+  color: #1a1206;
+  transform: translateY(-1px);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+
+.modal-tagline {
+  font-style: italic;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.modal-original-title {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0 0 0.35rem;
+}
+
+.modal-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.fact-chip {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+.fact-chip--available {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgba(79, 182, 160, 0.1);
+}
+.fact-chip--requested {
+  border-color: var(--pending);
+  color: var(--pending);
+  background: rgba(110, 155, 201, 0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.fact-chip--requested svg {
+  flex-shrink: 0;
+}
+
+.modal-meta {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.35rem;
+}
+
+.modal-genres {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.modal-streaming {
+  margin: 0.9rem 0;
+}
+.modal-streaming h3 {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.5rem;
+}
+.streaming-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.streaming-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 4px;
+}
+
+.modal-overview {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0 0 1rem;
+}
+
+.modal-request-btn {
+  display: inline-block;
+  width: auto;
+}
+
+.modal-cast {
+  padding: 0 1.5rem 1.5rem;
+}
+.modal-cast h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  color: var(--text-muted);
+}
+
+.cast-row {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  padding-bottom: 0.9rem;
+}
+.cast-row::-webkit-scrollbar { height: 6px; }
+.cast-row::-webkit-scrollbar-track { background: transparent; }
+.cast-row::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.cast-chip {
+  flex: 0 0 92px;
+  text-align: center;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+.cast-chip:disabled {
+  cursor: default;
+}
+.cast-chip img,
+.cast-chip__fallback {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  margin: 0 auto 0.4rem;
+  transition: border-color 0.15s ease;
+}
+.cast-chip:not(:disabled):hover img,
+.cast-chip:not(:disabled):hover .cast-chip__fallback,
+.cast-chip:not(:disabled):focus-visible img,
+.cast-chip:not(:disabled):focus-visible .cast-chip__fallback {
+  border-color: var(--gold);
+}
+.cast-chip__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-family: var(--font-display);
+}
+.cast-chip__name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+  transition: color 0.15s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 3.75em;
+}
+.cast-chip:not(:disabled):hover .cast-chip__name,
+.cast-chip:not(:disabled):focus-visible .cast-chip__name {
+  color: var(--gold);
+}
+.cast-chip__character {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------
+   Toast
+--------------------------------------------------------------------- */
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+.toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---------------------------------------------------------------------
+   Motion preference
+--------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ticket, .btn, .toast, .ticket__request-btn { transition: none; }
+}
+
+/* ---------------------------------------------------------------------
+   Trailer theater mode
+--------------------------------------------------------------------- */
+
+.trailer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(6, 7, 10, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.trailer-theater {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.7);
+}
+
+.trailer-theater__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.9rem;
+  background: #0e1015;
+}
+.trailer-theater__title {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-theater__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+.trailer-theater__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.trailer-theater__controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.trailer-fullscreen-btn,
+.trailer-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.15s ease;
+}
+.trailer-fullscreen-btn:hover,
+.trailer-close-btn:hover {
+  background: var(--gold);
+  color: #1a1206;
+}
+
+@media (max-width: 560px) {
+  .trailer-overlay { padding: 0; }
+  .trailer-theater { border-radius: 0; }
+}
+
+/* ---------------------------------------------------------------------
+   Home user picker -- shown when the Plex server admin signs in,
+   letting managed users select their own profile
+--------------------------------------------------------------------- */
+
+.home-picker {
+  max-width: 560px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.home-picker__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.home-picker__user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 1rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+  width: 110px;
+}
+.home-picker__user:hover,
+.home-picker__user:focus-visible {
+  border-color: var(--gold-dim);
+  transform: translateY(-2px);
+}
+
+.home-picker__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--text-muted);
+}
+.home-picker__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-picker__name {
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.home-picker__pin-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
