@@ -24,7 +24,7 @@ export default function Landing() {
     const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
     const popup = window.open(
-      `https://app.plex.tv/auth#?clientID=${process.env.NEXT_PUBLIC_PLEX_CLIENT_ID}&code=${code}&forwardUrl=${window.location.origin}/api/auth/callback`,
+      `https://app.plex.tv/auth#?clientID=${process.env.NEXT_PUBLIC_PLEX_CLIENT_ID}&code=${code}&forwardUrl=${encodeURIComponent(`${window.location.origin}/api/auth/callback`)}`,
       'PlexAuth',
       `width=${width},height=${height},left=${left},top=${top}`
     );
