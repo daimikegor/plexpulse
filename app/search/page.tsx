@@ -119,7 +119,7 @@ export default async function SearchPage({
       <h1 className="search-context-heading">Search Results</h1>
       
       {query ? (
-        <p>
+        <p style={{ marginBottom: '1.25rem' }}>
           Showing results for: <span className="text-white">{query}</span>
         </p>
       ) : null}
