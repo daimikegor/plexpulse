@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function POST() {
-  const clientID = process.env.NEXT_PUBLIC_PLEX_CLIENT_ID || 'plexpulse-default-id';
+  const clientID = process.env.PLEX_CLIENT_ID || 'plexpulse-default-id';
   
   try {
     const res = await fetch('https://plex.tv/api/v2/pins', {
