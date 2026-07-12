@@ -1204,6 +1204,99 @@ main {
 }
 
 /* ---------------------------------------------------------------------
+   Sidebar
+--------------------------------------------------------------------- */
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+}
+
+.sidebar__brand {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.sidebar__bulbs {
+  height: 4px;
+  max-width: 140px;
+  margin: 0 auto 1rem;
+  background-image: radial-gradient(circle, var(--gold) 2px, transparent 2.5px);
+  background-size: 18px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.85;
+}
+
+.sidebar__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.sidebar__tagline {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.sidebar__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.15s ease, color 0.15s ease;
+  text-decoration: none;
+}
+
+.sidebar__nav-item:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.sidebar__nav-item.is-active {
+  background: rgba(232,163,61,0.12);
+  color: var(--gold);
+}
+
+.sidebar__user {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar__username {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.sidebar__logout-btn {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------------
    Home user picker -- shown when the Plex server admin signs in,
    letting managed users select their own profile
 --------------------------------------------------------------------- */
