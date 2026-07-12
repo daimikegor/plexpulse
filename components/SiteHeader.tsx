@@ -38,6 +38,13 @@ export function SiteHeader() {
             >
               <Search size={20} />
             </button>
+            <button 
+              type="button"
+              onClick={handleSearch}
+              className="absolute right-3 top-2.5 text-gray-400 hover:text-white"
+            >
+              <Search size={20} />
+            </button>
           </div>
         </form>
       </div>

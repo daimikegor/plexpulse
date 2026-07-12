@@ -36,7 +36,9 @@ export default async function SearchPage({
       }
       
       const data = await response.json();
-      results = (data.results || []).filter((item: any) => item.media_type !== 'person');
+      results = (data.results || []).filter((item: any) => 
+        item.media_type === 'movie' || item.media_type === 'tv'
+      );
     } catch (error) {
       console.error('Error fetching search results:', error);
     }
