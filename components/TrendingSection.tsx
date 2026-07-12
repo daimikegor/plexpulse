@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react';
 import { PosterImage } from '@/components/PosterImage';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { DetailModal } from '@/components/DetailModal';
 
 export function TrendingSection({ trendingData }: { trendingData: any }) {
   const [showScrollButtons, setShowScrollButtons] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const row = document.getElementById('trending-row');
@@ -43,6 +46,16 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
     }
   };
 
+  const handlePosterClick = (item: any) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
   return (
     <div className="mb-12">
       <div className="flex justify-between items-center mb-4 relative">
@@ -71,7 +84,11 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
             id="trending-row"
           >
             {trendingData.results.map((item: any) => (
-              <div key={item.id} className="flex-shrink-0 w-48 relative">
+              <div 
+                key={item.id} 
+                className="flex-shrink-0 w-48 relative cursor-pointer"
+                onClick={() => handlePosterClick(item)}
+              >
                 <div className="absolute top-2 left-2 z-10">
                   <span className={`text-white text-xs px-2 py-1 rounded-full ${
                     item.media_type === 'movie' ? 'bg-[#1f4fbc]' : 'bg-[#a329bb]'
@@ -90,6 +107,14 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
         </div>
       ) : (
         <p className="text-gray-400">Loading trending content...</p>
+      )}
+      
+      {isModalOpen && selectedItem && (
+        <DetailModal 
+          item={selectedItem} 
+          isOpen={isModalOpen} 
+          onClose={closeModal} 
+        />
       )}
     </div>
   );
