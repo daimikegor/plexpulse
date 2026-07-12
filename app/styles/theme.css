@@ -339,6 +339,9 @@ html, body {
   border: 1.5px solid var(--border);
   color: var(--text-muted);
   transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .shelf__heading:hover .heading-arrow,
 .shelf__heading:focus-visible .heading-arrow {

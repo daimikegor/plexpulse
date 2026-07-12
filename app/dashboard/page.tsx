@@ -17,12 +17,12 @@ export default async function Dashboard() {
   
   return (
     <main>
-      <TrendingSection trendingData={trendingData} />
+      <TrendingSection trendingData={trendingData} categorySlug="trending" />
       <GenreRow genres={movieGenres.genres} mediaType="movie" heading="Movie Genres" />
-      <TrendingSection trendingData={popularData} heading="Popular" rowId="popular-row" />
-      <TrendingSection trendingData={topRatedData} heading="Top Rated" rowId="top-rated-row" />
+      <TrendingSection trendingData={popularData} heading="Popular" rowId="popular-row" categorySlug="popular" />
+      <TrendingSection trendingData={topRatedData} heading="Top Rated" rowId="top-rated-row" categorySlug="top-rated" />
       <GenreRow genres={tvGenres.genres} mediaType="tv" heading="Series Genres" />
-      <TrendingSection trendingData={upcomingData} heading="Upcoming & New" rowId="upcoming-row" />
+      <TrendingSection trendingData={upcomingData} heading="Upcoming & New" rowId="upcoming-row" categorySlug="upcoming" />
     </main>
   );
 }

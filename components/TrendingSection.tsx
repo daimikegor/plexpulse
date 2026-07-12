@@ -4,15 +4,18 @@ import { useEffect, useState } from 'react';
 import { PosterImage } from '@/components/PosterImage';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DetailModal } from '@/components/DetailModal';
+import Link from 'next/link';
 
 export function TrendingSection({ 
   trendingData, 
   heading = "Trending This Week",
-  rowId = "trending-row"
+  rowId = "trending-row",
+  categorySlug
 }: { 
   trendingData: any;
   heading?: string;
   rowId?: string;
+  categorySlug?: string;
 }) {
   const [showScrollButtons, setShowScrollButtons] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -67,7 +70,14 @@ export function TrendingSection({
   return (
     <div className="shelf">
       <div className="shelf__head">
-        <h2 className="shelf__heading">{heading}</h2>
+        {categorySlug ? (
+          <Link href={`/category/${categorySlug}`} className="shelf__heading">
+            {heading}
+            <ChevronRight size={14} className="heading-arrow" />
+          </Link>
+        ) : (
+          <h2 className="shelf__heading">{heading}</h2>
+        )}
         {showScrollButtons && (
           <div className="shelf__nav-group">
             <button 
