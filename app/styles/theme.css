@@ -592,21 +592,10 @@ main {
 
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fill, 155px);
   gap: 1.5rem;
+  justify-content: start;
   align-items: stretch;
-}
-@media (max-width: 1400px) {
-  .results-grid { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 1000px) {
-  .results-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 560px) {
-  .results-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.9rem;
-  }
 }
 
 .ticket {

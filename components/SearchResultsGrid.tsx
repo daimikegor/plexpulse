@@ -26,34 +26,22 @@ export function SearchResultsGrid({ items, hideFilters }: { items: any[]; hideFi
   return (
     <div>
       {!hideFilters && (
-        <div className="flex gap-2 mb-6">
+        <div className="filter-toggle">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeFilter === 'all'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
+            className={`filter-toggle__btn ${activeFilter === 'all' ? 'is-active' : ''}`}
           >
             All
           </button>
           <button
             onClick={() => setActiveFilter('movie')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeFilter === 'movie'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
+            className={`filter-toggle__btn ${activeFilter === 'movie' ? 'is-active' : ''}`}
           >
             Movies
           </button>
           <button
             onClick={() => setActiveFilter('tv')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeFilter === 'tv'
-                ? 'bg-teal-500 text-white'
-                : 'bg-[#0E1015] text-gray-300 hover:bg-[#2A2D35]'
-            }`}
+            className={`filter-toggle__btn ${activeFilter === 'tv' ? 'is-active' : ''}`}
           >
             Series
           </button>
