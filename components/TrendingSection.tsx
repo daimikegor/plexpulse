@@ -1,56 +1,89 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PosterImage } from '@/components/PosterImage';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function TrendingSection({ trendingData }: { trendingData: any }) {
+  const [showScrollButtons, setShowScrollButtons] = useState(false);
+
   useEffect(() => {
     const row = document.getElementById('trending-row');
     if (!row) return;
 
-    const leftButton = document.createElement('button');
-    leftButton.innerHTML = '&lt;';
-    leftButton.className = 'absolute right-12 top-0 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors';
-    leftButton.id = 'scroll-left';
-
-    const rightButton = document.createElement('button');
-    rightButton.innerHTML = '&gt;';
-    rightButton.className = 'absolute right-0 top-0 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors';
-    rightButton.id = 'scroll-right';
-
-    row.parentElement?.appendChild(leftButton);
-    row.parentElement?.appendChild(rightButton);
-
-    const handleScroll = (direction: 'left' | 'right') => {
-      if (row) {
-        const scrollAmount = 300;
-        if (direction === 'right') {
-          row.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        } else {
-          row.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        }
-      }
+    // Check if scrolling is needed
+    const handleScroll = () => {
+      setShowScrollButtons(row.scrollWidth > row.clientWidth);
     };
 
-    leftButton.addEventListener('click', () => handleScroll('left'));
-    rightButton.addEventListener('click', () => handleScroll('right'));
+    // Initial check
+    handleScroll();
+
+    // Listen for scroll events
+    row.addEventListener('scroll', handleScroll);
+    
+    // Handle window resize
+    window.addEventListener('resize', handleScroll);
 
     return () => {
-      leftButton.remove();
-      rightButton.remove();
+      row.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, []);
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    const row = document.getElementById('trending-row');
+    if (!row) return;
+
+    const scrollAmount = 300;
+    if (direction === 'right') {
+      row.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    } else {
+      row.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="mb-12">
       <div className="flex justify-between items-center mb-4 relative">
         <h2 className="text-2xl font-bold text-teal-300">Trending This Week</h2>
+        {showScrollButtons && (
+          <>
+            <button 
+              onClick={() => handleScroll('left')}
+              className="absolute right-12 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button 
+              onClick={() => handleScroll('right')}
+              className="absolute right-0 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </>
+        )}
       </div>
       {trendingData && trendingData.results ? (
         <div className="relative">
-          <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide" id="trending-row">
+          <div 
+            className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide" 
+            id="trending-row"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              '&::-webkit-scrollbar': {
+                display: 'none'
+              }
+            }}
+          >
             {trendingData.results.map((item: any) => (
-              <div key={item.id} className="flex-shrink-0 w-48">
+              <div key={item.id} className="flex-shrink-0 w-48 relative">
+                <div className="absolute top-2 left-2 z-10">
+                  <span className="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
+                    {item.media_type === 'movie' ? 'Movie' : 'TV'}
+                  </span>
+                </div>
                 <PosterImage 
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
                   alt={item.name || item.title}
