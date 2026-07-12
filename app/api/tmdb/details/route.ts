@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
     }
     
     const endpoint = mediaType === 'movie' 
-      ? `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=genres`
-      : `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=genres`;
+      ? `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=genres,videos`
+      : `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=genres,videos`;
     
     const response = await fetch(endpoint);
     
