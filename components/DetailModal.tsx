@@ -80,7 +80,7 @@ export function DetailModal({
               <div className="modal-trailer-header">
                 <button 
                   onClick={handleMainClose}
-                  className="modal-close"
+                  className="modal-trailer-close"
                 >
                   <X size={20} />
                 </button>

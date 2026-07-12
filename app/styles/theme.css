@@ -827,6 +827,24 @@ main {
 }
 .modal-close:hover { border-color: var(--gold-dim); color: var(--gold); }
 
+.modal-trailer-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(14, 16, 21, 0.75);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-trailer-close:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
 .modal-backdrop {
   height: 200px;
   background-size: cover;
