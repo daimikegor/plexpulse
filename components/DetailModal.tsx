@@ -106,12 +106,30 @@ export function DetailModal({
                       alt={item.title || item.name}
                       className="w-full rounded-lg shadow-lg"
                     />
+                    {trailer && (
+                      <div className="mt-4 flex justify-center">
+                        <button 
+                          onClick={() => setShowTrailer(true)}
+                          className="bg-[#1A1D25] hover:bg-[#2A2D35] text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center gap-2"
+                        >
+                          <Play size={16} />
+                          Play Trailer
+                        </button>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="md:w-2/3">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Available</span>
-                      <h2 className="text-2xl font-bold text-teal-300">{item.title || item.name}</h2>
+                      <h2 className="text-2xl font-bold text-teal-300">
+                        {item.title || item.name}
+                        {item.release_date || item.first_air_date ? (
+                          <span className="text-gray-400 text-lg ml-2">
+                            ({new Date(item.release_date || item.first_air_date).getFullYear()})
+                          </span>
+                        ) : null}
+                      </h2>
                     </div>
                     
                     <div className="flex items-center gap-2 mb-4">
@@ -132,16 +150,6 @@ export function DetailModal({
                       >
                         Request
                       </button>
-                      
-                      {trailer && (
-                        <button 
-                          onClick={() => setShowTrailer(true)}
-                          className="bg-[#1A1D25] hover:bg-[#2A2D35] text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center gap-2"
-                        >
-                          <Play size={16} />
-                          Play Trailer
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
