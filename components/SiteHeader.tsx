@@ -17,7 +17,7 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="bg-[#1A1D25] p-4 sticky top-0 z-50">
+    <header className="bg-[#1A1D25] p-4 z-50">
       {/* Decorative dotted border */}
       <div className="border-t border-dotted border-amber-500 mb-4"></div>
       
