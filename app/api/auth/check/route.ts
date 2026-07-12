@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
       headers: {
         'X-Plex-Client-Identifier': process.env.NEXT_PUBLIC_PLEX_CLIENT_ID || 'plexpulse',
         'Accept': 'application/json'
-      }
+      },
+      cache: 'no-store'
     });
 
     if (!res.ok) throw new Error('Failed to check PIN status');
