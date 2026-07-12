@@ -21,7 +21,7 @@ export function PosterImage({ src, alt }: { src: string; alt: string }) {
       width={342}
       height={513}
       onError={handleError}
-      className="w-full h-auto rounded-lg shadow-lg"
+      className="w-full h-auto rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105"
     />
   );
 }
