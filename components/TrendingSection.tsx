@@ -101,6 +101,8 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
                   <div className="ticket__stub">
                     <p className="ticket__title">
                       {item.name || item.title}
+                      {(item.release_date || item.first_air_date) &&
+                        ` (${new Date(item.release_date || item.first_air_date).getFullYear()})`}
                     </p>
                     {item.release_date || item.first_air_date ? (
                       <span className="ticket__meta">
