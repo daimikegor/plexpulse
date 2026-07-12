@@ -18,10 +18,6 @@
   --teal: #4FB6A0;
   --pending: #6E9BC9;
   --radius: 10px;
-
-  --font-display: "Fraunces", Georgia, serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
 }
 
 * { box-sizing: border-box; }
