@@ -1,5 +1,6 @@
 import { getTrendingContent } from '@/lib/tmdb';
 import { PosterImage } from '@/components/PosterImage';
+import { FilmographyItem } from '@/components/FilmographyItem';
 
 export default async function PersonPage({ params }: { params: { id: string } }) {
   const personId = params.id;
@@ -91,35 +92,15 @@ export default async function PersonPage({ params }: { params: { id: string } })
             {filmography.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {filmography.map((item: any) => (
-                  <div 
+                  <FilmographyItem 
                     key={item.id} 
-                    className="cursor-pointer group"
+                    item={item}
                     onClick={() => {
                       // This would open the detail modal in a real implementation
                       // For now, we'll just log to console
                       console.log('Opening detail for:', item.id);
                     }}
-                  >
-                    <div className="relative">
-                      {item.poster_path ? (
-                        <PosterImage 
-                          src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
-                          alt={item.title || item.name}
-                        />
-                      ) : (
-                        <div className="bg-gray-700 rounded-lg w-full h-48 flex items-center justify-center">
-                          <span className="text-gray-400 text-sm">No Image</span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <span className="text-white text-sm font-bold text-center px-2">View Details</span>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-sm truncate">{item.title || item.name}</p>
-                    <p className="text-xs text-gray-400">
-                      {item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date).getFullYear() : ''}
-                    </p>
-                  </div>
+                  />
                 ))}
               </div>
             ) : (
