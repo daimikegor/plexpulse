@@ -8,8 +8,8 @@ export default async function Dashboard() {
   const trendingData = await getTrendingContent();
   
   return (
-    <div className="min-h-screen bg-[#0E1015] text-[#F3F1EA] flex flex-col items-center justify-center p-4">
-      <div className="max-w-4xl w-full text-center">
+    <div className="min-h-screen bg-[#0E1015] text-[#F3F1EA] p-4">
+      <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-6 text-teal-400">Welcome, {session.username}!</h1>
         <p className="text-lg mb-8">You are successfully logged in to PlexPulse.</p>
         
