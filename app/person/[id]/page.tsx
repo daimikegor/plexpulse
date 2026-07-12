@@ -24,10 +24,20 @@ export default async function PersonPage({ params }: { params: { id: string } })
     const personData = await personResponse.json();
     
     // Extract filmography from combined_credits
-    const filmography = [
+    let filmography = [
       ...(personData.combined_credits?.cast || []),
       ...(personData.combined_credits?.crew || [])
-    ].sort((a: any, b: any) => {
+    ];
+    
+    // Deduplicate by ID
+    const seenIds = new Set();
+    filmography = filmography.filter(item => {
+      if (seenIds.has(item.id)) {
+        return false;
+      }
+      seenIds.add(item.id);
+      return true;
+    }).sort((a: any, b: any) => {
       // Sort by release date or first air date (newest first)
       const dateA = a.release_date || a.first_air_date;
       const dateB = b.release_date || b.first_air_date;
