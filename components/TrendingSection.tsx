@@ -80,7 +80,7 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
       {trendingData && trendingData.results ? (
         <div className="relative">
           <div 
-            className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide" 
+            className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide pt-6 -mt-6" 
             id="trending-row"
           >
             {trendingData.results.map((item: any) => (
