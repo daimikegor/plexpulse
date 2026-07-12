@@ -1,6 +1,6 @@
 import { getTrendingContent } from '@/lib/tmdb';
 import { PosterImage } from '@/components/PosterImage';
-import { FilmographyItem } from '@/components/FilmographyItem';
+import { FilmographyGrid } from '@/components/FilmographyGrid';
 
 export default async function PersonPage({ params }: { params: { id: string } }) {
   const personId = params.id;
@@ -90,14 +90,7 @@ export default async function PersonPage({ params }: { params: { id: string } })
             <h2 className="text-2xl font-bold mb-4 text-teal-300">Filmography</h2>
             
             {filmography.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {filmography.map((item: any) => (
-                  <FilmographyItem 
-                    key={item.id} 
-                    item={item}
-                  />
-                ))}
-              </div>
+              <FilmographyGrid items={filmography} />
             ) : (
               <p className="text-gray-400">No filmography data available.</p>
             )}
