@@ -471,7 +471,7 @@ main {
 }
 .search-bar__submit:hover {
   background: #F0B457;
-  transform: scale(1.05);
+  transform: translateY(-50%) scale(1.05);
 }
 
 #search-input {
