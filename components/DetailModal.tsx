@@ -77,7 +77,7 @@ export function DetailModal({
           {showTrailer && trailer ? (
             // Trailer view
             <div className="relative">
-              <div className="h-[50px] flex items-center justify-end px-4 bg-[#0E1015]" style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+              <div className="modal-trailer-header">
                 <button 
                   onClick={handleMainClose}
                   className="modal-close"
