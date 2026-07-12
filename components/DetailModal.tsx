@@ -22,14 +22,7 @@ export function DetailModal({
       // Fetch extended details when modal opens
       const fetchExtendedDetails = async () => {
         try {
-          const API_KEY = process.env.TMDB_API_KEY;
-          if (!API_KEY) return;
-          
-          const endpoint = item.media_type === 'movie' 
-            ? `https://api.themoviedb.org/3/movie/${item.id}?api_key=${API_KEY}&append_to_response=genres`
-            : `https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}&append_to_response=genres`;
-          
-          const response = await fetch(endpoint);
+          const response = await fetch(`/api/tmdb/details?id=${item.id}&mediaType=${item.media_type}`);
           if (response.ok) {
             const data = await response.json();
             setExtendedItem(data);
