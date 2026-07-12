@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Star, Play } from 'lucide-react';
+import { X, Play } from 'lucide-react';
 
 export function DetailModal({ 
   item, 
@@ -43,10 +43,6 @@ export function DetailModal({
   const genres = extendedItem?.genres?.map((g: any) => g.name).join(', ') || 
                  item.genres?.map((g: any) => g.name).join(', ') || '';
   
-  const runtimeText = runtime ? `${Math.floor(runtime / 60)}h ${runtime % 60}m` : '';
-  const displayText = runtimeText && genres ? `${runtimeText} • ${genres}` : 
-                     runtimeText || genres || '';
-
   // Find the first YouTube trailer
   const trailer = extendedItem?.videos?.results?.find(
     (video: any) => video.type === 'Trailer' && video.site === 'YouTube'
@@ -60,16 +56,18 @@ export function DetailModal({
     }
   };
 
+  // Extract year from release date or first air date
+  const itemYear = item.release_date ? new Date(item.release_date).getFullYear() : 
+                  item.first_air_date ? new Date(item.first_air_date).getFullYear() : 
+                  null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-      <div 
-        className="relative bg-[#0E1015] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="modal-overlay" onClick={handleMainClose}>
+      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         {!showTrailer && (
           <button 
             onClick={handleMainClose}
-            className="absolute top-4 right-4 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors z-10"
+            className="modal-close"
           >
             <X size={20} />
           </button>
@@ -79,10 +77,10 @@ export function DetailModal({
           {showTrailer && trailer ? (
             // Trailer view
             <div className="relative">
-              <div className="h-[50px] flex items-center justify-end px-4 bg-[#0E1015]">
+              <div className="h-[50px] flex items-center justify-end px-4 bg-[#0E1015]" style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
                 <button 
                   onClick={handleMainClose}
-                  className="w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors"
+                  className="modal-close"
                 >
                   <X size={20} />
                 </button>
@@ -102,104 +100,71 @@ export function DetailModal({
             <>
               {/* Backdrop banner */}
               {item.backdrop_path && (
-                <div className="relative h-[250px] w-full overflow-hidden hidden md:block">
-                  <img 
-                    src={`https://image.tmdb.org/t/p/w1280${item.backdrop_path}`} 
-                    alt={item.title || item.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0E1015] to-transparent"></div>
-                </div>
+                <div className="modal-backdrop" style={{ backgroundImage: `url(https://image.tmdb.org/t/p/w1280${item.backdrop_path})` }}></div>
               )}
               
-              <div className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="md:w-1/3">
-                    <img 
-                      src={`https://image.tmdb.org/t/p/w500${item.poster_path}`} 
-                      alt={item.title || item.name}
-                      className="w-full rounded-lg shadow-lg"
-                    />
-                    {trailer && (
-                      <div className="mt-4 flex justify-center">
-                        <button 
-                          onClick={() => setShowTrailer(true)}
-                          className="bg-[#1A1D25] hover:bg-[#2A2D35] text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center gap-2"
-                        >
-                          <Play size={16} />
-                          Play Trailer
-                        </button>
-                      </div>
-                    )}
+              <div className="modal-body">
+                <div>
+                  <div className="modal-body__poster">
+                    <img src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                      alt={item.title || item.name} />
                   </div>
-                  
-                  <div className="md:w-2/3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Available</span>
-                      <h2 className="text-2xl font-bold text-teal-300">
-                        {item.title || item.name}
-                        {item.release_date || item.first_air_date ? (
-                          <span className="text-gray-400 text-lg ml-2">
-                            ({new Date(item.release_date || item.first_air_date).getFullYear()})
-                          </span>
-                        ) : null}
-                      </h2>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 mb-4">
-                      <Star className="text-yellow-400 fill-current" size={20} />
-                      <span>{item.vote_average?.toFixed(1)}/10</span>
-                    </div>
-                    
-                    {displayText && (
-                      <p className="mb-4 text-gray-300">{displayText}</p>
-                    )}
-                    
-                    <p className="mb-6 text-gray-300">{item.overview}</p>
-                    
-                    <div className="flex flex-wrap justify-center gap-3 mb-6">
-                      <button 
-                        onClick={() => console.log('Request clicked for:', item.id)}
-                        className="bg-[#E5A00D] hover:bg-[#c98d0b] text-white font-bold py-2 px-6 rounded-lg transition-colors uppercase"
-                      >
-                        Request
-                      </button>
-                    </div>
-                    
-                    {extendedItem?.credits?.cast && extendedItem.credits.cast.length > 0 && (
-                      <div className="mt-6">
-                        <h3 className="text-xl font-bold mb-4 text-teal-300">Cast</h3>
-                        <div className="flex flex-wrap gap-4">
-                          {extendedItem.credits.cast.slice(0, 10).map((actor: any) => (
-                            <div 
-                              key={actor.id} 
-                              className="flex-shrink-0 text-center cursor-pointer"
-                              onClick={() => {
-                                // Navigate to person page
-                                window.location.href = `/person/${actor.id}`;
-                              }}
-                            >
-                              <div className="w-24 h-24 rounded-full overflow-hidden mb-2">
-                                {actor.profile_path ? (
-                                  <img 
-                                    src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`} 
-                                    alt={actor.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full bg-gray-700 rounded-full flex items-center justify-center">
-                                    <span className="text-gray-400 text-xs">No Image</span>
-                                  </div>
-                                )}
-                              </div>
-                              <p className="text-sm truncate">{actor.name}</p>
-                              <p className="text-xs text-gray-400 truncate">{actor.character}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                  {trailer && (
+                    <button className="trailer-play-btn" onClick={() => setShowTrailer(true)}>
+                      <Play size={16} /> Play Trailer
+                    </button>
+                  )}
+                </div>
+                <div>
+                  <p className="modal-meta">
+                    {item.media_type === 'movie' ? 'FILM' : 'SERIES'} · {itemYear} · {runtime ? `${runtime} MIN` : ''} · ★
+                    {item.vote_average?.toFixed(1)}/10
+                  </p>
+                  <h2 className="modal-title">{item.title || item.name}</h2>
+                  {(extendedItem?.tagline || item.tagline) && (
+                    <p className="modal-tagline">{extendedItem?.tagline || item.tagline}</p>
+                  )}
+                  {genres && <p className="modal-genres">{genres}</p>}
+                  <div className="modal-facts">
+                    <span className="fact-chip">NOT IN PLEX</span>
+                    <span className="fact-chip">
+                      {(item.release_date || item.first_air_date) &&
+                      new Date(item.release_date || item.first_air_date) <= new Date()
+                        ? 'RELEASED' : 'UPCOMING'}
+                    </span>
+                    <span className="fact-chip">
+                      ORIGINAL LANGUAGE: {(extendedItem?.spoken_languages?.[0]?.english_name ||
+                      extendedItem?.original_language?.toUpperCase() || 'UNKNOWN')}
+                    </span>
                   </div>
+                  <p className="modal-overview">{item.overview}</p>
+                  <button
+                    onClick={() => console.log('Request clicked for:', item.id)}
+                    className="ticket__request-btn modal-request-btn"
+                  >
+                    Request
+                  </button>
+                  {extendedItem?.credits?.cast && extendedItem.credits.cast.length > 0 && (
+                    <div className="modal-cast">
+                      <h3>Cast</h3>
+                      <div className="cast-row">
+                        {extendedItem.credits.cast.slice(0, 10).map((actor: any) => (
+                          <button key={actor.id} className="cast-chip" onClick={() => {
+                            window.location.href = `/person/${actor.id}`;
+                          }}>
+                            {actor.profile_path ? (
+                              <img src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                                alt={actor.name} />
+                            ) : (
+                              <div className="cast-chip__fallback">{actor.name.charAt(0)}</div>
+                            )}
+                            <p className="cast-chip__name">{actor.name}</p>
+                            <p className="cast-chip__character">{actor.character}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </>
