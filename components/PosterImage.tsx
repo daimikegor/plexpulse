@@ -7,7 +7,11 @@ export function PosterImage({ src, alt }: { src: string; alt: string }) {
   const [imageSrc, setImageSrc] = useState(src);
 
   const handleError = () => {
-    setImageSrc('/placeholder-image.jpg');
+    // Simply hide the broken image by setting display to none
+    const imgElement = document.querySelector(`img[src="${src}"]`);
+    if (imgElement) {
+      (imgElement as HTMLImageElement).style.display = 'none';
+    }
   };
 
   return (
