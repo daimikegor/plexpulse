@@ -95,11 +95,6 @@ export default async function PersonPage({ params }: { params: { id: string } })
                   <FilmographyItem 
                     key={item.id} 
                     item={item}
-                    onClick={() => {
-                      // This would open the detail modal in a real implementation
-                      // For now, we'll just log to console
-                      console.log('Opening detail for:', item.id);
-                    }}
                   />
                 ))}
               </div>

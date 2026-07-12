@@ -4,21 +4,15 @@ import { PosterImage } from '@/components/PosterImage';
 import { useRouter } from 'next/navigation';
 
 export function FilmographyItem({ 
-  item,
-  onClick 
+  item
 }: { 
   item: any; 
-  onClick: () => void; 
 }) {
   const router = useRouter();
   
   const handleClick = () => {
-    if (onClick) {
-      onClick();
-    } else {
-      // Navigate to detail page
-      router.push(`/detail/${item.id}`);
-    }
+    // Navigate to detail page
+    router.push(`/detail/${item.id}`);
   };
 
   return (
