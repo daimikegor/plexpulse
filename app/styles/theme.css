@@ -1313,6 +1313,7 @@ main {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: 0.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .sidebar__nav {
