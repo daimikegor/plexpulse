@@ -24,6 +24,7 @@ export function FilmographyItem({
             src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
             alt={item.title || item.name}
             mediaType={item.media_type}
+            title={item.title || item.name}
           />
         ) : (
           <div className="bg-gray-700 rounded-lg w-full h-48 flex items-center justify-center">
