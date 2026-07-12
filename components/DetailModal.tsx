@@ -76,6 +76,12 @@ export function DetailModal({
                 allowFullScreen
                 title={`${item.title || item.name} Trailer`}
               ></iframe>
+              <button 
+                onClick={() => setShowTrailer(false)}
+                className="absolute top-4 right-4 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors z-20"
+              >
+                <X size={20} />
+              </button>
             </div>
           ) : (
             // Normal view
