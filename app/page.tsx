@@ -29,10 +29,34 @@ export default function Landing() {
       `width=${width},height=${height},left=${left},top=${top}`
     );
 
+    // Listen for auth completion message from popup
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data?.type === 'plex-auth-complete') {
+        clearInterval(pollInterval);
+        window.removeEventListener('message', handleMessage);
+        
+        try {
+          const finalRes = await fetch(`/api/auth/check?pinId=${pinId}`);
+          const finalData = await finalRes.json();
+          if (finalData.authenticated) {
+            router.push('/dashboard');
+            router.refresh();
+          } else {
+            setLoading(false);
+          }
+        } catch (e) {
+          console.error('Final auth check failed', e);
+          setLoading(false);
+        }
+      }
+    };
+    window.addEventListener('message', handleMessage);
+
     // 3. Poll backend for token approval
     const pollInterval = setInterval(async () => {
       if (popup?.closed) {
         clearInterval(pollInterval);
+        window.removeEventListener('message', handleMessage);
         setLoading(false);
         return;
       }
@@ -43,6 +67,7 @@ export default function Landing() {
         
         if (data.authenticated) {
           clearInterval(pollInterval);
+          window.removeEventListener('message', handleMessage);
           router.push('/dashboard');
           router.refresh();
         }
@@ -52,7 +77,11 @@ export default function Landing() {
     }, 2000);
 
     // Safety timeout after 60 seconds
-    setTimeout(() => clearInterval(pollInterval), 60000);
+    setTimeout(() => {
+      clearInterval(pollInterval);
+      window.removeEventListener('message', handleMessage);
+      setLoading(false);
+    }, 60000);
   };
 
   return (
