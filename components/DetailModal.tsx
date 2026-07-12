@@ -76,12 +76,6 @@ export function DetailModal({
                 allowFullScreen
                 title={`${item.title || item.name} Trailer`}
               ></iframe>
-              <button 
-                onClick={() => setShowTrailer(false)}
-                className="absolute top-4 left-4 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors z-10"
-              >
-                <X size={20} />
-              </button>
             </div>
           ) : (
             // Normal view
@@ -143,7 +137,7 @@ export function DetailModal({
                     
                     <p className="mb-6 text-gray-300">{item.overview}</p>
                     
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap justify-center gap-3 mb-6">
                       <button 
                         onClick={() => console.log('Request clicked for:', item.id)}
                         className="bg-[#E5A00D] hover:bg-[#c98d0b] text-white font-bold py-2 px-6 rounded-lg transition-colors uppercase"
@@ -151,6 +145,37 @@ export function DetailModal({
                         Request
                       </button>
                     </div>
+                    
+                    {extendedItem?.credits?.cast && extendedItem.credits.cast.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="text-xl font-bold mb-4 text-teal-300">Cast</h3>
+                        <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
+                          {extendedItem.credits.cast.slice(0, 10).map((actor: any) => (
+                            <div 
+                              key={actor.id} 
+                              className="flex-shrink-0 text-center cursor-pointer"
+                              onClick={() => console.log('Actor clicked:', actor.id, actor.name)}
+                            >
+                              <div className="w-24 h-24 rounded-full overflow-hidden mb-2">
+                                {actor.profile_path ? (
+                                  <img 
+                                    src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`} 
+                                    alt={actor.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-gray-700 rounded-full flex items-center justify-center">
+                                    <span className="text-gray-400 text-xs">No Image</span>
+                                  </div>
+                                )}
+                              </div>
+                              <p className="text-sm truncate">{actor.name}</p>
+                              <p className="text-xs text-gray-400 truncate">{actor.character}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
