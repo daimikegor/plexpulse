@@ -38,6 +38,9 @@ export default async function SearchPage({
       results = allResults.filter((item: any) => 
         item.media_type === 'movie' || item.media_type === 'tv'
       );
+      
+      console.log('Raw results count:', allResults.length);
+      console.log('Filtered results count:', results.length);
     } catch (error) {
       console.error('Error fetching search results:', error);
     }
