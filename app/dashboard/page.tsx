@@ -8,11 +8,8 @@ export default async function Dashboard() {
   const trendingData = await getTrendingContent();
   
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-4xl mx-auto">
-        
-        <TrendingSection trendingData={trendingData} />
-      </div>
-    </div>
+    <main>
+      <TrendingSection trendingData={trendingData} />
+    </main>
   );
 }
