@@ -1202,6 +1202,51 @@ main {
 }
 
 /* ---------------------------------------------------------------------
+   Genre tiles
+--------------------------------------------------------------------- */
+
+.genre-tile {
+  flex: 0 0 240px;
+  height: 135px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  scroll-snap-align: start;
+  display: block;
+}
+.genre-tile__image {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.genre-tile__image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, rgba(14,16,21,0.55), rgba(14,16,21,0.85));
+}
+.genre-tile__label {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.15rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  text-align: center;
+  padding: 0 1rem;
+}
+.genre-tile:hover .genre-tile__image::before {
+  background: linear-gradient(145deg, rgba(232,163,61,0.35), rgba(14,16,21,0.75));
+}
+
+/* ---------------------------------------------------------------------
    App shell
 --------------------------------------------------------------------- */
 
