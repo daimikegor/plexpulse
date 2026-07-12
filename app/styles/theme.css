@@ -861,6 +861,10 @@ main {
   display: block;
 }
 
+.modal-body__poster-col {
+  text-align: center;
+}
+
 .trailer-play-btn {
   display: inline-flex;
   align-items: center;
