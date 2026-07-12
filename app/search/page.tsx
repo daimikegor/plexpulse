@@ -20,7 +20,7 @@ export default async function SearchPage({
       }
       
       // Fetch first 3 pages to get more results
-      let allResults = [];
+      let allResults: any[] = [];
       for (let page = 1; page <= 3; page++) {
         const url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
         
