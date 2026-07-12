@@ -60,7 +60,10 @@ export function PosterImage({
         )}
         
         <button 
-          onClick={onRequestClick || (() => console.log('Request clicked for:', title))}
+          onClick={(e) => {
+            e.stopPropagation();
+            (onRequestClick || (() => console.log('Request clicked for:', title)))();
+          }}
           className="btn btn--gold poster-overlay__request-btn"
         >
           Request

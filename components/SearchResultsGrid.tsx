@@ -60,43 +60,25 @@ export function SearchResultsGrid({ items, hideFilters }: { items: any[]; hideFi
         </div>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="results-grid">
         {filteredItems.map((item) => (
           <div 
             key={item.id} 
-            className="cursor-pointer group"
+            className="ticket-wrap ticket-wrap--compact"
             onClick={() => handlePosterClick(item)}
           >
-            <div className="relative">
-              {item.poster_path ? (
+            <div className="ticket ticket--compact">
+              <div className="ticket__poster-wrap">
                 <PosterImage 
-                  src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
+                  src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
                   alt={item.name || item.title}
                   mediaType={item.media_type}
                   title={item.name || item.title}
+                  year={item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date).getFullYear() : undefined}
+                  overview={item.overview}
                 />
-              ) : (
-                <div className="bg-gray-700 rounded-lg w-full h-48 flex items-center justify-center relative">
-                  <span className="text-gray-400 text-sm">No Image</span>
-                  {item.media_type && (
-                    <div className="absolute top-2 left-2 z-10">
-                      <span className={`text-white text-xs px-2 py-1 rounded-full ${
-                        item.media_type === 'movie' ? 'bg-[#1f4fbc]' : 'bg-[#a329bb]'
-                      }`}>
-                        {item.media_type === 'movie' ? 'Movie' : 'Series'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <span className="text-white text-sm font-bold text-center px-2">View Details</span>
               </div>
             </div>
-            <p className="mt-2 text-sm truncate">{item.name || item.title}</p>
-            <p className="text-xs text-gray-400">
-              {item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date).getFullYear() : ''}
-            </p>
           </div>
         ))}
       </div>
