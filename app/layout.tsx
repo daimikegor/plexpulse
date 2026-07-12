@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Inter, Fraunces, IBM_Plex_Mono } from 'next/font/google';
-import { SiteHeader } from '@/components/SiteHeader';
+import { cookies } from 'next/headers';
+import { getSession } from '@/lib/session';
+import { AppShell } from '@/components/AppShell';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
 const fraunces = Fraunces({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-display' });
@@ -12,16 +14,18 @@ export const metadata: Metadata = {
   description: 'Discover. Request. Watch.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const sessionToken = cookies().get('session_token')?.value;
+  const session = sessionToken ? await getSession(sessionToken) : null;
+
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable}`}>
       <body className="antialiased">
-        <SiteHeader />
-        {children}
+        <AppShell username={session?.username ?? null}>{children}</AppShell>
       </body>
     </html>
   );

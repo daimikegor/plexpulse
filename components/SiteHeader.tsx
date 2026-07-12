@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Ticket } from 'lucide-react';
-import Link from 'next/link';
+import { Search } from 'lucide-react';
 
 export function SiteHeader() {
   const [query, setQuery] = useState('');
@@ -17,18 +16,7 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="marquee">
-      <div className="marquee__bulbs"></div>
-      
-      <div className="marquee__brand">
-        <Ticket size={32} className="marquee__mark" />
-        <Link href="/dashboard" className="marquee__title">
-          PlexPulse
-        </Link>
-      </div>
-      
-      <p className="marquee__subtitle">Discover. Request. Watch.</p>
-      
+    <div className="top-search-bar">
       <div className="search-bar">
         <form onSubmit={handleSearch} className="search-bar__row">
           <div className="search-bar__input-wrapper">
@@ -49,6 +37,6 @@ export function SiteHeader() {
           </div>
         </form>
       </div>
-    </header>
+    </div>
   );
 }

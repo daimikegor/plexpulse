@@ -356,7 +356,7 @@ html, body {
   min-width: 0;
 }
 .ticket-wrap--compact {
-  flex: 0 0 185px;
+  flex: 0 0 155px;
   scroll-snap-align: start;
 }
 .results-grid .ticket-wrap--compact {
@@ -410,7 +410,7 @@ html, body {
 }
 
 @media (max-width: 560px) {
-  .ticket--compact { flex-basis: 135px; }
+  .ticket--compact { flex-basis: 115px; }
 }
 
 /* ---------------------------------------------------------------------

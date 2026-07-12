@@ -5,13 +5,21 @@ import { PosterImage } from '@/components/PosterImage';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DetailModal } from '@/components/DetailModal';
 
-export function TrendingSection({ trendingData }: { trendingData: any }) {
+export function TrendingSection({ 
+  trendingData, 
+  heading = "Trending This Week",
+  rowId = "trending-row"
+}: { 
+  trendingData: any;
+  heading?: string;
+  rowId?: string;
+}) {
   const [showScrollButtons, setShowScrollButtons] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const row = document.getElementById('trending-row');
+    const row = document.getElementById(rowId);
     if (!row) return;
 
     // Check if scrolling is needed
@@ -32,10 +40,10 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
       row.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, []);
+  }, [rowId]);
 
   const handleScroll = (direction: 'left' | 'right') => {
-    const row = document.getElementById('trending-row');
+    const row = document.getElementById(rowId);
     if (!row) return;
 
     const scrollAmount = 300;
@@ -59,7 +67,7 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
   return (
     <div className="shelf">
       <div className="shelf__head">
-        <h2 className="shelf__heading">Trending This Week</h2>
+        <h2 className="shelf__heading">{heading}</h2>
         {showScrollButtons && (
           <div className="shelf__nav-group">
             <button 
@@ -81,7 +89,7 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
         <div className="relative">
           <div 
             className="shelf__row" 
-            id="trending-row"
+            id={rowId}
           >
             {trendingData.results.map((item: any) => (
               <div 
