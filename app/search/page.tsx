@@ -19,16 +19,23 @@ export default async function SearchPage({
         throw new Error('TMDB_API_KEY is not set in environment variables');
       }
       
-      const url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
-      
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch search results: ${response.status}`);
+      // Fetch first 3 pages to get more results
+      let allResults = [];
+      for (let page = 1; page <= 3; page++) {
+        const url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch search results page ${page}: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        allResults = allResults.concat(data.results || []);
       }
       
-      const data = await response.json();
-      results = (data.results || []).filter((item: any) => 
+      // Filter out non-movie/tv entries
+      results = allResults.filter((item: any) => 
         item.media_type === 'movie' || item.media_type === 'tv'
       );
     } catch (error) {
