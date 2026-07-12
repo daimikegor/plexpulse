@@ -76,15 +76,24 @@ export function DetailModal({
         <div className="relative">
           {showTrailer && trailer ? (
             // Trailer view
-            <div className="relative h-[300px] w-full overflow-hidden">
-              <iframe
-                src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                title={`${item.title || item.name} Trailer`}
-              ></iframe>
-            </div>
+            <div className="relative">
+              <div className="h-[50px] flex items-center justify-end px-4 bg-[#0E1015]">
+                <button 
+                  onClick={handleMainClose}
+                  className="w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="relative h-[300px] w-full overflow-hidden">
+                <iframe
+                  src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={`${item.title || item.name} Trailer`}
+                ></iframe>
+              </div>
           ) : (
             // Normal view
             <>
