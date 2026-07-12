@@ -89,3 +89,154 @@ export async function getTrendingSeries() {
     return { results: [] };
   }
 }
+
+export async function getPopularContent() {
+  const cached = await redis.get('tmdb:popular');
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return { results: [] };
+    }
+
+    const [movieResponse, tvResponse] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`),
+      fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`)
+    ]);
+
+    if (!movieResponse.ok || !tvResponse.ok) {
+      throw new Error(`TMDB API error: ${movieResponse.status} ${tvResponse.status}`);
+    }
+
+    const movieData = await movieResponse.json();
+    const tvData = await tvResponse.json();
+
+    // Add media_type to each item
+    const moviesWithMediaType = movieData.results.map((item: any) => ({
+      ...item,
+      media_type: 'movie'
+    }));
+
+    const tvsWithMediaType = tvData.results.map((item: any) => ({
+      ...item,
+      media_type: 'tv'
+    }));
+
+    // Merge and sort by popularity
+    const mergedResults = [...moviesWithMediaType, ...tvsWithMediaType]
+      .sort((a: any, b: any) => b.popularity - a.popularity);
+
+    const data = { results: mergedResults };
+    await redis.setex('tmdb:popular', 7200, JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error fetching popular content from TMDB:', error);
+    return { results: [] };
+  }
+}
+
+export async function getTopRatedContent() {
+  const cached = await redis.get('tmdb:top_rated');
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return { results: [] };
+    }
+
+    const [movieResponse, tvResponse] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`),
+      fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}`)
+    ]);
+
+    if (!movieResponse.ok || !tvResponse.ok) {
+      throw new Error(`TMDB API error: ${movieResponse.status} ${tvResponse.status}`);
+    }
+
+    const movieData = await movieResponse.json();
+    const tvData = await tvResponse.json();
+
+    // Add media_type to each item
+    const moviesWithMediaType = movieData.results.map((item: any) => ({
+      ...item,
+      media_type: 'movie'
+    }));
+
+    const tvsWithMediaType = tvData.results.map((item: any) => ({
+      ...item,
+      media_type: 'tv'
+    }));
+
+    // Merge and sort by rating
+    const mergedResults = [...moviesWithMediaType, ...tvsWithMediaType]
+      .sort((a: any, b: any) => b.vote_average - a.vote_average);
+
+    const data = { results: mergedResults };
+    await redis.setex('tmdb:top_rated', 7200, JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error fetching top rated content from TMDB:', error);
+    return { results: [] };
+  }
+}
+
+export async function getUpcomingContent() {
+  const cached = await redis.get('tmdb:upcoming');
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return { results: [] };
+    }
+
+    const [movieResponse, tvResponse] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`),
+      fetch(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}`)
+    ]);
+
+    if (!movieResponse.ok || !tvResponse.ok) {
+      throw new Error(`TMDB API error: ${movieResponse.status} ${tvResponse.status}`);
+    }
+
+    const movieData = await movieResponse.json();
+    const tvData = await tvResponse.json();
+
+    // Add media_type to each item
+    const moviesWithMediaType = movieData.results.map((item: any) => ({
+      ...item,
+      media_type: 'movie'
+    }));
+
+    const tvsWithMediaType = tvData.results.map((item: any) => ({
+      ...item,
+      media_type: 'tv'
+    }));
+
+    // Merge and sort by release date
+    const mergedResults = [...moviesWithMediaType, ...tvsWithMediaType]
+      .sort((a: any, b: any) => {
+        const dateA = a.release_date || a.first_air_date;
+        const dateB = b.release_date || b.first_air_date;
+        return new Date(dateA).getTime() - new Date(dateB).getTime();
+      });
+
+    const data = { results: mergedResults };
+    await redis.setex('tmdb:upcoming', 7200, JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error fetching upcoming content from TMDB:', error);
+    return { results: [] };
+  }
+}
