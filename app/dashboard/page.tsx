@@ -3,10 +3,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export default async function Dashboard() {
-  console.log('DASHBOARD PAGE HIT');
   const cookieStore = cookies();
   const sessionToken = cookieStore.get('session_token')?.value;
-  console.log('Session token:', sessionToken || 'MISSING');
   
   if (!sessionToken) {
     redirect('/');
