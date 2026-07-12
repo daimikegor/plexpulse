@@ -85,10 +85,9 @@ export function DetailModal({
                   <X size={20} />
                 </button>
               </div>
-              <div className="relative h-[300px] w-full overflow-hidden">
+              <div className="modal-trailer-frame">
                 <iframe
                   src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
-                  className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title={`${item.title || item.name} Trailer`}
