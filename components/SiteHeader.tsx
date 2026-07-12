@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 export function SiteHeader() {
@@ -17,13 +17,21 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="bg-[#1A1D25] border-b border-[#2A2D35] p-4 sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-4">
-        <Link href="/dashboard" className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition-colors">
-          PlexPulse
-        </Link>
+    <header className="bg-[#1A1D25] p-4 sticky top-0 z-50">
+      {/* Decorative dotted border */}
+      <div className="border-t border-dotted border-amber-500 mb-4"></div>
+      
+      <div className="max-w-6xl mx-auto text-center">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Ticket size={32} className="text-teal-400" />
+          <Link href="/dashboard" className="text-4xl font-bold text-teal-400 hover:text-teal-300 transition-colors">
+            PlexPulse
+          </Link>
+        </div>
         
-        <form onSubmit={handleSearch} className="flex-1 w-full max-w-2xl">
+        <p className="text-gray-400 mb-4">Discover. Request. Watch.</p>
+        
+        <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
           <div className="relative">
             <input
               type="text"
