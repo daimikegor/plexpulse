@@ -124,12 +124,6 @@ export default async function SearchPage({
         </p>
       ) : null}
       
-      {personName && (
-        <p>
-          Results for <span className="font-semibold">{personName}</span>
-        </p>
-      )}
-      
       {results.length > 0 ? (
         <SearchResultsGrid items={results} />
       ) : (

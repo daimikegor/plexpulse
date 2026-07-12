@@ -236,6 +236,7 @@ html, body {
   display: flex;
   gap: 0.4rem;
   flex-shrink: 0;
+  margin-bottom: 1.5rem;
 }
 .filter-toggle__btn {
   font-family: var(--font-body);
