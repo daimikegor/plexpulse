@@ -174,7 +174,10 @@ export function DetailModal({
                             <div 
                               key={actor.id} 
                               className="flex-shrink-0 text-center cursor-pointer"
-                              onClick={() => console.log('Actor clicked:', actor.id, actor.name)}
+                              onClick={() => {
+                                // Navigate to person page
+                                window.location.href = `/person/${actor.id}`;
+                              }}
                             >
                               <div className="w-24 h-24 rounded-full overflow-hidden mb-2">
                                 {actor.profile_path ? (
