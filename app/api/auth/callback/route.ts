@@ -11,7 +11,7 @@ export async function GET() {
       <script>
         if (window.opener) {
           window.opener.postMessage({ type: 'plex-auth-complete' }, '*');
-          setTimeout(() => window.close(), 30000);
+          setTimeout(() => window.close(), 500);
         } else {
           document.body.innerHTML = '<p>You can close this window.</p>';
         }

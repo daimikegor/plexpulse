@@ -29,45 +29,40 @@ export default function Landing() {
       `width=${width},height=${height},left=${left},top=${top}`
     );
 
-    // Listen for auth completion message from popup
-    const handleMessage = async (event: MessageEvent) => {
-      if (event.data?.type === 'plex-auth-complete') {
-        clearInterval(pollInterval);
-        window.removeEventListener('message', handleMessage);
-        
-        try {
-          const finalRes = await fetch(`/api/auth/check?pinId=${pinId}`);
-          const finalData = await finalRes.json();
-          if (finalData.authenticated) {
-            router.push('/dashboard');
-            router.refresh();
-          } else {
-            setLoading(false);
-          }
-        } catch (e) {
-          console.error('Final auth check failed', e);
-          setLoading(false);
-        }
-      }
-    };
-    window.addEventListener('message', handleMessage);
-
     // 3. Poll backend for token approval
+    let popupClosedHandled = false;
     const pollInterval = setInterval(async () => {
-      if (popup?.closed) {
+      if (popup?.closed && !popupClosedHandled) {
+        popupClosedHandled = true;
         clearInterval(pollInterval);
-        window.removeEventListener('message', handleMessage);
+        
+        // Do a few final checks after popup closes, as Plex may take a moment to finalize the token
+        for (let i = 0; i < 3; i++) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          try {
+            const checkRes = await fetch(`/api/auth/check?pinId=${pinId}`);
+            const data = await checkRes.json();
+            if (data.authenticated) {
+              router.push('/dashboard');
+              router.refresh();
+              return;
+            }
+          } catch (e) {
+            console.error('Final polling error', e);
+          }
+        }
         setLoading(false);
         return;
       }
-      
+
+      if (popupClosedHandled) return;
+
       try {
         const checkRes = await fetch(`/api/auth/check?pinId=${pinId}`);
         const data = await checkRes.json();
         
         if (data.authenticated) {
           clearInterval(pollInterval);
-          window.removeEventListener('message', handleMessage);
           router.push('/dashboard');
           router.refresh();
         }
@@ -79,7 +74,6 @@ export default function Landing() {
     // Safety timeout after 60 seconds
     setTimeout(() => {
       clearInterval(pollInterval);
-      window.removeEventListener('message', handleMessage);
       setLoading(false);
     }, 60000);
   };
