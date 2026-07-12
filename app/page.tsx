@@ -79,7 +79,7 @@ export default function Landing() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen px-4 bg-[#0E1015] text-white">
+    <main className="flex flex-col items-center justify-center min-h-screen px-4 bg-plex-dark text-white">
       <h1 className="text-5xl font-bold tracking-tight mb-2 bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
         PlexPulse
       </h1>
@@ -87,7 +87,7 @@ export default function Landing() {
       <button 
         onClick={handleSignIn}
         disabled={loading}
-        className="px-6 py-3 bg-[#E5A00D] hover:bg-[#c98d0b] disabled:opacity-50 text-white font-medium rounded-lg transition-all shadow-lg hover:shadow-orange-500/20"
+        className="px-6 py-3 bg-plex-orange hover:bg-plex-orange-hover disabled:opacity-50 text-white font-medium rounded-lg transition-all shadow-lg hover:shadow-orange-500/20"
       >
         {loading ? 'Connecting...' : 'Sign in with Plex'}
       </button>

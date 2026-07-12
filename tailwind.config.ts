@@ -7,7 +7,13 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'plex-dark': '#0E1015',
+        'plex-orange': '#E5A00D',
+        'plex-orange-hover': '#c98d0b',
+      },
+    },
   },
   plugins: [],
 }
