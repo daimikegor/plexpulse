@@ -141,7 +141,7 @@ export function DetailModal({
                   <p className="modal-overview">{item.overview}</p>
                   <button
                     onClick={() => console.log('Request clicked for:', item.id)}
-                    className="ticket__request-btn modal-request-btn"
+                    className="btn btn--gold modal-request-btn"
                   >
                     Request
                   </button>

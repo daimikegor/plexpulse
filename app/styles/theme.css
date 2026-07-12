@@ -996,8 +996,9 @@ main {
   display: inline-block;
   width: auto;
   margin-bottom: 1.5rem;
-  padding: 0.35rem 0.85rem;
+  padding: 0.45rem 0.75rem;
   font-size: 0.8rem;
+  border-radius: 6px;
 }
 
 .modal-cast {
