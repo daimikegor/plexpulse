@@ -261,3 +261,169 @@ export async function getUpcomingContent() {
     return { results: [] };
   }
 }
+
+export async function getMovieGenresWithBackdrops() {
+  const cached = await redis.get('tmdb:genres:movie');
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return { genres: [] };
+    }
+
+    // Get the genre list
+    const genreResponse = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}`);
+    
+    if (!genreResponse.ok) {
+      throw new Error(`TMDB API error: ${genreResponse.status} ${genreResponse.statusText}`);
+    }
+
+    const genreData = await genreResponse.json();
+    const genres = genreData.genres || [];
+
+    // Fetch backdrop for each genre in parallel
+    const genrePromises = genres.map(async (genre: any) => {
+      try {
+        const discoverResponse = await fetch(
+          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genre.id}&sort_by=popularity.desc`
+        );
+        
+        if (!discoverResponse.ok) {
+          throw new Error(`TMDB API error: ${discoverResponse.status} ${discoverResponse.statusText}`);
+        }
+
+        const discoverData = await discoverResponse.json();
+        const backdrop_path = discoverData.results && discoverData.results[0] && discoverData.results[0].backdrop_path || null;
+        
+        return {
+          id: genre.id,
+          name: genre.name,
+          backdrop_path
+        };
+      } catch (error) {
+        // If one genre fails, return it with null backdrop_path
+        console.error(`Error fetching backdrop for movie genre ${genre.id}:`, error);
+        return {
+          id: genre.id,
+          name: genre.name,
+          backdrop_path: null
+        };
+      }
+    });
+
+    const genresWithBackdrops = await Promise.all(genrePromises);
+    
+    const data = { genres: genresWithBackdrops };
+    await redis.setex('tmdb:genres:movie', 86400, JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error fetching movie genres with backdrops from TMDB:', error);
+    return { genres: [] };
+  }
+}
+
+export async function getTVGenresWithBackdrops() {
+  const cached = await redis.get('tmdb:genres:tv');
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return { genres: [] };
+    }
+
+    // Get the genre list
+    const genreResponse = await fetch(`https://api.themoviedb.org/3/genre/tv/list?api_key=${API_KEY}`);
+    
+    if (!genreResponse.ok) {
+      throw new Error(`TMDB API error: ${genreResponse.status} ${genreResponse.statusText}`);
+    }
+
+    const genreData = await genreResponse.json();
+    const genres = genreData.genres || [];
+
+    // Fetch backdrop for each genre in parallel
+    const genrePromises = genres.map(async (genre: any) => {
+      try {
+        const discoverResponse = await fetch(
+          `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=${genre.id}&sort_by=popularity.desc`
+        );
+        
+        if (!discoverResponse.ok) {
+          throw new Error(`TMDB API error: ${discoverResponse.status} ${discoverResponse.statusText}`);
+        }
+
+        const discoverData = await discoverResponse.json();
+        const backdrop_path = discoverData.results && discoverData.results[0] && discoverData.results[0].backdrop_path || null;
+        
+        return {
+          id: genre.id,
+          name: genre.name,
+          backdrop_path
+        };
+      } catch (error) {
+        // If one genre fails, return it with null backdrop_path
+        console.error(`Error fetching backdrop for TV genre ${genre.id}:`, error);
+        return {
+          id: genre.id,
+          name: genre.name,
+          backdrop_path: null
+        };
+      }
+    });
+
+    const genresWithBackdrops = await Promise.all(genrePromises);
+    
+    const data = { genres: genresWithBackdrops };
+    await redis.setex('tmdb:genres:tv', 86400, JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error fetching TV genres with backdrops from TMDB:', error);
+    return { genres: [] };
+  }
+}
+
+export async function getGenreContent(mediaType: 'movie' | 'tv', genreId: string) {
+  const cached = await redis.get(`tmdb:genre:${mediaType}:${genreId}`);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return { results: [] };
+    }
+
+    const response = await fetch(
+      `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`
+    );
+
+    if (!response.ok) {
+      throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Add media_type to each result item
+    const resultsWithMediaType = data.results.map((item: any) => ({
+      ...item,
+      media_type: mediaType
+    }));
+
+    const finalData = { results: resultsWithMediaType };
+    await redis.setex(`tmdb:genre:${mediaType}:${genreId}`, 7200, JSON.stringify(finalData));
+    return finalData;
+  } catch (error) {
+    console.error(`Error fetching ${mediaType} genre content from TMDB:`, error);
+    return { results: [] };
+  }
+}
