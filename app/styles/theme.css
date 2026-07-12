@@ -153,6 +153,53 @@ html, body {
 .btn--ghost:hover { color: var(--text); border-color: var(--text-muted); }
 
 /* ---------------------------------------------------------------------
+   Poster overlay
+--------------------------------------------------------------------- */
+
+.poster-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(14,16,21,0.95) 0%, rgba(14,16,21,0.75) 50%, rgba(14,16,21,0.2) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.poster-overlay__title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.poster-overlay__year {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-left: 0.4rem;
+}
+
+.poster-overlay__overview {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin: 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.poster-overlay__request-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* ---------------------------------------------------------------------
    Discover shelves (trending/popular/upcoming rows)
 --------------------------------------------------------------------- */
 
