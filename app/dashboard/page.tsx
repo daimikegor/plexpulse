@@ -18,10 +18,10 @@ export default async function Dashboard() {
   return (
     <main>
       <TrendingSection trendingData={trendingData} categorySlug="trending" />
-      <GenreRow genres={movieGenres.genres} mediaType="movie" heading="Movie Genres" />
+      <GenreRow genres={movieGenres.genres} mediaType="movie" heading="Movie Genres" categoryHref="/genres/movie" />
       <TrendingSection trendingData={popularData} heading="Popular" rowId="popular-row" categorySlug="popular" />
       <TrendingSection trendingData={topRatedData} heading="Top Rated" rowId="top-rated-row" categorySlug="top-rated" />
-      <GenreRow genres={tvGenres.genres} mediaType="tv" heading="Series Genres" />
+      <GenreRow genres={tvGenres.genres} mediaType="tv" heading="Series Genres" categoryHref="/genres/tv" />
       <TrendingSection trendingData={upcomingData} heading="Upcoming & New" rowId="upcoming-row" categorySlug="upcoming" />
     </main>
   );
