@@ -31,19 +31,22 @@ export function SiteHeader() {
       
       <div className="search-bar">
         <form onSubmit={handleSearch} className="search-bar__row">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search movies, TV shows..."
-            id="search-input"
-          />
-          <button 
-            type="submit"
-            className="btn btn--gold search-submit-btn"
-          >
-            <Search size={20} />
-          </button>
+          <div className="search-bar__input-wrapper">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search movies, TV shows..."
+              id="search-input"
+              className="search-bar__input"
+            />
+            <button 
+              type="submit"
+              className="search-bar__submit"
+            >
+              <Search size={20} />
+            </button>
+          </div>
         </form>
       </div>
     </header>
