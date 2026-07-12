@@ -48,78 +48,76 @@ export default async function PersonPage({ params }: { params: { id: string } })
     });
     
     return (
-      <div className="min-h-screen bg-[#0E1015] text-[#F3F1EA] p-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Person Header */}
-          <div className="flex flex-col md:flex-row gap-6 mb-8">
-            <div className="md:w-1/3">
-              {personData.profile_path ? (
-                <img 
-                  src={`https://image.tmdb.org/t/p/w500${personData.profile_path}`} 
-                  alt={personData.name}
-                  className="w-full rounded-lg shadow-lg"
-                />
-              ) : (
-                <div className="bg-gray-700 rounded-lg w-full h-96 flex items-center justify-center">
-                  <span className="text-gray-400">No Image</span>
+      <main>
+        {/* Person Header */}
+        <div className="flex flex-col md:flex-row gap-6 mb-8">
+          <div className="md:w-1/3">
+            {personData.profile_path ? (
+              <img 
+                src={`https://image.tmdb.org/t/p/w500${personData.profile_path}`} 
+                alt={personData.name}
+                className="w-full rounded-lg shadow-lg"
+              />
+            ) : (
+              <div className="bg-gray-700 rounded-lg w-full h-96 flex items-center justify-center">
+                <span className="text-gray-400">No Image</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="md:w-2/3">
+            <h1 className="search-context-heading">{personData.name}</h1>
+            
+            {personData.biography && (
+              <p>{personData.biography}</p>
+            )}
+            
+            <div className="grid grid-cols-2 gap-4">
+              {personData.birthday && (
+                <div>
+                  <p>Birthday</p>
+                  <p>{new Date(personData.birthday).toLocaleDateString()}</p>
+                </div>
+              )}
+              
+              {personData.place_of_birth && (
+                <div>
+                  <p>Place of Birth</p>
+                  <p>{personData.place_of_birth}</p>
+                </div>
+              )}
+              
+              {personData.known_for_department && (
+                <div>
+                  <p>Known For</p>
+                  <p>{personData.known_for_department}</p>
                 </div>
               )}
             </div>
-            
-            <div className="md:w-2/3">
-              <h1 className="text-3xl font-bold mb-4 text-teal-300">{personData.name}</h1>
-              
-              {personData.biography && (
-                <p className="mb-4 text-gray-300">{personData.biography}</p>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4">
-                {personData.birthday && (
-                  <div>
-                    <p className="text-gray-400">Birthday</p>
-                    <p>{new Date(personData.birthday).toLocaleDateString()}</p>
-                  </div>
-                )}
-                
-                {personData.place_of_birth && (
-                  <div>
-                    <p className="text-gray-400">Place of Birth</p>
-                    <p>{personData.place_of_birth}</p>
-                  </div>
-                )}
-                
-                {personData.known_for_department && (
-                  <div>
-                    <p className="text-gray-400">Known For</p>
-                    <p>{personData.known_for_department}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          {/* Filmography */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4 text-teal-300">Filmography</h2>
-            
-            {filmography.length > 0 ? (
-              <FilmographyGrid items={filmography} />
-            ) : (
-              <p className="text-gray-400">No filmography data available.</p>
-            )}
           </div>
         </div>
-      </div>
+        
+        {/* Filmography */}
+        <div>
+          <h2 className="search-context-heading">Filmography</h2>
+          
+          {filmography.length > 0 ? (
+            <FilmographyGrid items={filmography} />
+          ) : (
+            <p>No filmography data available.</p>
+          )}
+        </div>
+      </main>
     );
   } catch (error) {
     console.error('Error fetching person details:', error);
     return (
-      <div className="min-h-screen bg-[#0E1015] text-[#F3F1EA] flex items-center justify-center p-4">
+      <main>
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4 text-teal-300">Error</h1>
+          <h1 className="search-context-heading">Error</h1>
           <p>Failed to load person details. Please try again later.</p>
         </div>
-      </div>
+      </main>
     );
   }
 }
