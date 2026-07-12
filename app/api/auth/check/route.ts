@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       let isAdmin = false;
       try {
         const libCheck = await fetch(`${process.env.PLEX_SERVER_URL}/library/sections`, {
-          headers: { 'X-Plex-Token': data.auth_token }
+          headers: { 'X-Plex-Token': data.authToken }
         });
         if (libCheck.ok) isAdmin = true;
       } catch {}
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       const resObj = NextResponse.json({ authenticated: true });
       resObj.cookies.set('session_token', sessionToken, {
         httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', 
+        secure: process.env.IS_HTTPS === 'true', 
         sameSite: 'lax', 
         maxAge: 60 * 60 * 24 * 7
       });
