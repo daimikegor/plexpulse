@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
+import Link from 'next/link';
 
 export function SiteHeader() {
   const [query, setQuery] = useState('');
@@ -18,7 +19,9 @@ export function SiteHeader() {
   return (
     <header className="bg-[#1A1D25] border-b border-[#2A2D35] p-4 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-4">
-        <h1 className="text-2xl font-bold text-teal-400">PlexPulse</h1>
+        <Link href="/dashboard" className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition-colors">
+          PlexPulse
+        </Link>
         
         <form onSubmit={handleSearch} className="flex-1 w-full max-w-2xl">
           <div className="relative">
