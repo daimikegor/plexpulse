@@ -20,7 +20,7 @@ export default async function GenrePage({
         {genreName} {params.mediaType === 'movie' ? 'Movies' : 'Series'}
       </h1>
       {data.results.length > 0 ? (
-        <SearchResultsGrid items={data.results} />
+        <SearchResultsGrid items={data.results} hideFilters={true} />
       ) : (
         <p className="empty-state">No results found.</p>
       )}
