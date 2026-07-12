@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { redis } from '@/lib/redis';
 import { db } from '@/lib/db';
 import { users } from '@/db/schema';
