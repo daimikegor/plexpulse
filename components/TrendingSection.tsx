@@ -100,7 +100,14 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
                   src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
                   alt={item.name || item.title}
                 />
-                <p className="mt-2 text-sm truncate">{item.name || item.title}</p>
+                <p className="mt-2 text-sm truncate">
+                  {item.name || item.title}
+                  {item.release_date || item.first_air_date ? (
+                    <span className="text-gray-400 text-xs block">
+                      ({new Date(item.release_date || item.first_air_date).getFullYear()})
+                    </span>
+                  ) : null}
+                </p>
               </div>
             ))}
           </div>
