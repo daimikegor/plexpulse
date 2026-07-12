@@ -136,6 +136,7 @@ export function DetailModal({
                   title={`${item.title || item.name} Trailer`}
                 ></iframe>
               </div>
+              </div>
           ) : (
             // Normal view
             <>
