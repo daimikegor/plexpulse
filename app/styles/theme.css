@@ -1296,9 +1296,8 @@ main {
 }
 
 .sidebar__user {
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-  margin-top: auto;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -1311,6 +1310,20 @@ main {
 
 .sidebar__logout-btn {
   width: 100%;
+}
+
+.sidebar__brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.sidebar__mark {
+  width: 28px;
+  height: 28px;
+  color: var(--gold);
+  flex-shrink: 0;
 }
 
 /* ---------------------------------------------------------------------
