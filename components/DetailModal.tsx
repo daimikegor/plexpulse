@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Star, Play } from 'lucide-react';
 
 export function DetailModal({ 
@@ -15,10 +15,6 @@ export function DetailModal({
   const [isClient, setIsClient] = useState(false);
   const [extendedItem, setExtendedItem] = useState<any>(null);
   const [showTrailer, setShowTrailer] = useState(false);
-  const castRowRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
-  const startXRef = useRef(0);
-  const scrollLeftRef = useRef(0);
 
   useEffect(() => {
     setIsClient(true);
@@ -40,44 +36,6 @@ export function DetailModal({
       fetchExtendedDetails();
     }
   }, [isOpen, item]);
-
-  useEffect(() => {
-    const castRow = castRowRef.current;
-    if (!castRow) return;
-
-    const handleMouseDown = (e: MouseEvent) => {
-      isDraggingRef.current = true;
-      startXRef.current = e.pageX - castRow.offsetLeft;
-      scrollLeftRef.current = castRow.scrollLeft;
-      castRow.style.cursor = 'grabbing';
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDraggingRef.current) return;
-      e.preventDefault();
-      const x = e.pageX - castRow.offsetLeft;
-      const walk = (x - startXRef.current) * 2; // Adjust scroll speed
-      castRow.scrollLeft = scrollLeftRef.current - walk;
-    };
-
-    const handleMouseUp = () => {
-      isDraggingRef.current = false;
-      if (castRow) {
-        castRow.style.cursor = 'grab';
-      }
-    };
-
-    // Add event listeners
-    castRow.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      castRow.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, []);
 
   if (!isClient || !isOpen) return null;
 
@@ -108,12 +66,14 @@ export function DetailModal({
         className="relative bg-[#0E1015] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <button 
-          onClick={handleMainClose}
-          className="absolute top-4 right-4 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors z-10"
-        >
-          <X size={20} />
-        </button>
+        {!showTrailer && (
+          <button 
+            onClick={handleMainClose}
+            className="absolute top-4 right-4 w-8 h-8 bg-[#1A1D25] rounded-full flex items-center justify-center text-teal-400 hover:bg-[#2A2D35] transition-colors z-10"
+          >
+            <X size={20} />
+          </button>
+        )}
         
         <div className="relative">
           {showTrailer && trailer ? (
@@ -136,7 +96,7 @@ export function DetailModal({
                   title={`${item.title || item.name} Trailer`}
                 ></iframe>
               </div>
-              </div>
+            </div>
           ) : (
             // Normal view
             <>
@@ -209,10 +169,7 @@ export function DetailModal({
                     {extendedItem?.credits?.cast && extendedItem.credits.cast.length > 0 && (
                       <div className="mt-6">
                         <h3 className="text-xl font-bold mb-4 text-teal-300">Cast</h3>
-                        <div 
-                          ref={castRowRef}
-                          className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide cursor-grab"
-                        >
+                        <div className="flex flex-wrap gap-4">
                           {extendedItem.credits.cast.slice(0, 10).map((actor: any) => (
                             <div 
                               key={actor.id} 
