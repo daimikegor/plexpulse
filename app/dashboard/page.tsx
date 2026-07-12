@@ -2,6 +2,7 @@ import { getSession } from '@/lib/session';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getTrendingContent } from '@/lib/tmdb';
+import { PosterImage } from '@/components/PosterImage';
 
 export default async function Dashboard() {
   const cookieStore = cookies();
@@ -31,14 +32,9 @@ export default async function Dashboard() {
             <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
               {trendingData.results.map((item: any) => (
                 <div key={item.id} className="flex-shrink-0 w-48">
-                  <img 
+                  <PosterImage 
                     src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
                     alt={item.name || item.title}
-                    className="w-full h-auto rounded-lg shadow-lg"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder-image.jpg';
-                    }}
                   />
                   <p className="mt-2 text-sm truncate">{item.name || item.title}</p>
                 </div>
