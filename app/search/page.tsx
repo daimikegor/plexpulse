@@ -41,6 +41,11 @@ export default async function SearchPage({
       
       console.log('Raw results count:', allResults.length);
       console.log('Filtered results count:', results.length);
+      
+      // Log total results from first page
+      if (allResults.length > 0 && allResults[0].total_results !== undefined) {
+        console.log('Total results claimed by TMDB:', allResults[0].total_results);
+      }
     } catch (error) {
       console.error('Error fetching search results:', error);
     }
