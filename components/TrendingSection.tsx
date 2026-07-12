@@ -73,7 +73,9 @@ export function TrendingSection({ trendingData }: { trendingData: any }) {
             {trendingData.results.map((item: any) => (
               <div key={item.id} className="flex-shrink-0 w-48 relative">
                 <div className="absolute top-2 left-2 z-10">
-                  <span className="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
+                  <span className={`text-white text-xs px-2 py-1 rounded-full ${
+                    item.media_type === 'movie' ? 'bg-[#1f4fbc]' : 'bg-[#a329bb]'
+                  }`}>
                     {item.media_type === 'movie' ? 'Movie' : 'TV'}
                   </span>
                 </div>
