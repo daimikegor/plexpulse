@@ -116,6 +116,7 @@ export function DetailModal({
                       </button>
                     )}
                   </div>
+                </div>
                 <div>
                   <p className="modal-meta">
                     {item.media_type === 'movie' ? 'FILM' : 'SERIES'} · {itemYear} · {runtime ? `${runtime} MIN` : ''} · ★
