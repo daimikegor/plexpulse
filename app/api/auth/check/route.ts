@@ -21,10 +21,10 @@ export async function GET(req: NextRequest) {
     if (!res.ok) throw new Error('Failed to check PIN status');
     const data = await res.json();
 
-    if (data.auth_token) {
+    if (data.authToken) {
       // Auth successful: fetch user profile
       const userRes = await fetch('https://plex.tv/api/v2/user', {
-        headers: { 'X-Plex-Token': data.auth_token, 'Accept': 'application/json' }
+        headers: { 'X-Plex-Token': data.authToken, 'Accept': 'application/json' }
       });
       const userData = await userRes.json();
 
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       const sessionToken = crypto.randomBytes(32).toString('hex');
       await redis.set(
         `session:${sessionToken}`, 
-        JSON.stringify({ plexId: userData.id, authToken: data.auth_token }), 
+        JSON.stringify({ plexId: userData.id, authToken: data.authToken }), 
         'EX', 604800 // 7 days TTL
       );
 
