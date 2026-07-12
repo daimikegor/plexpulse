@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   try {
     const res = await fetch(`https://plex.tv/api/v2/pins/${pinId}`, {
       headers: {
-        'X-Plex-Client-Identifier': process.env.NEXT_PUBLIC_PLEX_CLIENT_ID || 'plexpulse',
+        'X-Plex-Client-Identifier': process.env.PLEX_CLIENT_ID || 'plexpulse-default-id',
         'Accept': 'application/json'
       },
       cache: 'no-store'
