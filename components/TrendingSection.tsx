@@ -113,6 +113,7 @@ export function TrendingSection({
                       src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
                       alt={item.name || item.title}
                       mediaType={item.media_type}
+                      tmdbId={String(item.id)}
                       className="ticket__poster"
                       title={item.name || item.title}
                       year={item.release_date ? new Date(item.release_date).getFullYear() : item.first_air_date ? new Date(item.first_air_date).getFullYear() : undefined}

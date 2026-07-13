@@ -20,6 +20,7 @@ export function FilmographyItem({
             src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
             alt={item.title || item.name}
             mediaType={item.media_type}
+            tmdbId={String(item.id)}
             title={item.title || item.name}
             year={item.release_date || item.first_air_date ? new
               Date(item.release_date || item.first_air_date).getFullYear() : undefined}
