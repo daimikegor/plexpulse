@@ -427,3 +427,32 @@ export async function getGenreContent(mediaType: 'movie' | 'tv', genreId: string
     return { results: [] };
   }
 }
+
+export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return { results: [], page: 1, total_pages: 1 };
+    }
+    const response = await fetch(
+      `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`
+    );
+    if (!response.ok) {
+      throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    const resultsWithMediaType = data.results.map((item: any) => ({
+      ...item,
+      media_type: mediaType
+    }));
+    return {
+      results: resultsWithMediaType,
+      page: data.page,
+      total_pages: data.total_pages
+    };
+  } catch (error) {
+    console.error(`Error fetching discover page for ${mediaType}:`, error);
+    return { results: [], page: 1, total_pages: 1 };
+  }
+}
