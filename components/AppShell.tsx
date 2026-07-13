@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { SiteHeader } from '@/components/SiteHeader';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 
 export function AppShell({ username, children }: { username: string | null; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export function AppShell({ username, children }: { username: string | null; chil
         <SiteHeader />
         {children}
       </div>
+      <ScrollToTopButton />
     </div>
   );
 }
