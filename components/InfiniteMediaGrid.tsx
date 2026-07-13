@@ -5,12 +5,12 @@ import { PosterImage } from '@/components/PosterImage';
 import { DetailModal } from '@/components/DetailModal';
 
 export function InfiniteMediaGrid({
-  mediaType,
+  apiEndpoint,
   initialResults,
   initialPage,
   initialTotalPages
 }: {
-  mediaType: 'movie' | 'tv';
+  apiEndpoint: string;
   initialResults: any[];
   initialPage: number;
   initialTotalPages: number;
@@ -47,7 +47,7 @@ export function InfiniteMediaGrid({
   const loadMore = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/discover?mediaType=${mediaType}&page=${page + 1}`);
+      const response = await fetch(`${apiEndpoint}&page=${page + 1}`);
       const data = await response.json();
       
       // Filter out duplicates

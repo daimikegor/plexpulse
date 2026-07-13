@@ -11,7 +11,7 @@ export default async function SeriesPage() {
     <main>
       <h1 className="search-context-heading">Series</h1>
       <InfiniteMediaGrid 
-        mediaType="tv" 
+        apiEndpoint="/api/discover?mediaType=tv" 
         initialResults={data.results}
         initialPage={data.page} 
         initialTotalPages={data.total_pages} 
