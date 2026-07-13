@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
+const statusRequestCache = new Map<string, Promise<any>>();
+
 export function PosterImage({ 
   src, 
   alt, 
