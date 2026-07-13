@@ -558,3 +558,23 @@ export async function getUpcomingPage(page: number) {
     return { results: [], page: 1, total_pages: 1 };
   }
 }
+
+export async function getGenreContentPage(mediaType: 'movie' | 'tv', genreId: string, page: number) {
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const response = await fetch(
+      `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=${page}`
+    );
+    if (!response.ok) throw new Error(`TMDB API error: ${response.status}`);
+    const data = await response.json();
+    const resultsWithMediaType = data.results.map((item: any) => ({
+      ...item,
+      media_type: mediaType
+    }));
+    return { results: resultsWithMediaType, page: data.page, total_pages: data.total_pages };
+  } catch (error) {
+    console.error('Error fetching genre content page:', error);
+    return { results: [], page: 1, total_pages: 1 };
+  }
+}
