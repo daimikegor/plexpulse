@@ -23,6 +23,7 @@ export function PosterImage({
   onRequestClick?: () => void;
 }) {
   const [imageSrc, setImageSrc] = useState(src);
+  const [requestStatus, setRequestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const handleError = () => {
     // Simply hide the broken image by setting display to none
@@ -60,13 +61,30 @@ export function PosterImage({
         )}
         
         <button 
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            (onRequestClick || (() => console.log('Request clicked for:', title)))();
+            if (onRequestClick) {
+              onRequestClick();
+              return;
+            }
+            if (requestStatus !== 'idle') return;
+            setRequestStatus('loading');
+            try {
+              const response = await fetch('/api/watchlist/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, year, mediaType: mediaType === 'tv' ? 'tv' : 'movie' })
+              });
+              setRequestStatus(response.ok ? 'success' : 'error');
+            } catch (err) {
+              setRequestStatus('error');
+            }
           }}
-          className="btn btn--gold poster-overlay__request-btn"
+          className={`btn btn--gold poster-overlay__request-btn ${requestStatus === 'success'
+            ? 'is-added' : ''} ${requestStatus === 'error' ? 'is-error' : ''}`}
+          disabled={requestStatus === 'loading' || requestStatus === 'success'}
         >
-          Request
+          {requestStatus === 'loading' ? 'Requesting...' : requestStatus === 'success' ? 'Requested' : requestStatus === 'error' ? 'Not Found' : 'Request'}
         </button>
       </div>
       

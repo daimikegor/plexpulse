@@ -145,6 +145,16 @@ html, body {
 }
 .btn--gold:hover { background: #F0B457; }
 
+.btn.is-added {
+  background: var(--teal);
+  color: #06231d;
+}
+
+.btn.is-error {
+  background: #C2554B;
+  color: #fff;
+}
+
 .btn--ghost {
   background: transparent;
   color: var(--text-muted);
