@@ -109,6 +109,8 @@ export function PosterImage({
               setRequestStatus('error');
             }
           }}
+          className={`btn btn--gold poster-overlay__request-btn ${effectiveState === 'available' ? 'is-available' : ''} ${effectiveState === 'requested' ? 'is-requested' : ''} ${effectiveState === 'error' ? 'is-error' : ''}`}
+          disabled={effectiveState !== 'idle'}
         >
           {buttonText}
         </button>
