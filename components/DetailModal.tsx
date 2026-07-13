@@ -15,6 +15,8 @@ export function DetailModal({
   const [isClient, setIsClient] = useState(false);
   const [extendedItem, setExtendedItem] = useState<any>(null);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [requestStatus, setRequestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -37,9 +39,30 @@ export function DetailModal({
     }
   }, [isOpen, item]);
 
+  useEffect(() => {
+    if (!isOpen || !item) return;
+    const mediaType = item.media_type === 'tv' ? 'tv' : 'movie';
+    fetch(`/api/media-status?tmdbId=${item.id}&mediaType=${mediaType}`)
+      .then(res => res.json())
+      .then(data => setLiveStatus(data.status))
+      .catch(() => setLiveStatus(null));
+  }, [isOpen, item]);
+
   if (!isClient || !isOpen) return null;
 
   const runtime = extendedItem?.runtime || item.runtime;
+
+  const effectiveState = liveStatus === 'available' ? 'available'
+    : (liveStatus === 'requested' || requestStatus === 'success') ? 'requested'
+    : requestStatus === 'loading' ? 'loading'
+    : requestStatus === 'error' ? 'error'
+    : 'idle';
+
+  const buttonText = effectiveState === 'available' ? 'Available'
+    : effectiveState === 'requested' ? 'Requested'
+    : effectiveState === 'loading' ? 'Requesting...'
+    : effectiveState === 'error' ? 'Not Found'
+    : 'Request';
   const genres = extendedItem?.genres?.map((g: any) => g.name).join(', ') || 
                  item.genres?.map((g: any) => g.name).join(', ') || '';
   
