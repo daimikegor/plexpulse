@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/session';
-import { getGenreContent } from '@/lib/tmdb';
-import { SearchResultsGrid } from '@/components/SearchResultsGrid';
+import { getGenreContentPage } from '@/lib/tmdb';
+import { InfiniteMediaGrid } from '@/components/InfiniteMediaGrid';
 
 export default async function GenrePage({
   params,
@@ -11,7 +11,7 @@ export default async function GenrePage({
 }) {
   await requireAuth();
   
-  const data = await getGenreContent(params.mediaType as 'movie' | 'tv', params.id);
+  const data = await getGenreContentPage(params.mediaType as 'movie' | 'tv', params.id, 1);
   const genreName = searchParams.name || 'Genre';
   
   return (
@@ -19,11 +19,11 @@ export default async function GenrePage({
       <h1 className="search-context-heading">
         {genreName} {params.mediaType === 'movie' ? 'Movies' : 'Series'}
       </h1>
-      {data.results.length > 0 ? (
-        <SearchResultsGrid items={data.results} hideFilters={true} />
-      ) : (
-        <p className="empty-state">No results found.</p>
-      )}
+      <InfiniteMediaGrid
+        apiEndpoint={`/api/genre-content?mediaType=${params.mediaType}&genreId=${params.id}`}
+        initialResults={data.results} 
+        initialPage={data.page}
+        initialTotalPages={data.total_pages} />
     </main>
   );
 }
