@@ -64,18 +64,6 @@ export function DetailModal({
   if (!isClient || !isOpen) return null;
 
   const runtime = extendedItem?.runtime || item.runtime;
-
-  const effectiveState = liveStatus === 'available' ? 'available'
-    : (liveStatus === 'requested' || requestStatus === 'success') ? 'requested'
-    : requestStatus === 'loading' ? 'loading'
-    : requestStatus === 'error' ? 'error'
-    : 'idle';
-
-  const buttonText = effectiveState === 'available' ? 'Available'
-    : effectiveState === 'requested' ? 'Requested'
-    : effectiveState === 'loading' ? 'Requesting...'
-    : effectiveState === 'error' ? 'Not Found'
-    : 'Request';
   const genres = extendedItem?.genres?.map((g: any) => g.name).join(', ') || 
                  item.genres?.map((g: any) => g.name).join(', ') || '';
   
