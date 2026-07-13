@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { Check, Clock } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 const statusRequestCache = new Map<string, Promise<any>>();
@@ -143,6 +144,13 @@ export function PosterImage({
           }`}>
             {mediaType === 'movie' ? 'Movie' : 'Series'}
           </span>
+        </div>
+      )}
+
+      {(effectiveState === 'available' || effectiveState === 'requested') && (
+        <div className={`poster-status-badge ${effectiveState === 'available' ?
+          'poster-status-badge--available' : 'poster-status-badge--requested'}`}>
+          {effectiveState === 'available' ? <Check size={14} /> : <Clock size={14} />}
         </div>
       )}
     </div>

@@ -152,7 +152,7 @@ html, body {
 }
 
 .btn.is-available {
-  background: #4CAF7D;
+  background: #22C55E;
   color: #06231d;
   opacity: 1;
 }
@@ -794,6 +794,29 @@ main {
 .ticket__request-btn.is-error {
   border-color: #C2554B;
   color: #C2554B;
+}
+
+.poster-status-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.poster-status-badge--available {
+  background: rgba(14,16,21,0.85);
+  border: 2px solid #22C55E;
+  color: #22C55E;
+}
+.poster-status-badge--requested {
+  background: #fff;
+  color: var(--teal);
 }
 
 /* ---------------------------------------------------------------------
