@@ -17,6 +17,7 @@ export function DetailModal({
   const [showTrailer, setShowTrailer] = useState(false);
   const [requestStatus, setRequestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
+  const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -47,6 +48,18 @@ export function DetailModal({
       .then(data => setLiveStatus(data.status))
       .catch(() => setLiveStatus(null));
   }, [isOpen, item]);
+
+  const effectiveState = liveStatus === 'available' ? 'available'
+    : (liveStatus === 'requested' || requestStatus === 'success') ? 'requested'
+    : requestStatus === 'loading' ? 'loading'
+    : requestStatus === 'error' ? 'error'
+    : 'idle';
+
+  const buttonText = effectiveState === 'available' ? 'Available'
+    : effectiveState === 'requested' ? 'Requested'
+    : effectiveState === 'loading' ? 'Requesting...'
+    : effectiveState === 'error' ? 'Not Found'
+    : 'Request';
 
   if (!isClient || !isOpen) return null;
 
@@ -164,9 +177,10 @@ export function DetailModal({
                   <p className="modal-overview">{item.overview}</p>
                   <button
                     onClick={() => console.log('Request clicked for:', item.id)}
-                    className="btn btn--gold modal-request-btn"
+                    className={`btn btn--gold modal-request-btn ${effectiveState === 'available' ? 'is-available' : ''} ${effectiveState === 'requested' ? 'is-requested' : ''} ${effectiveState === 'error' ? 'is-error' : ''}`}
+                    disabled={effectiveState !== 'idle'}
                   >
-                    Request
+                    {buttonText}
                   </button>
                   {extendedItem?.credits?.cast && extendedItem.credits.cast.length > 0 && (
                     <div className="modal-cast">
