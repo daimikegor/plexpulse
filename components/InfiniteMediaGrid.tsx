@@ -105,7 +105,6 @@ export function InfiniteMediaGrid({
           item={selectedItem} 
           isOpen={isModalOpen} 
           onClose={() => setIsModalOpen(false)} 
-          mediaType={mediaType}
         />
       )}
     </>
