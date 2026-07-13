@@ -578,3 +578,19 @@ export async function getGenreContentPage(mediaType: 'movie' | 'tv', genreId: st
     return { results: [], page: 1, total_pages: 1 };
   }
 }
+
+export async function getTvdbIdFromTmdb(tmdbId: string): Promise<string | null> {
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) return null;
+    const response = await fetch(
+      `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids?api_key=${API_KEY}`
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.tvdb_id ? String(data.tvdb_id) : null;
+  } catch (error) {
+    console.error('Error fetching TVDB id from TMDB:', error);
+    return null;
+  }
+}
