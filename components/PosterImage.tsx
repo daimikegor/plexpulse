@@ -63,6 +63,29 @@ export function PosterImage({
     return () => observer.disconnect();
   }, [tmdbId, mediaType]);
 
+  useEffect(() => {
+    if (requestStatus !== 'success' || !tmdbId) return;
+    const mediaTypeParam = mediaType === 'tv' ? 'tv' : 'movie';
+    let pollCount = 0;
+    const maxPolls = 8; // 8 * 15s = 2 minutes
+
+    const interval = setInterval(() => {
+      pollCount++;
+      fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaTypeParam}&force=1`)
+        .then(res => res.json())
+        .then(data => {
+          setLiveStatus(data.status);
+          if (data.status === 'available' || pollCount >= maxPolls) {
+            clearInterval(interval);
+          }
+        })
+        .catch(() => {});
+      if (pollCount >= maxPolls) clearInterval(interval);
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [requestStatus, tmdbId, mediaType]);
+
   const handleError = () => {
     // Simply hide the broken image by setting display to none
     const imgElement = document.querySelector(`img[src="${src}"]`);
