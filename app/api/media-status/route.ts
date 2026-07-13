@@ -9,7 +9,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing or invalid parameters' }, { status: 400 });
   }
 
-  let status = await getCachedMediaStatus(tmdbId, mediaType);
+  const force = searchParams.get('force');
+  let status = force ? null : await getCachedMediaStatus(tmdbId, mediaType);
   if (status === null) {
     status = await refreshMediaStatus(tmdbId, mediaType);
   }
