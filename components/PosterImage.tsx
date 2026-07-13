@@ -11,6 +11,7 @@ export function PosterImage({
   title,
   year,
   overview,
+  tmdbId,
   onRequestClick
 }: { 
   src: string; 
@@ -20,10 +21,20 @@ export function PosterImage({
   title: string;
   year?: string | number;
   overview?: string;
+  tmdbId: string;
   onRequestClick?: () => void;
 }) {
   const [imageSrc, setImageSrc] = useState(src);
   const [requestStatus, setRequestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
+
+  useEffect(() => {
+    if (!tmdbId) return;
+    fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType === 'tv' ? 'tv' : 'movie'}`)
+      .then(res => res.json())
+      .then(data => setLiveStatus(data.status))
+      .catch(() => setLiveStatus(null));
+  }, [tmdbId, mediaType]);
 
   const handleError = () => {
     // Simply hide the broken image by setting display to none
@@ -80,11 +91,8 @@ export function PosterImage({
               setRequestStatus('error');
             }
           }}
-          className={`btn btn--gold poster-overlay__request-btn ${requestStatus === 'success'
-            ? 'is-added' : ''} ${requestStatus === 'error' ? 'is-error' : ''}`}
-          disabled={requestStatus === 'loading' || requestStatus === 'success'}
         >
-          {requestStatus === 'loading' ? 'Requesting...' : requestStatus === 'success' ? 'Requested' : requestStatus === 'error' ? 'Not Found' : 'Request'}
+          {buttonText}
         </button>
       </div>
       
@@ -99,4 +107,16 @@ export function PosterImage({
       )}
     </div>
   );
+
+  const effectiveState = liveStatus === 'available' ? 'available'
+    : (liveStatus === 'requested' || requestStatus === 'success') ? 'requested'
+    : requestStatus === 'loading' ? 'loading'
+    : requestStatus === 'error' ? 'error'
+    : 'idle';
+
+  const buttonText = effectiveState === 'available' ? 'Available'
+    : effectiveState === 'requested' ? 'Requested'
+    : effectiveState === 'loading' ? 'Requesting...'
+    : effectiveState === 'error' ? 'Not Found'
+    : 'Request';
 }
