@@ -456,3 +456,105 @@ export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
     return { results: [], page: 1, total_pages: 1 };
   }
 }
+
+export async function getTrendingPage(page: number) {
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const response = await fetch(
+      `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&page=${page}`
+    );
+    if (!response.ok) throw new Error(`TMDB API error: ${response.status}`);
+    const data = await response.json();
+    return { results: data.results, page: data.page, total_pages: data.total_pages };
+  } catch (error) {
+    console.error('Error fetching trending page:', error);
+    return { results: [], page: 1, total_pages: 1 };
+  }
+}
+
+export async function getPopularPage(page: number) {
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const [movieRes, tvRes] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&page=${page}`),
+      fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&page=${page}`)
+    ]);
+    if (!movieRes.ok || !tvRes.ok) throw new Error('TMDB API error');
+    const movieData = await movieRes.json();
+    const tvData = await tvRes.json();
+    const movies = movieData.results.map((item: any) => ({ ...item, media_type: 'movie' }));
+    const tvs = tvData.results.map((item: any) => ({ ...item, media_type: 'tv' }));
+    const merged = [...movies, ...tvs].sort((a, b) => b.popularity - a.popularity);
+    return {
+      results: merged,
+      page,
+      total_pages: Math.min(movieData.total_pages, tvData.total_pages)
+    };
+  } catch (error) {
+    console.error('Error fetching popular page:', error);
+    return { results: [], page: 1, total_pages: 1 };
+  }
+}
+
+export async function getTopRatedPage(page: number) {
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const [movieRes, tvRes] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&page=${page}`),
+      fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}&page=${page}`)
+    ]);
+    if (!movieRes.ok || !tvRes.ok) throw new Error('TMDB API error');
+    const movieData = await movieRes.json();
+    const tvData = await tvRes.json();
+    const movies = movieData.results.map((item: any) => ({ ...item, media_type: 'movie' }));
+    const tvs = tvData.results.map((item: any) => ({ ...item, media_type: 'tv' }));
+    const merged = [...movies, ...tvs].sort((a, b) => b.popularity - a.popularity);
+    return {
+      results: merged,
+      page,
+      total_pages: Math.min(movieData.total_pages, tvData.total_pages)
+    };
+  } catch (error) {
+    console.error('Error fetching top rated page:', error);
+    return { results: [], page: 1, total_pages: 1 };
+  }
+}
+
+export async function getUpcomingPage(page: number) {
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const [movieRes, tvRes] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&page=${page}`),
+      fetch(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&page=${page}`)
+    ]);
+    if (!movieRes.ok || !tvRes.ok) throw new Error('TMDB API error');
+    const movieData = await movieRes.json();
+    const tvData = await tvRes.json();
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now); thirtyDaysAgo.setDate(now.getDate() - 30);
+    const ninetyDaysFromNow = new Date(now); ninetyDaysFromNow.setDate(now.getDate() + 90);
+    const movies = movieData.results
+      .map((item: any) => ({ ...item, media_type: 'movie' }))
+      .filter((item: any) => item.release_date && new Date(item.release_date) >= thirtyDaysAgo && new Date(item.release_date) <= ninetyDaysFromNow);
+    const tvs = tvData.results
+      .map((item: any) => ({ ...item, media_type: 'tv' }))
+      .filter((item: any) => item.first_air_date && new Date(item.first_air_date) >= thirtyDaysAgo && new Date(item.first_air_date) <= ninetyDaysFromNow);
+    const merged = [...movies, ...tvs].sort((a, b) => {
+      const dateA = a.release_date || a.first_air_date;
+      const dateB = b.release_date || b.first_air_date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+    return {
+      results: merged,
+      page,
+      total_pages: Math.min(movieData.total_pages, tvData.total_pages)
+    };
+  } catch (error) {
+    console.error('Error fetching upcoming page:', error);
+    return { results: [], page: 1, total_pages: 1 };
+  }
+}
