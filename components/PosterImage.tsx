@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const statusRequestCache = new Map<string, Promise<any>>();
 
@@ -29,17 +29,37 @@ export function PosterImage({
   const [imageSrc, setImageSrc] = useState(src);
   const [requestStatus, setRequestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!tmdbId) return;
-    const cacheKey = `${tmdbId}-${mediaType === 'tv' ? 'tv' : 'movie'}`;
-    let request = statusRequestCache.get(cacheKey);
-    if (!request) {
-      request = fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType === 'tv' ? 'tv' : 'movie'}`)
-        .then(res => res.json());
-      statusRequestCache.set(cacheKey, request);
-    }
-    request.then(data => setLiveStatus(data.status)).catch(() => setLiveStatus(null));
+    if (!tmdbId || !containerRef.current) return;
+    let hasFetched = false;
+
+    const fetchStatus = () => {
+      if (hasFetched) return;
+      hasFetched = true;
+      const cacheKey = `${tmdbId}-${mediaType === 'tv' ? 'tv' : 'movie'}`;
+      let request = statusRequestCache.get(cacheKey);
+      if (!request) {
+        request = fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType === 'tv' ? 'tv' : 'movie'}`)
+          .then(res => res.json());
+        statusRequestCache.set(cacheKey, request);
+      }
+      request.then(data => setLiveStatus(data.status)).catch(() => setLiveStatus(null));
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchStatus();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
   }, [tmdbId, mediaType]);
 
   const handleError = () => {
@@ -63,7 +83,7 @@ export function PosterImage({
     : 'Request';
 
   return (
-    <div className="relative group">
+    <div ref={containerRef} className="relative group">
       <Image 
         src={imageSrc} 
         alt={alt}
