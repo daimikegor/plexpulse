@@ -1103,8 +1103,8 @@ main {
 }
 .cast-chip img,
 .cast-chip__fallback {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--border);
@@ -1614,7 +1614,7 @@ main {
   justify-content: center;
   border: none;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.6), 0 0 0 5px rgba(232,163,61,0.18);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.55), 0 0 0 3px rgba(232,163,61,0.15);
   opacity: 0;
   pointer-events: none;
   transform: translateY(10px) scale(0.9);
