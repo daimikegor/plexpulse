@@ -47,6 +47,11 @@ manually in Plex's web interface (requires Plex Pass):
 4. Enter: http://<your-plexpulse-address>:3000/api/webhooks/plex
 5. Save
 
+**Important:** The webhook URL is tied to wherever PlexPulse is actually hosted/running.
+If PlexPulse's deployment location changes (e.g., moving between machines), the webhook
+URL registered in Plex's settings must be manually updated to match, or it will silently
+stop firing with no error.
+
 ## Sonarr TVDB Matching
 
 Sonarr identifies TV series by TVDB ID, not TMDB ID (Radarr uses TMDB natively for
