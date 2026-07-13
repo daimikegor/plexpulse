@@ -1604,8 +1604,8 @@ main {
   position: fixed;
   bottom: 2.5rem;
   right: 3rem;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: var(--gold);
   color: #1a1305;
