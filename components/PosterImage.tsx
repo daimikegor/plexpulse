@@ -84,7 +84,7 @@ export function PosterImage({
     : 'Request';
 
   return (
-    <div ref={containerRef} className="relative group">
+    <div ref={containerRef} className="relative group w-full h-full">
       <Image 
         src={imageSrc} 
         alt={alt}
