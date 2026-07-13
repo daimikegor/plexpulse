@@ -675,19 +675,14 @@ main {
 
 .media-type-badge {
   position: absolute;
-  top: 0.4rem;
-  left: 0.4rem;
-  padding: 0.2rem 0.5rem;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+  padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: rgba(14, 16, 21, 0.82);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
 }
 
 .in-library-badge {

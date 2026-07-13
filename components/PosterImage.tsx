@@ -91,7 +91,7 @@ export function PosterImage({
         width={342}
         height={513}
         onError={handleError}
-        className={`w-full h-auto rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 ${className || ''}`}
+        className={`w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 ${className || ''}`}
       />
       
       <div className="poster-overlay group-hover:opacity-100">
@@ -138,12 +138,8 @@ export function PosterImage({
       </div>
       
       {mediaType && (
-        <div className="absolute top-2 left-2 z-10">
-          <span className={`text-white text-xs px-2 py-1 rounded-full ${
-            mediaType === 'movie' ? 'bg-[#1f4fbc]' : 'bg-[#a329bb]'
-          }`}>
-            {mediaType === 'movie' ? 'Movie' : 'Series'}
-          </span>
+        <div className="media-type-badge" style={{ background: mediaType === 'movie' ? '#1f4fbc' : '#a329bb' }}>
+          {mediaType === 'movie' ? 'Movie' : 'Series'}
         </div>
       )}
 
