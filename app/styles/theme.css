@@ -145,6 +145,23 @@ html, body {
 }
 .btn--gold:hover { background: #F0B457; }
 
+.btn.is-requested {
+  background: var(--teal);
+  color: #06231d;
+  opacity: 1;
+}
+
+.btn.is-available {
+  background: #4CAF7D;
+  color: #06231d;
+  opacity: 1;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .btn.is-added {
   background: var(--teal);
   color: #06231d;
