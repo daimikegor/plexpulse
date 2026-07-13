@@ -1,18 +1,20 @@
-import { getTrendingMovies } from '@/lib/tmdb';
+import { getDiscoverPage } from '@/lib/tmdb';
 import { requireAuth } from '@/lib/session';
-import { TrendingSection } from '@/components/TrendingSection';
+import { InfiniteMediaGrid } from '@/components/InfiniteMediaGrid';
 
 export default async function MoviesPage() {
   await requireAuth();
   
-  const moviesData = await getTrendingMovies();
+  const data = await getDiscoverPage('movie', 1);
   
   return (
     <main>
-      <TrendingSection 
-        trendingData={moviesData} 
-        heading="Trending Movies" 
-        rowId="movies-row" 
+      <h1 className="search-context-heading">Movies</h1>
+      <InfiniteMediaGrid 
+        mediaType="movie" 
+        initialResults={data.results}
+        initialPage={data.page} 
+        initialTotalPages={data.total_pages} 
       />
     </main>
   );
