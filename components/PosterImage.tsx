@@ -44,13 +44,13 @@ export function PosterImage({
       />
       
       <div className="poster-overlay group-hover:opacity-100">
+        {year && (
+          <div className="poster-overlay__year">
+            {year}
+          </div>
+        )}
         <div className="poster-overlay__title">
           {title}
-          {year && (
-            <span className="poster-overlay__year">
-              {year}
-            </span>
-          )}
         </div>
         
         {overview && (

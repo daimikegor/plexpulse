@@ -50,50 +50,30 @@ export default async function PersonPage({ params }: { params: { id: string } })
     return (
       <main>
         {/* Person Header */}
-        <div className="flex flex-col md:flex-row gap-6 mb-8">
-          <div className="md:w-1/3">
-            {personData.profile_path ? (
-              <img 
-                src={`https://image.tmdb.org/t/p/w500${personData.profile_path}`} 
-                alt={personData.name}
-                className="w-full rounded-lg shadow-lg"
-              />
-            ) : (
-              <div className="bg-gray-700 rounded-lg w-full h-96 flex items-center justify-center">
-                <span className="text-gray-400">No Image</span>
-              </div>
-            )}
-          </div>
-          
-          <div className="md:w-2/3">
-            <h1 className="search-context-heading">{personData.name}</h1>
-            
-            {personData.biography && (
-              <p>{personData.biography}</p>
-            )}
-            
-            <div className="grid grid-cols-2 gap-4">
-              {personData.birthday && (
-                <div>
-                  <p>Birthday</p>
-                  <p>{new Date(personData.birthday).toLocaleDateString()}</p>
-                </div>
-              )}
-              
-              {personData.place_of_birth && (
-                <div>
-                  <p>Place of Birth</p>
-                  <p>{personData.place_of_birth}</p>
-                </div>
-              )}
-              
-              {personData.known_for_department && (
-                <div>
-                  <p>Known For</p>
-                  <p>{personData.known_for_department}</p>
-                </div>
-              )}
+        <div className="person-header">
+          {personData.profile_path ? (
+            <img 
+              src={`https://image.tmdb.org/t/p/w500${personData.profile_path}`} 
+              alt={personData.name}
+              className="person-header__photo"
+            />
+          ) : (
+            <div className="person-header__photo person-header__photo--fallback">
+              {personData.name.charAt(0)}
             </div>
+          )}
+          <div className="person-header__info">
+            <h1 className="search-context-heading">{personData.name}</h1>
+            <p className="person-header__meta">
+              {personData.birthday && `Born ${new
+                Date(personData.birthday).toLocaleDateString('en-US', { year: 'numeric',
+                month: 'long', day: 'numeric' })}`}
+              {personData.place_of_birth && ` · ${personData.place_of_birth}`}
+              {personData.known_for_department && ` · Known for ${personData.known_for_department}`}
+            </p>
+            {personData.biography && (
+              <p className="modal-overview">{personData.biography}</p>
+            )}
           </div>
         </div>
         
