@@ -17,7 +17,6 @@ export function DetailModal({
   const [showTrailer, setShowTrailer] = useState(false);
   const [requestStatus, setRequestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
-  const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -48,18 +47,6 @@ export function DetailModal({
       .then(data => setLiveStatus(data.status))
       .catch(() => setLiveStatus(null));
   }, [isOpen, item]);
-
-  const effectiveState = liveStatus === 'available' ? 'available'
-    : (liveStatus === 'requested' || requestStatus === 'success') ? 'requested'
-    : requestStatus === 'loading' ? 'loading'
-    : requestStatus === 'error' ? 'error'
-    : 'idle';
-
-  const buttonText = effectiveState === 'available' ? 'Available'
-    : effectiveState === 'requested' ? 'Requested'
-    : effectiveState === 'loading' ? 'Requesting...'
-    : effectiveState === 'error' ? 'Not Found'
-    : 'Request';
 
   if (!isClient || !isOpen) return null;
 
