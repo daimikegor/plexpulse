@@ -38,8 +38,10 @@ export async function getCachedMediaStatus(tmdbId: string, mediaType: 'movie' | 
   const id = `${mediaType}-${tmdbId}`;
   const result = await db.select().from(mediaStatus).where(eq(mediaStatus.id, id)).get();
   if (!result) return null;
-  // Consider cache stale after 1 hour
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-  if (new Date(result.lastChecked) < oneHourAgo) return null;
+  const staleThreshold = result.status === 'available'
+    ? 24 * 60 * 60 * 1000
+    : 60 * 1000;
+  const cutoff = new Date(Date.now() - staleThreshold);
+  if (new Date(result.lastChecked) < cutoff) return null;
   return result.status as 'none' | 'requested' | 'available';
 }
