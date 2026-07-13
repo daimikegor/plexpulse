@@ -88,8 +88,7 @@ export function PosterImage({
       <Image 
         src={imageSrc} 
         alt={alt}
-        width={342}
-        height={513}
+        fill
         onError={handleError}
         className={`w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 ${className || ''}`}
       />
