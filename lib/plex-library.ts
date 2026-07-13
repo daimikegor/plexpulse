@@ -4,6 +4,15 @@ export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'
     const token = process.env.PLEX_SERVER_TOKEN;
     if (!serverUrl || !token) return false;
 
+    // Check cache first
+    const cacheKey = `plex:library:guids:${mediaType}`;
+    const cachedGuids = await redis.get(cacheKey);
+    if (cachedGuids) {
+      const guids = JSON.parse(cachedGuids);
+      return guids.includes(tmdbId);
+    }
+
+    // Cache miss, fetch from Plex
     const sectionsRes = await fetch(
       `${serverUrl}/library/sections?X-Plex-Token=${token}`,
       { headers: { 'Accept': 'application/json' } }
@@ -15,6 +24,7 @@ export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'
     const targetType = mediaType === 'movie' ? 'movie' : 'show';
     const relevantSections = sections.filter((s: any) => s.type === targetType);
 
+    const guids: string[] = [];
     for (const section of relevantSections) {
       const itemsRes = await fetch(
         `${serverUrl}/library/sections/${section.key}/all?includeGuids=1&X-Plex-Token=${token}`,
@@ -23,14 +33,26 @@ export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'
       if (!itemsRes.ok) continue;
       const itemsData = await itemsRes.json();
       const items = itemsData.MediaContainer?.Metadata || [];
-      const found = items.find((item: any) =>
-        item.Guid?.some((g: any) => g.id === `tmdb://${tmdbId}`)
-      );
-      if (found) return true;
+      for (const item of items) {
+        const guid = item.Guid?.find((g: any) => g.id.startsWith('tmdb://'));
+        if (guid) {
+          const tmdbIdFromGuid = guid.id.replace('tmdb://', '');
+          guids.push(tmdbIdFromGuid);
+        }
+      }
     }
-    return false;
+
+    // Cache indefinitely
+    await redis.set(cacheKey, JSON.stringify(guids));
+
+    return guids.includes(tmdbId);
   } catch (error) {
     console.error('Error checking Plex library:', error);
     return false;
   }
+}
+
+export async function invalidatePlexLibraryCache(): Promise<void> {
+  await redis.del('plex:library:guids:movie');
+  await redis.del('plex:library:guids:tv');
 }
