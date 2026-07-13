@@ -801,8 +801,8 @@ main {
   top: 0.5rem;
   right: 0.5rem;
   z-index: 10;
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -812,7 +812,7 @@ main {
 .poster-status-badge--available {
   background: rgba(14,16,21,0.85);
   border: 2px solid #22C55E;
-  color: #22C55E;
+  color: #fff;
 }
 .poster-status-badge--requested {
   background: #fff;
