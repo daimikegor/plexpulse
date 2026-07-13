@@ -44,6 +44,18 @@ export function PosterImage({
     }
   };
 
+  const effectiveState = liveStatus === 'available' ? 'available'
+    : (liveStatus === 'requested' || requestStatus === 'success') ? 'requested'
+    : requestStatus === 'loading' ? 'loading'
+    : requestStatus === 'error' ? 'error'
+    : 'idle';
+
+  const buttonText = effectiveState === 'available' ? 'Available'
+    : effectiveState === 'requested' ? 'Requested'
+    : effectiveState === 'loading' ? 'Requesting...'
+    : effectiveState === 'error' ? 'Not Found'
+    : 'Request';
+
   return (
     <div className="relative group">
       <Image 
@@ -107,16 +119,4 @@ export function PosterImage({
       )}
     </div>
   );
-
-  const effectiveState = liveStatus === 'available' ? 'available'
-    : (liveStatus === 'requested' || requestStatus === 'success') ? 'requested'
-    : requestStatus === 'loading' ? 'loading'
-    : requestStatus === 'error' ? 'error'
-    : 'idle';
-
-  const buttonText = effectiveState === 'available' ? 'Available'
-    : effectiveState === 'requested' ? 'Requested'
-    : effectiveState === 'loading' ? 'Requesting...'
-    : effectiveState === 'error' ? 'Not Found'
-    : 'Request';
 }
