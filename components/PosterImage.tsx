@@ -30,10 +30,14 @@ export function PosterImage({
 
   useEffect(() => {
     if (!tmdbId) return;
-    fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType === 'tv' ? 'tv' : 'movie'}`)
-      .then(res => res.json())
-      .then(data => setLiveStatus(data.status))
-      .catch(() => setLiveStatus(null));
+    const cacheKey = `${tmdbId}-${mediaType === 'tv' ? 'tv' : 'movie'}`;
+    let request = statusRequestCache.get(cacheKey);
+    if (!request) {
+      request = fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType === 'tv' ? 'tv' : 'movie'}`)
+        .then(res => res.json());
+      statusRequestCache.set(cacheKey, request);
+    }
+    request.then(data => setLiveStatus(data.status)).catch(() => setLiveStatus(null));
   }, [tmdbId, mediaType]);
 
   const handleError = () => {
