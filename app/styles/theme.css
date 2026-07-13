@@ -178,9 +178,12 @@ html, body {
 }
 
 .poster-overlay__year {
-  color: var(--text-muted);
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 0.85rem;
-  margin-left: 0.4rem;
+  color: var(--text);
+  margin-bottom: 0.15rem;
 }
 
 .poster-overlay__overview {
