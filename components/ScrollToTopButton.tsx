@@ -29,7 +29,7 @@ export function ScrollToTopButton() {
       className={`scroll-to-top-btn ${visible ? 'is-visible' : ''}`}
       aria-label="Scroll to top"
     >
-      <ArrowUp size={28} />
+      <ArrowUp size={20} />
     </button>,
     document.body
   );
