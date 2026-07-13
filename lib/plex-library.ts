@@ -1,3 +1,5 @@
+import { redis } from '@/lib/redis';
+
 export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<boolean> {
   try {
     const serverUrl = process.env.PLEX_SERVER_URL;
