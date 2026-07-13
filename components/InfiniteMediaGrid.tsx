@@ -82,7 +82,7 @@ export function InfiniteMediaGrid({
             <div className="ticket ticket--compact">
               <div className="ticket__poster-wrap">
                 <PosterImage 
-                  src={item.poster_path} 
+                  src={`https://image.tmdb.org/t/p/w342${item.poster_path}`} 
                   alt={item.title || item.name} 
                   title={item.title || item.name}
                   year={item.release_date ? new Date(item.release_date).getFullYear() : item.first_air_date ? new Date(item.first_air_date).getFullYear() : ''}
