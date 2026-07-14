@@ -1,5 +1,7 @@
 # PlexPulse Setup Notes
 
+For a general project overview and quick-start installation instructions, see README.md. This file (SETUP.md) covers detailed configuration and known gotchas.
+
 ## Environment Variables (.env)
 
 Required variables and where to find them:
@@ -62,25 +64,33 @@ RADARR_*/SONARR_* variables, REDIS_URL, SESSION_SECRET) is read fresh at runtime
 and can be supplied purely through the container's environment (e.g. Unraid's
 Docker template UI) without needing to be present during the build.
 
-## External Access via Cloudflare Tunnel
+## Additional Database Tables
 
-PlexPulse can be exposed externally the same way v2 (plex-request-hub) was —
-directly through Cloudflare Tunnel, not through Nginx Proxy Manager.
+Beyond `users` and `media_status`, this project also has:
+- `user_requests` — tracks which specific user requested which specific title
+  (separate from media_status, which tracks overall status regardless of who
+  requested it). Powers the "My Requests" and admin "All Requests" pages.
 
-1. Cloudflare Zero Trust dashboard (one.dash.cloudflare.com) -> Networks -> Tunnels
-2. Select the existing tunnel -> Public Hostname tab -> Add a public hostname
-3. Subdomain: plexpulse (or preferred) / Domain: yourdomain.com / Service Type: HTTP /
-   URL: <unraid-ip>:<port> (the internal address PlexPulse actually runs on)
-4. Save
+Remember: since this project's migrate.js is hand-written (not a real migration
+runner), any new table OR new column added to db/schema.ts must ALSO be
+manually added to migrate.js, or it will never actually get created in a fresh
+database. Recent example: adding avatar_url to the users table required an
+ALTER TABLE statement wrapped in a try/catch (to safely no-op on databases
+where the column already exists).
 
-Two things to update once this is set up:
+## Unraid Deployment Notes
 
-- Set IS_HTTPS=true in PlexPulse's environment variables (runtime, no rebuild
-  needed) — required so session cookies get the Secure flag once traffic arrives
-  over HTTPS via the tunnel.
-- Rebuild the image with NEXT_PUBLIC_APP_URL set to the final public URL (e.g.
-  https://plexpulse.yourdomain.com) rather than the internal LAN address, since this is
-  a build-time variable per the section above.
+Generic Unraid templates are included in unraid-templates/ in this repo. When
+filling them in on your own server, never commit a version with your actual
+API keys/tokens filled in — only the blank template belongs in version control.
+
+A recurring gotcha during deployment: Unraid's "Force Update" button (or a full
+stop/remove/re-add) is required to pick up a freshly built Docker image —
+docker restart or stop+start alone will keep running the OLD image even after
+rebuilding. Always verify with:
+  docker inspect --format='{{.Image}}' plexpulse-app
+  docker images plexpulse-app --format "{{.ID}}"
+These two values should match after any update.
 
 ## Request/Availability Status Logic
 
