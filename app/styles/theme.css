@@ -1492,6 +1492,10 @@ main {
   padding: 2rem 2.5rem 4rem;
 }
 
+.app-shell__page {
+  overflow-x: hidden;
+}
+
 .search-bar__row {
   display: flex;
   align-items: center;
