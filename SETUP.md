@@ -45,9 +45,12 @@ getTvdbIdFromTmdb function and lib/sonarr.ts.
 ## Request/Availability Status Logic
 
 - "Requested" = title found in any connected Radarr/Sonarr instance
-- "Available" = title found directly in the Plex Media Server library (not the
-  watchlist, a completely separate check) — checked live via Plex's native guid filtering
-  (querying /library/sections/{id}/all?guid=tmdb://{id} directly) rather than caching the
-  full library, so no manual refresh or webhook setup is required for this to stay accurate.
+- "Available" status is determined by fetching your full Plex library's TMDB guids
+  (via /library/sections/{id}/all?includeGuids=1) and caching that list in Redis for
+  120 seconds. This means newly added content should appear as "Available" within
+  about 2 minutes, without requiring a manual cache refresh or webhook. (An earlier
+  attempt used Plex's server-side guid= query filter for a lighter-weight per-title
+  check, but this did not reliably return matches even for confirmed library items,
+  so it was reverted in favor of this caching approach.)
 - Status results are cached in the media_status database table, refreshed on-demand
   when a poster's status hasn't been checked or the cache is stale
