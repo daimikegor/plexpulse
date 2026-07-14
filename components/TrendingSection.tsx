@@ -20,6 +20,7 @@ export function TrendingSection({
   const [showScrollButtons, setShowScrollButtons] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'movie' | 'tv'>('all');
 
   useEffect(() => {
     const row = document.getElementById(rowId);
@@ -67,6 +68,11 @@ export function TrendingSection({
     setSelectedItem(null);
   };
 
+  const filteredResults = trendingData?.results
+    ? (activeFilter === 'all' ? trendingData.results :
+       trendingData.results.filter((item: any) => item.media_type === activeFilter))
+    : [];
+
   return (
     <div className="shelf">
       <div className="shelf__head">
@@ -78,6 +84,14 @@ export function TrendingSection({
         ) : (
           <h2 className="shelf__heading">{heading}</h2>
         )}
+        <div className="filter-toggle filter-toggle--compact">
+          <button onClick={() => setActiveFilter('all')} className={`filter-toggle__btn
+            ${activeFilter === 'all' ? 'is-active' : ''}`}>All</button>
+          <button onClick={() => setActiveFilter('movie')} className={`filter-toggle__btn
+            ${activeFilter === 'movie' ? 'is-active' : ''}`}>Movies</button>
+          <button onClick={() => setActiveFilter('tv')} className={`filter-toggle__btn
+            ${activeFilter === 'tv' ? 'is-active' : ''}`}>Series</button>
+        </div>
         {showScrollButtons && (
           <div className="shelf__nav-group">
             <button 
@@ -101,7 +115,7 @@ export function TrendingSection({
             className="shelf__row" 
             id={rowId}
           >
-            {trendingData.results.map((item: any) => (
+            {filteredResults.map((item: any) => (
               <div 
                 key={item.id} 
                 className="ticket-wrap ticket-wrap--compact"
