@@ -1428,6 +1428,33 @@ main {
   padding: 2rem 2.5rem 4rem;
 }
 
+.mobile-header-controls {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.mobile-home-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--gold);
+}
+.mobile-home-link:hover {
+  border-color: var(--gold-dim);
+}
+
+@media (max-width: 860px) {
+  .mobile-header-controls {
+    display: flex;
+  }
+}
+
 .top-search-bar {
   margin-bottom: 2rem;
   position: sticky;
