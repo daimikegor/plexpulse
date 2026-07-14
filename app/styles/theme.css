@@ -918,6 +918,9 @@ main {
     padding: 1rem;
     gap: 1rem;
   }
+  .modal-body > div {
+    min-width: 0;
+  }
   .modal-body__poster-col {
     max-width: 160px;
     margin: 0 auto;
