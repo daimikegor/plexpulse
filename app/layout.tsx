@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable}`}>
       <body className="antialiased">
-        <AppShell username={session?.username ?? null} avatarUrl={session?.avatarUrl ?? null}>{children}</AppShell>
+        <AppShell username={session?.username ?? null} avatarUrl={session?.avatarUrl ?? null} isAdmin={session?.isAdmin ?? false}>{children}</AppShell>
       </body>
     </html>
   );

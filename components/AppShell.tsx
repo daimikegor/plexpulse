@@ -7,7 +7,7 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 
-export function AppShell({ username, avatarUrl, children }: { username: string | null; avatarUrl?: string | null; children: React.ReactNode }) {
+export function AppShell({ username, avatarUrl, isAdmin, children }: { username: string | null; avatarUrl?: string | null; isAdmin?: boolean; children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
@@ -27,6 +27,7 @@ export function AppShell({ username, avatarUrl, children }: { username: string |
       )}
       <Sidebar 
         username={username ?? ''} 
+        isAdmin={isAdmin}
       />
       <div className="app-shell__content">
         <SiteHeader avatarUrl={avatarUrl} />
