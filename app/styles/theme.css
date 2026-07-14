@@ -1438,7 +1438,7 @@ main {
 }
 
 .top-search-bar {
-  margin-bottom: 2rem;
+  margin-bottom: 0.6rem;
   position: sticky;
   top: 0;
   z-index: 5;
