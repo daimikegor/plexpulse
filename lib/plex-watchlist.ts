@@ -9,7 +9,10 @@ mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
         'X-Plex-Token': plexToken
       }
     });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      console.error(`Plex Discover search failed: ${response.status} ${response.statusText} for query "${title}"`);
+      return null;
+    }
     const data = await response.json();
     const searchResults = data.MediaContainer?.SearchResults || [];
     const externalResults = searchResults.find((s: any) => s.id === 'external')?.SearchResult || [];
@@ -23,6 +26,10 @@ mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
       const yearMatch = !year || metaYear === year;
       return titleMatch && yearMatch;
     });
+    
+    if (!match) {
+      console.log(`No Plex Discover match found for "${title}" (${year}) among ${externalResults.length} results`);
+    }
     
     if (!match?.Metadata?.guid) return null;
     // Extract ratingKey from guid, e.g. "plex://movie/5d776824..." -> "5d776824..."
