@@ -4,6 +4,7 @@ export const users = sqliteTable('users', {
   plexId: text('plex_id').primaryKey(),
   username: text('username').notNull(),
   isAdmin: integer('is_admin', { mode: 'boolean' }).default(false),
+  avatarUrl: text('avatar_url'),
 });
 
 export const mediaStatus = sqliteTable('media_status', {

@@ -28,7 +28,8 @@ export async function getSession(sessionToken: string) {
       plexId,
       authToken,
       isAdmin: user.isAdmin,
-      username: user.username
+      username: user.username,
+      avatarUrl: user.avatarUrl
     };
   } catch (error) {
     console.error('Error parsing session data:', error);

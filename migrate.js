@@ -8,9 +8,16 @@ const { createClient } = require('@libsql/client');
       CREATE TABLE IF NOT EXISTS users (
         plex_id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
-        is_admin BOOLEAN DEFAULT false
+        is_admin BOOLEAN DEFAULT false,
+        avatar_url TEXT
       )
     `);
+    try {
+      await client.execute(`ALTER TABLE users ADD COLUMN avatar_url TEXT`);
+    } catch (err) {
+      // Ignore error if column already exists (SQLite throws "duplicate column
+      // name" in that case, which is expected on repeat runs)
+    }
     await client.execute(`
       CREATE TABLE IF NOT EXISTS media_status (
         id TEXT PRIMARY KEY,

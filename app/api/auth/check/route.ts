@@ -42,10 +42,11 @@ export async function GET(req: NextRequest) {
       await db.insert(users).values({
         plexId: String(userData.id),
         username: userData.username || userData.title,
-        isAdmin
+        isAdmin,
+        avatarUrl: userData.thumb || null
       }).onConflictDoUpdate({
         target: users.plexId,
-        set: { username: userData.username || userData.title, isAdmin }
+        set: { username: userData.username || userData.title, isAdmin, avatarUrl: userData.thumb || null }
       });
 
       // Create secure session & map to Redis for fast retrieval
