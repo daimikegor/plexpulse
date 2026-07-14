@@ -14,3 +14,13 @@ export const mediaStatus = sqliteTable('media_status', {
   status: text('status').notNull().default('none'), // 'none' | 'requested' | 'available'
   lastChecked: integer('last_checked', { mode: 'timestamp' }).notNull(),
 });
+
+export const userRequests = sqliteTable('user_requests', {
+  id: text('id').primaryKey(), // format: `${plexId}-${mediaType}-${tmdbId}`
+  plexId: text('plex_id').notNull(),
+  tmdbId: text('tmdb_id').notNull(),
+  mediaType: text('media_type').notNull(),
+  title: text('title').notNull(),
+  posterPath: text('poster_path'),
+  requestedAt: integer('requested_at', { mode: 'timestamp' }).notNull(),
+});

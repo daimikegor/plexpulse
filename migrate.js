@@ -27,6 +27,17 @@ const { createClient } = require('@libsql/client');
         last_checked INTEGER NOT NULL
       )
     `);
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS user_requests (
+        id TEXT PRIMARY KEY,
+        plex_id TEXT NOT NULL,
+        tmdb_id TEXT NOT NULL,
+        media_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        poster_path TEXT,
+        requested_at INTEGER NOT NULL
+      )
+    `);
     console.log('Database migration completed.');
   } catch (error) {
     console.error('Migration failed:', error);
