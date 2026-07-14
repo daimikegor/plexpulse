@@ -1479,10 +1479,6 @@ main {
   .mobile-menu-btn {
     display: flex;
   }
-  .app-shell__content {
-    padding-left: 0.85rem;
-    padding-right: 0;
-  }
   .top-search-bar,
   .shelf__head,
   .search-context-heading {
@@ -1815,6 +1811,8 @@ main {
   }
   .app-shell__content {
     padding-bottom: 5rem;
+    padding-left: 0.85rem;
+    padding-right: 0;
   }
   .scroll-to-top-btn {
     bottom: calc(5rem + env(safe-area-inset-bottom));
