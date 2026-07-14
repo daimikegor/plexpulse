@@ -6,9 +6,9 @@ const { createClient } = require('@libsql/client');
     });
     await client.execute(`
       CREATE TABLE IF NOT EXISTS users (
-        plexId TEXT PRIMARY KEY,
+        plex_id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
-        isAdmin BOOLEAN DEFAULT false
+        is_admin BOOLEAN DEFAULT false
       )
     `);
     await client.execute(`
