@@ -14,6 +14,12 @@ Radarr, Sonarr, and Plex library.
 - Infinite scroll on every list
 - Live-as-you-type search across movies, TV shows, and people
 - One-click request → adds to your Plex watchlist automatically
+- Requests work by adding titles to your Plex watchlist — actually downloading and
+  organizing them is handled by [Pulsarr](https://github.com/jamcalli/Pulsarr),
+  which watches your watchlist and routes new items to Sonarr/Radarr
+  automatically. PlexPulse doesn't talk to Sonarr/Radarr to *add* things directly
+  (only to check status) — Pulsarr (or a similar tool) is required for requests to
+  actually result in anything being downloaded.
 - Live Requested/Available status, checked against Radarr, Sonarr, and your Plex
   library directly (supports multiple instances of each)
 - Personal request history ("My Requests")
