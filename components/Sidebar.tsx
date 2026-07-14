@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Compass, Film, Tv, Ticket, LogOut, ShieldCheck } from 'lucide-react';
+import { Compass, Film, Tv, Ticket, LogOut, ShieldCheck, Clock } from 'lucide-react';
 
 export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boolean }) {
   const pathname = usePathname();
@@ -64,6 +64,13 @@ export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boo
         >
           <Tv size={20} />
           <span>Series</span>
+        </Link>
+        <Link 
+          href="/requests" 
+          className={`sidebar__nav-item ${pathname === '/requests' ? 'is-active' : ''}`}
+        >
+          <Clock size={20} />
+          <span>Requests</span>
         </Link>
         
         {isAdmin && (
