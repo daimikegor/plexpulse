@@ -1479,11 +1479,6 @@ main {
   .mobile-menu-btn {
     display: flex;
   }
-  .top-search-bar,
-  .shelf__head,
-  .search-context-heading {
-    padding-right: 1rem;
-  }
 }
 
 .app-shell__content {
@@ -1812,10 +1807,13 @@ main {
   .app-shell__content {
     padding-bottom: 5rem;
     padding-left: 0.85rem;
-    padding-right: 0;
+    padding-right: 0.85rem;
   }
   .scroll-to-top-btn {
     bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+  .shelf__row {
+    margin-right: -0.85rem;
   }
 }
 .person-header__meta {
