@@ -536,7 +536,7 @@ main {
   width: 100%;
   font-family: var(--font-body);
   font-size: 1.1rem;
-  padding: 0.9rem 1.2rem;
+  padding: 0.675rem 1.2rem;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--surface);
@@ -1424,8 +1424,8 @@ main {
   margin-left: 0.75rem;
 }
 .header-avatar__img {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--border);
@@ -1439,8 +1439,10 @@ main {
   position: sticky;
   top: 0;
   z-index: 5;
-  background: var(--bg);
-  padding: 1rem 0;
+  background: rgba(14, 16, 21, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.6rem 0;
   margin-top: -1rem;
   border-bottom: 1px solid transparent;
 }
@@ -1703,7 +1705,9 @@ main {
     left: 0;
     right: 0;
     z-index: 200;
-    background: var(--surface);
+    background: rgba(23, 26, 33, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid var(--border);
     padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
   }
