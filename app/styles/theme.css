@@ -494,6 +494,8 @@ main {
 
 .search-bar {
   margin-bottom: 0;
+  margin-right: -2.5rem;
+  padding-right: 2.5rem;
 }
 
 .search-bar__input-wrapper {
@@ -1498,7 +1500,7 @@ main {
 .header-avatar {
   flex-shrink: 0;
   margin-left: 0.75rem;
-  margin-right: -2.5rem;
+  margin-right: 1rem;
 }
 .header-avatar__img {
   width: 34px;
@@ -1819,8 +1821,9 @@ main {
   .shelf__row {
     margin-right: -0.85rem;
   }
-  .header-avatar {
+  .search-bar {
     margin-right: -0.85rem;
+    padding-right: 0.85rem;
   }
 }
 .person-header__meta {
