@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Menu } from 'lucide-react';
+import { Search, Menu, Ticket } from 'lucide-react';
+import Link from 'next/link';
 
 export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
   const [query, setQuery] = useState('');
@@ -18,9 +19,14 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
   return (
     <div className="top-search-bar">
       <div className="search-bar">
-        <button className="mobile-menu-btn" onClick={onMenuClick} aria-label="Open menu">
-          <Menu size={22} />
-        </button>
+        <div className="mobile-header-controls">
+          <button className="mobile-menu-btn" onClick={onMenuClick} aria-label="Open menu">
+            <Menu size={22} />
+          </button>
+          <Link href="/dashboard" className="mobile-home-link" aria-label="Go to Discover">
+            <Ticket size={20} />
+          </Link>
+        </div>
         <form onSubmit={handleSearch} className="search-bar__row">
           <div className="search-bar__input-wrapper">
             <input

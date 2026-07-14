@@ -1382,7 +1382,6 @@ main {
   color: var(--text);
   cursor: pointer;
   flex-shrink: 0;
-  margin-right: 0.75rem;
 }
 .mobile-menu-btn:hover {
   border-color: var(--gold-dim);
