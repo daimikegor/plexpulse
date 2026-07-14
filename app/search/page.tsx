@@ -71,6 +71,11 @@ export default async function SearchPage({
             const dateB = b.release_date || b.first_air_date;
             return new Date(dateB).getTime() - new Date(dateA).getTime();
           });
+
+          personFilmography = personFilmography.filter((item: any) => {
+            const genreIds = item.genre_ids || [];
+            return !genreIds.includes(10767) && !genreIds.includes(10763);
+          });
           
           // Combine with original search results
           const combinedResults = [...allResults, ...personFilmography];

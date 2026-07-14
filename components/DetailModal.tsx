@@ -163,7 +163,24 @@ export function DetailModal({
                   </div>
                   <p className="modal-overview">{item.overview}</p>
                   <button
-                    onClick={() => console.log('Request clicked for:', item.id)}
+                    onClick={async () => {
+                      if (requestStatus !== 'idle') return;
+                      setRequestStatus('loading');
+                      try {
+                        const response = await fetch('/api/watchlist/add', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            title: item.title || item.name,
+                            year: itemYear,
+                            mediaType: item.media_type === 'tv' ? 'tv' : 'movie'
+                          })
+                        });
+                        setRequestStatus(response.ok ? 'success' : 'error');
+                      } catch (err) {
+                        setRequestStatus('error');
+                      }
+                    }}
                     className={`btn btn--gold modal-request-btn ${effectiveState === 'available' ? 'is-available' : ''} ${effectiveState === 'requested' ? 'is-requested' : ''} ${effectiveState === 'error' ? 'is-error' : ''}`}
                     disabled={effectiveState !== 'idle'}
                   >

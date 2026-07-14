@@ -46,6 +46,11 @@ export default async function PersonPage({ params }: { params: { id: string } })
       const dateB = b.release_date || b.first_air_date;
       return new Date(dateB).getTime() - new Date(dateA).getTime();
     });
+
+    filmography = filmography.filter((item: any) => {
+      const genreIds = item.genre_ids || [];
+      return !genreIds.includes(10767) && !genreIds.includes(10763);
+    });
     
     return (
       <main>
