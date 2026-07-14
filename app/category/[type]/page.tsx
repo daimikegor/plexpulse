@@ -42,6 +42,7 @@ export default async function CategoryPage({
           initialResults={data.results}
           initialPage={data.page}
           initialTotalPages={data.total_pages}
+          showFilter={true}
         />
       ) : (
         <p className="empty-state">No results found.</p>
