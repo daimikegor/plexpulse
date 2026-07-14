@@ -8,12 +8,14 @@ export function InfiniteMediaGrid({
   apiEndpoint,
   initialResults,
   initialPage,
-  initialTotalPages
+  initialTotalPages,
+  showFilter = false
 }: {
   apiEndpoint: string;
   initialResults: any[];
   initialPage: number;
   initialTotalPages: number;
+  showFilter?: boolean;
 }) {
   const [results, setResults] = useState(initialResults);
   const [page, setPage] = useState(initialPage);
@@ -21,6 +23,7 @@ export function InfiniteMediaGrid({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'movie' | 'tv'>('all');
   
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -70,10 +73,24 @@ export function InfiniteMediaGrid({
     setIsModalOpen(true);
   };
 
+  const filteredResults = activeFilter === 'all' ? results :
+    results.filter((item: any) => item.media_type === activeFilter);
+
   return (
     <>
+      {showFilter && (
+        <div className="filter-toggle">
+          <button onClick={() => setActiveFilter('all')} className={`filter-toggle__btn
+            ${activeFilter === 'all' ? 'is-active' : ''}`}>All</button>
+          <button onClick={() => setActiveFilter('movie')} className={`filter-toggle__btn
+            ${activeFilter === 'movie' ? 'is-active' : ''}`}>Movies</button>
+          <button onClick={() => setActiveFilter('tv')} className={`filter-toggle__btn
+            ${activeFilter === 'tv' ? 'is-active' : ''}`}>Series</button>
+        </div>
+      )}
+      
       <div className="results-grid">
-        {results.map((item: any) => (
+        {filteredResults.map((item: any) => (
           <div 
             key={item.id} 
             className="ticket-wrap ticket-wrap--compact"
