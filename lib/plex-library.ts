@@ -1,20 +1,9 @@
-import { redis } from '@/lib/redis';
-
 export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<boolean> {
   try {
     const serverUrl = process.env.PLEX_SERVER_URL;
     const token = process.env.PLEX_SERVER_TOKEN;
     if (!serverUrl || !token) return false;
 
-    // Check cache first
-    const cacheKey = `plex:library:guids:${mediaType}`;
-    const cachedGuids = await redis.get(cacheKey);
-    if (cachedGuids) {
-      const guids = JSON.parse(cachedGuids);
-      return guids.includes(tmdbId);
-    }
-
-    // Cache miss, fetch from Plex
     const sectionsRes = await fetch(
       `${serverUrl}/library/sections?X-Plex-Token=${token}`,
       { headers: { 'Accept': 'application/json' } }
@@ -26,28 +15,17 @@ export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'
     const targetType = mediaType === 'movie' ? 'movie' : 'show';
     const relevantSections = sections.filter((s: any) => s.type === targetType);
 
-    const guids: string[] = [];
     for (const section of relevantSections) {
-      const itemsRes = await fetch(
-        `${serverUrl}/library/sections/${section.key}/all?includeGuids=1&X-Plex-Token=${token}`,
+      const queryRes = await fetch(
+        `${serverUrl}/library/sections/${section.key}/all?guid=tmdb://${tmdbId}&X-Plex-Token=${token}`,
         { headers: { 'Accept': 'application/json' } }
       );
-      if (!itemsRes.ok) continue;
-      const itemsData = await itemsRes.json();
-      const items = itemsData.MediaContainer?.Metadata || [];
-      for (const item of items) {
-        const guid = item.Guid?.find((g: any) => g.id.startsWith('tmdb://'));
-        if (guid) {
-          const tmdbIdFromGuid = guid.id.replace('tmdb://', '');
-          guids.push(tmdbIdFromGuid);
-        }
-      }
+      if (!queryRes.ok) continue;
+      const queryData = await queryRes.json();
+      const items = queryData.MediaContainer?.Metadata || [];
+      if (items.length > 0) return true;
     }
-
-    // Cache indefinitely
-    await redis.set(cacheKey, JSON.stringify(guids));
-
-    return guids.includes(tmdbId);
+    return false;
   } catch (error) {
     console.error('Error checking Plex library:', error);
     return false;
@@ -55,6 +33,6 @@ export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'
 }
 
 export async function invalidatePlexLibraryCache(): Promise<void> {
-  await redis.del('plex:library:guids:movie');
-  await redis.del('plex:library:guids:tv');
+  // No longer needed with the new guid-filtered approach, kept as a no-op
+  // for backward compatibility with the existing refresh-library-cache route.
 }
