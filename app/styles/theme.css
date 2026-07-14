@@ -1402,26 +1402,6 @@ main {
   .mobile-menu-btn {
     display: flex;
   }
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 200;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
-  }
-  .sidebar.is-open {
-    transform: translateX(0);
-  }
-  .sidebar-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 150;
-  }
   .app-shell__content {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
@@ -1707,6 +1687,46 @@ main {
 .scroll-to-top-btn:hover {
   background: #F0B457;
   transform: translateY(-3px) scale(1.08);
+}
+
+.mobile-bottom-nav {
+  display: none;
+}
+@media (max-width: 860px) {
+  .sidebar {
+    display: none;
+  }
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
+  }
+  .mobile-bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    font-family: var(--font-body);
+    cursor: pointer;
+    padding: 0.3rem 0;
+  }
+  .mobile-bottom-nav__item.is-active {
+    color: var(--gold);
+  }
+  .app-shell__content {
+    padding-bottom: 5rem;
+  }
 }
 .person-header__meta {
   color: var(--text-muted);
