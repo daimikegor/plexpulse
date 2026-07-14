@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Ticket } from 'lucide-react';
 
 export default function Landing() {
   const [loading, setLoading] = useState(false);
@@ -79,15 +80,19 @@ export default function Landing() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen px-4 bg-plex-dark text-white">
-      <h1 className="text-5xl font-bold tracking-tight mb-2 bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
-        PlexPulse
-      </h1>
-      <p className="text-gray-400 mb-8">Discover. Request. Watch.</p>
-      <button 
+    <main className="login-page">
+      <div className="login-page__brand">
+        <div className="login-page__bulbs"></div>
+        <div className="login-page__brand-row">
+          <Ticket size={40} className="login-page__mark" />
+          <h1 className="login-page__title">PlexPulse</h1>
+        </div>
+        <p className="login-page__tagline">Discover. Request. Watch.</p>
+      </div>
+      <button
         onClick={handleSignIn}
         disabled={loading}
-        className="px-6 py-3 bg-plex-orange hover:bg-plex-orange-hover disabled:opacity-50 text-white font-medium rounded-lg transition-all shadow-lg hover:shadow-orange-500/20"
+        className="btn btn--gold login-page__signin-btn"
       >
         {loading ? 'Connecting...' : 'Sign in with Plex'}
       </button>
