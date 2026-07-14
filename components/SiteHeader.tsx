@@ -24,7 +24,7 @@ export function SiteHeader({ avatarUrl, isAdmin }: { avatarUrl?: string | null; 
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search movies, TV shows..."
+              placeholder="Search Movies & Series"
               id="search-input"
               className="search-bar__input"
             />
