@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
 
 export function SiteHeader({ avatarUrl }: { avatarUrl?: string | null }) {
   const [query, setQuery] = useState('');
@@ -28,12 +27,6 @@ export function SiteHeader({ avatarUrl }: { avatarUrl?: string | null }) {
               id="search-input"
               className="search-bar__input"
             />
-            <button 
-              type="submit"
-              className="search-bar__submit"
-            >
-              <Search size={20} />
-            </button>
           </div>
           <div className="header-avatar">
             {avatarUrl ? (
