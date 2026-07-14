@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Check, Clock } from 'lucide-react';
+import { Check, Clock, Film } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 const statusRequestCache = new Map<string, Promise<any>>();
@@ -108,13 +108,20 @@ export function PosterImage({
 
   return (
     <div ref={containerRef} className="relative group w-full h-full">
-      <Image 
-        src={imageSrc} 
-        alt={alt}
-        fill
-        onError={handleError}
-        className={`w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 ${className || ''}`}
-      />
+      {src ? (
+        <Image 
+          src={imageSrc} 
+          alt={alt}
+          fill
+          onError={handleError}
+          className={`w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-200 ease-in-out hover:scale-105 ${className || ''}`}
+        />
+      ) : (
+        <div className="poster-fallback">
+          <Film size={32} />
+          <span className="poster-fallback__title">{title}</span>
+        </div>
+      )}
       
       <div className="poster-overlay group-hover:opacity-100">
         {year && (
