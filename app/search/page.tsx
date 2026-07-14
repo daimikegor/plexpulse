@@ -1,6 +1,5 @@
 import { requireAuth } from '@/lib/session';
 import { SearchResultsGrid } from '@/components/SearchResultsGrid';
-import { redirect } from 'next/navigation';
 
 export default async function SearchPage({
   searchParams
@@ -11,7 +10,6 @@ export default async function SearchPage({
   
   const query = searchParams.q || '';
   let results = [];
-  let personName = null;
   
   if (query) {
     const API_KEY = process.env.TMDB_API_KEY;
@@ -35,29 +33,16 @@ export default async function SearchPage({
       allResults = allResults.concat(data.results || []);
     }
     
-    // Check if any results are persons
-    const personResults = allResults.filter((item: any) => item.media_type === 'person');
-    const movieOrTvResults = allResults.filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
-
-    // Only treat this as a "person search" if the best-matching person result
-    // ranks higher (appears earlier) in the results than the best-matching
-    // movie/tv result — otherwise a coincidental person match shouldn't hijack
-    // a search that's really about a movie or show.
-    const firstPersonIndex = allResults.findIndex((item: any) => item.media_type === 'person');
-    const firstMovieOrTvIndex = allResults.findIndex((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
-    const isPersonSearch = personResults.length > 0 &&
-      (firstMovieOrTvIndex === -1 || firstPersonIndex < firstMovieOrTvIndex);
-
-    if (isPersonSearch) {
-      // Take the first person result as most relevant
-      const person = personResults[0];
-      redirect(`/person/${person.id}`);
-    } else {
-      // No person results, just filter existing results
-      results = allResults.filter((item: any) => 
-        item.media_type === 'movie' || item.media_type === 'tv'
-      );
-    }
+    // Deduplicate by a composite key (media_type + id), since IDs aren't
+    // guaranteed unique across different media types.
+    const seenKeys = new Set();
+    results = allResults.filter((item: any) => {
+      if (!['movie', 'tv', 'person'].includes(item.media_type)) return false;
+      const key = `${item.media_type}-${item.id}`;
+      if (seenKeys.has(key)) return false;
+      seenKeys.add(key);
+      return true;
+    });
     
     console.log('Raw results count:', allResults.length);
     console.log('Filtered results count:', results.length);
