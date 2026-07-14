@@ -151,7 +151,6 @@ export function DetailModal({
                   )}
                   {genres && <p className="modal-genres">{genres}</p>}
                   <div className="modal-facts">
-                    <span className="fact-chip">NOT IN PLEX</span>
                     <span className="fact-chip">
                       {(item.release_date || item.first_air_date) &&
                       new Date(item.release_date || item.first_air_date) <= new Date()
