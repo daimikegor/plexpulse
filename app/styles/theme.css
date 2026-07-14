@@ -1734,6 +1734,9 @@ main {
   .app-shell__content {
     padding-bottom: 5rem;
   }
+  .scroll-to-top-btn {
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
 }
 .person-header__meta {
   color: var(--text-muted);
