@@ -85,7 +85,7 @@ export function DetailModal({
                   item.first_air_date ? new Date(item.first_air_date).getFullYear() : 
                   null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={handleMainClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         {!showTrailer && (
@@ -214,6 +214,7 @@ export function DetailModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
