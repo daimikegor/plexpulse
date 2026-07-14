@@ -26,7 +26,7 @@ export default async function RequestsPage() {
     <main>
       <h1 className="search-context-heading">My Requests</h1>
       {items.length > 0 ? (
-        <SearchResultsGrid items={items} hideFilters={true} />
+        <SearchResultsGrid items={items} />
       ) : (
         <p className="empty-state">You haven't requested anything yet.</p>
       )}
