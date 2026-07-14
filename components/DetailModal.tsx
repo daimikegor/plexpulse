@@ -173,7 +173,9 @@ export function DetailModal({
                           body: JSON.stringify({
                             title: item.title || item.name,
                             year: itemYear,
-                            mediaType: item.media_type === 'tv' ? 'tv' : 'movie'
+                            mediaType: item.media_type === 'tv' ? 'tv' : 'movie',
+                            tmdbId: item.id,
+                            posterPath: item.poster_path
                           })
                         });
                         setRequestStatus(response.ok ? 'success' : 'error');

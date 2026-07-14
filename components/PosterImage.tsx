@@ -152,7 +152,10 @@ export function PosterImage({
               const response = await fetch('/api/watchlist/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, year, mediaType: mediaType === 'tv' ? 'tv' : 'movie' })
+                body: JSON.stringify({
+                  title, year, mediaType: mediaType === 'tv' ? 'tv' : 'movie',
+                  tmdbId, posterPath: src?.includes('/t/p/') ? src.split('/t/p/w342')[1] : null
+                })
               });
               setRequestStatus(response.ok ? 'success' : 'error');
             } catch (err) {
