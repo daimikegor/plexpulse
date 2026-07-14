@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>plexpulse-redis</Name>
+  <Repository>redis:7-alpine</Repository>
+  <Registry>https://hub.docker.com/_/redis</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://redis.io/</Support>
+  <Overview>Dedicated Redis instance for PlexPulse. Use a port other than 6379 if you already run other Redis containers, to avoid conflicts.</Overview>
+  <Category>Tools: MediaApp:Other</Category>
+  <WebUI/>
+  <Icon>https://redis.io/images/redis-white.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="Host Port" Target="6379" Default="6380" Mode="tcp" Description="Host port for Redis. Pick something other than 6379 if you already have another Redis instance running." Type="Port" Display="always" Required="true" Mask="false">6380</Config>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/plexpulse-redis" Mode="rw" Description="Persistent storage for Redis data" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/plexpulse-redis</Config>
+</Container>

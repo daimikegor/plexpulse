@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>plexpulse-app</Name>
+  <Repository>plexpulse-app:latest</Repository>
+  <Registry/>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support/>
+  <Overview>PlexPulse - custom media discovery and request app. This image is NOT pulled from a registry; it must be built locally first. SSH into your server, clone the repo, and run: docker build -t plexpulse-app:latest . from inside the project folder before starting this container. See SETUP.md in the repo for full details on every variable below and important gotchas (build-time vs runtime variables, the Force Update requirement after rebuilding, etc).</Overview>
+  <Category>Tools: MediaApp:Other</Category>
+  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <Icon>https://raw.githubusercontent.com/plexinc/plex-media-player/master/resources/images/plex.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>plexpulse-redis must be running first, and its host port must match the REDIS_URL variable below.</Requires>
+
+  <Config Name="WebUI Port" Target="3000" Default="3000" Mode="tcp" Description="Port to access PlexPulse's web interface" Type="Port" Display="always" Required="true" Mask="false">3000</Config>
+
+  <Config Name="App Data" Target="/app/data" Default="/mnt/user/appdata/plexpulse/data" Mode="rw" Description="Persistent storage for the SQLite database" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/plexpulse/data</Config>
+
+  <Config Name="TMDB_API_KEY" Target="TMDB_API_KEY" Default="" Mode="" Description="API key from themoviedb.org account settings" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <Config Name="DATABASE_URL" Target="DATABASE_URL" Default="file:./data/plexpulse.db" Mode="" Description="Leave as default - matches the App Data volume mount above" Type="Variable" Display="always" Required="true" Mask="false">file:./data/plexpulse.db</Config>
+
+  <Config Name="NEXT_PUBLIC_APP_URL" Target="NEXT_PUBLIC_APP_URL" Default="" Mode="" Description="The full URL used to access PlexPulse. IMPORTANT: this must be correct at BUILD time, not just runtime - see SETUP.md" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <Config Name="SESSION_SECRET" Target="SESSION_SECRET" Default="" Mode="" Description="Random secret string used to sign session cookies" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+
+  <Config Name="NEXT_PUBLIC_PLEX_CLIENT_ID" Target="NEXT_PUBLIC_PLEX_CLIENT_ID" Default="" Mode="" Description="Identifier used for Plex PIN OAuth login (browser-side). IMPORTANT: this must be correct at BUILD time, not just runtime - see SETUP.md" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <Config Name="PLEX_CLIENT_ID" Target="PLEX_CLIENT_ID" Default="" Mode="" Description="Same identifier as above, used server-side. Must match NEXT_PUBLIC_PLEX_CLIENT_ID exactly." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <Config Name="PLEX_SERVER_URL" Target="PLEX_SERVER_URL" Default="" Mode="" Description="Your Plex Media Server address, e.g. http://10.0.0.X:32400" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <Config Name="PLEX_SERVER_TOKEN" Target="PLEX_SERVER_TOKEN" Default="" Mode="" Description="Plex Media Server's own access token (see SETUP.md for how to find this)" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+
+  <Config Name="REDIS_URL" Target="REDIS_URL" Default="" Mode="" Description="e.g. redis://10.0.0.X:6380 - point at the plexpulse-redis container's host IP and port" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <Config Name="IS_HTTPS" Target="IS_HTTPS" Default="false" Mode="" Description="Set to true only if accessing PlexPulse over HTTPS (e.g. via Cloudflare Tunnel)" Type="Variable" Display="always" Required="false" Mask="false">false</Config>
+
+  <Config Name="RADARR_1_URL" Target="RADARR_1_URL" Default="" Mode="" Description="Radarr instance base URL, e.g. http://10.0.0.X:7878" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="RADARR_1_API_KEY" Target="RADARR_1_API_KEY" Default="" Mode="" Description="Found in Radarr: Settings -> General -> Security -> API Key" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+  <Config Name="RADARR_2_URL" Target="RADARR_2_URL" Default="" Mode="" Description="Optional second Radarr instance" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="RADARR_2_API_KEY" Target="RADARR_2_API_KEY" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+  <Config Name="RADARR_3_URL" Target="RADARR_3_URL" Default="" Mode="" Description="Optional third Radarr instance" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="RADARR_3_API_KEY" Target="RADARR_3_API_KEY" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+
+  <Config Name="SONARR_1_URL" Target="SONARR_1_URL" Default="" Mode="" Description="Sonarr instance base URL, e.g. http://10.0.0.X:8989" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="SONARR_1_API_KEY" Target="SONARR_1_API_KEY" Default="" Mode="" Description="Found in Sonarr: Settings -> General -> Security -> API Key" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+  <Config Name="SONARR_2_URL" Target="SONARR_2_URL" Default="" Mode="" Description="Optional second Sonarr instance" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="SONARR_2_API_KEY" Target="SONARR_2_API_KEY" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+  <Config Name="SONARR_3_URL" Target="SONARR_3_URL" Default="" Mode="" Description="Optional third Sonarr instance" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="SONARR_3_API_KEY" Target="SONARR_3_API_KEY" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+</Container>
