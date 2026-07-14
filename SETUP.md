@@ -69,7 +69,7 @@ directly through Cloudflare Tunnel, not through Nginx Proxy Manager.
 
 1. Cloudflare Zero Trust dashboard (one.dash.cloudflare.com) -> Networks -> Tunnels
 2. Select the existing tunnel -> Public Hostname tab -> Add a public hostname
-3. Subdomain: plexpulse (or preferred) / Domain: mlin.ca / Service Type: HTTP /
+3. Subdomain: plexpulse (or preferred) / Domain: yourdomain.com / Service Type: HTTP /
    URL: <unraid-ip>:<port> (the internal address PlexPulse actually runs on)
 4. Save
 
@@ -79,7 +79,7 @@ Two things to update once this is set up:
   needed) — required so session cookies get the Secure flag once traffic arrives
   over HTTPS via the tunnel.
 - Rebuild the image with NEXT_PUBLIC_APP_URL set to the final public URL (e.g.
-  https://plexpulse.mlin.ca) rather than the internal LAN address, since this is
+  https://plexpulse.yourdomain.com) rather than the internal LAN address, since this is
   a build-time variable per the section above.
 
 ## Request/Availability Status Logic
