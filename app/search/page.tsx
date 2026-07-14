@@ -77,23 +77,12 @@ export default async function SearchPage({
             return !genreIds.includes(10767) && !genreIds.includes(10763);
           });
           
-          // Combine with original search results
-          const combinedResults = [...allResults, ...personFilmography];
-          
-          // Filter out non-movie/tv entries and deduplicate by ID
-          results = combinedResults.filter((item: any) => 
+          // When we've identified a specific person, show ONLY their actual
+          // filmography, not raw fuzzy text search matches (which can include
+          // unrelated titles that just happen to share a word with the query).
+          results = personFilmography.filter((item: any) => 
             item.media_type === 'movie' || item.media_type === 'tv'
           );
-          
-          // Deduplicate again after combining
-          const seenIds2 = new Set();
-          results = results.filter(item => {
-            if (seenIds2.has(item.id)) {
-              return false;
-            }
-            seenIds2.add(item.id);
-            return true;
-          });
         } else {
           // If we can't fetch person credits, just use the original search results
           results = allResults.filter((item: any) => 
