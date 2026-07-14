@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-export function SiteHeader({ avatarUrl }: { avatarUrl?: string | null }) {
+export function SiteHeader({ avatarUrl, isAdmin }: { avatarUrl?: string | null; isAdmin?: boolean }) {
   const [query, setQuery] = useState('');
   const router = useRouter();
 
@@ -28,13 +29,23 @@ export function SiteHeader({ avatarUrl }: { avatarUrl?: string | null }) {
               className="search-bar__input"
             />
           </div>
-          <div className="header-avatar">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="Profile" className="header-avatar__img" />
-            ) : (
-              <div className="header-avatar__img header-avatar__img--fallback" />
-            )}
-          </div>
+          {isAdmin ? (
+            <Link href="/admin/requests" className="header-avatar">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile" className="header-avatar__img" />
+              ) : (
+                <div className="header-avatar__img header-avatar__img--fallback" />
+              )}
+            </Link>
+          ) : (
+            <div className="header-avatar">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile" className="header-avatar__img" />
+              ) : (
+                <div className="header-avatar__img header-avatar__img--fallback" />
+              )}
+            </div>
+          )}
         </form>
       </div>
     </div>

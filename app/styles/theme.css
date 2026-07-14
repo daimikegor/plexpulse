@@ -1430,6 +1430,9 @@ main {
   object-fit: cover;
   border: 2px solid var(--border);
 }
+.header-avatar:hover .header-avatar__img {
+  border-color: var(--gold-dim);
+}
 .header-avatar__img--fallback {
   background: var(--surface-2);
 }

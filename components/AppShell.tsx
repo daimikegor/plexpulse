@@ -30,7 +30,7 @@ export function AppShell({ username, avatarUrl, isAdmin, children }: { username:
         isAdmin={isAdmin}
       />
       <div className="app-shell__content">
-        <SiteHeader avatarUrl={avatarUrl} />
+        <SiteHeader avatarUrl={avatarUrl} isAdmin={isAdmin} />
         {children}
       </div>
       <ScrollToTopButton />
