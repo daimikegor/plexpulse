@@ -268,6 +268,14 @@ html, body {
   flex-shrink: 0;
   margin-bottom: 1.5rem;
 }
+
+.filter-toggle--compact {
+  gap: 0.4rem;
+}
+.filter-toggle--compact .filter-toggle__btn {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+}
 .filter-toggle__btn {
   font-family: var(--font-body);
   font-size: 0.82rem;
@@ -300,6 +308,7 @@ html, body {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.9rem;
+  flex-wrap: wrap;
 }
 
 .shelf__row {
