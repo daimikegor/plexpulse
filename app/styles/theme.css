@@ -1708,7 +1708,9 @@ main {
     left: 0;
     right: 0;
     z-index: 200;
-    background: var(--surface);
+    background: rgba(23, 26, 33, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid var(--border);
     padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
   }
