@@ -32,7 +32,3 @@ export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'
   }
 }
 
-export async function invalidatePlexLibraryCache(): Promise<void> {
-  // No longer needed with the new guid-filtered approach, kept as a no-op
-  // for backward compatibility with the existing refresh-library-cache route.
-}

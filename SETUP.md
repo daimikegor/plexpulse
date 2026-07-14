@@ -35,23 +35,6 @@ Also note: podman-compose up -d does NOT recreate an already-running container e
 after rebuilding the image. Use `podman-compose down && podman-compose build
 --no-cache && podman-compose up -d` to guarantee changes actually take effect.
 
-## Plex Webhook Setup (manual, one-time)
-
-PlexPulse listens for Plex library update events at /api/webhooks/plex to know when
-to refresh its cached list of what's in your Plex library. This must be registered
-manually in Plex's web interface (requires Plex Pass):
-
-1. Open Plex Web, log in as the server owner
-2. Settings (wrench icon) -> Webhooks (under Account section)
-3. Add Webhook
-4. Enter: http://<your-plexpulse-address>:3000/api/webhooks/plex
-5. Save
-
-**Important:** The webhook URL is tied to wherever PlexPulse is actually hosted/running.
-If PlexPulse's deployment location changes (e.g., moving between machines), the webhook
-URL registered in Plex's settings must be manually updated to match, or it will silently
-stop firing with no error.
-
 ## Sonarr TVDB Matching
 
 Sonarr identifies TV series by TVDB ID, not TMDB ID (Radarr uses TMDB natively for
@@ -63,10 +46,8 @@ getTvdbIdFromTmdb function and lib/sonarr.ts.
 
 - "Requested" = title found in any connected Radarr/Sonarr instance
 - "Available" = title found directly in the Plex Media Server library (not the
-  watchlist, a completely separate check)
+  watchlist, a completely separate check) — checked live via Plex's native guid filtering
+  (querying /library/sections/{id}/all?guid=tmdb://{id} directly) rather than caching the
+  full library, so no manual refresh or webhook setup is required for this to stay accurate.
 - Status results are cached in the media_status database table, refreshed on-demand
   when a poster's status hasn't been checked or the cache is stale
-- The Plex library's full list of titles (for the Available check) is cached
-  indefinitely in Redis under keys plex:library:guids:movie and
-  plex:library:guids:tv, invalidated either manually via POST to
-  /api/admin/refresh-library-cache, or automatically via the Plex webhook above
