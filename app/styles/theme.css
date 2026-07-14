@@ -339,6 +339,9 @@ html, body {
 .shelf__row::-webkit-scrollbar {
   display: none; /* Chrome/Safari/Edge -- native scroll stays, just no visible bar */
 }
+.shelf__row {
+  margin-right: -2.5rem;
+}
 
 .shelf__nav-group {
   display: flex;
@@ -1495,6 +1498,7 @@ main {
 .header-avatar {
   flex-shrink: 0;
   margin-left: 0.75rem;
+  margin-right: -2.5rem;
 }
 .header-avatar__img {
   width: 34px;
@@ -1813,6 +1817,9 @@ main {
     bottom: calc(5rem + env(safe-area-inset-bottom));
   }
   .shelf__row {
+    margin-right: -0.85rem;
+  }
+  .header-avatar {
     margin-right: -0.85rem;
   }
 }
