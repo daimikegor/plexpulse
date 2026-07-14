@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { SiteHeader } from '@/components/SiteHeader';
@@ -7,6 +8,11 @@ import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 
 export function AppShell({ username, children }: { username: string | null; children: React.ReactNode }) {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
   
   // If we're on the login page, don't wrap with sidebar
   if (pathname === '/') {
@@ -15,9 +21,16 @@ export function AppShell({ username, children }: { username: string | null; chil
   
   return (
     <div className="app-shell">
-      <Sidebar username={username ?? ''} />
+      {mobileMenuOpen && (
+        <div className="sidebar-backdrop" onClick={() => setMobileMenuOpen(false)} />
+      )}
+      <Sidebar 
+        username={username ?? ''} 
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
       <div className="app-shell__content">
-        <SiteHeader />
+        <SiteHeader onMenuClick={() => setMobileMenuOpen(true)} />
         {children}
       </div>
       <ScrollToTopButton />
