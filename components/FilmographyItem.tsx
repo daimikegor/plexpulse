@@ -17,7 +17,7 @@ export function FilmographyItem({
       <div className="ticket ticket--compact">
         <div className="ticket__poster-wrap">
           <PosterImage 
-            src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
+            src={item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : ''}
             alt={item.title || item.name}
             mediaType={item.media_type}
             tmdbId={String(item.id)}
