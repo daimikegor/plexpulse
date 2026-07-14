@@ -31,7 +31,9 @@ export function AppShell({ username, avatarUrl, isAdmin, children }: { username:
       />
       <div className="app-shell__content">
         <SiteHeader avatarUrl={avatarUrl} isAdmin={isAdmin} />
-        {children}
+        <div className="app-shell__page">
+          {children}
+        </div>
       </div>
       <ScrollToTopButton />
       <MobileBottomNav />
