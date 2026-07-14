@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Menu, Ticket } from 'lucide-react';
-import Link from 'next/link';
+import { Search } from 'lucide-react';
 
-export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
+export function SiteHeader({ avatarUrl }: { avatarUrl?: string | null }) {
   const [query, setQuery] = useState('');
   const router = useRouter();
 
@@ -19,14 +18,6 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
   return (
     <div className="top-search-bar">
       <div className="search-bar">
-        <div className="mobile-header-controls">
-          <button className="mobile-menu-btn" onClick={onMenuClick} aria-label="Open menu">
-            <Menu size={22} />
-          </button>
-          <Link href="/dashboard" className="mobile-home-link" aria-label="Go to Discover">
-            <Ticket size={20} />
-          </Link>
-        </div>
         <form onSubmit={handleSearch} className="search-bar__row">
           <div className="search-bar__input-wrapper">
             <input
@@ -43,6 +34,13 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
             >
               <Search size={20} />
             </button>
+          </div>
+          <div className="header-avatar">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profile" className="header-avatar__img" />
+            ) : (
+              <div className="header-avatar__img header-avatar__img--fallback" />
+            )}
           </div>
         </form>
       </div>

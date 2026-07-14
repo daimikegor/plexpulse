@@ -1434,31 +1434,24 @@ main {
   padding: 2rem 2.5rem 4rem;
 }
 
-.mobile-header-controls {
-  display: none;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-.mobile-home-link {
+.search-bar__row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--gold);
-}
-.mobile-home-link:hover {
-  border-color: var(--gold-dim);
 }
 
-@media (max-width: 860px) {
-  .mobile-header-controls {
-    display: flex;
-  }
+.header-avatar {
+  flex-shrink: 0;
+  margin-left: 0.75rem;
+}
+.header-avatar__img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+.header-avatar__img--fallback {
+  background: var(--surface-2);
 }
 
 .top-search-bar {
