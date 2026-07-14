@@ -37,8 +37,18 @@ export default async function SearchPage({
       
       // Check if any results are persons
       const personResults = allResults.filter((item: any) => item.media_type === 'person');
-      
-      if (personResults.length > 0) {
+      const movieOrTvResults = allResults.filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
+
+      // Only treat this as a "person search" if the best-matching person result
+      // ranks higher (appears earlier) in the results than the best-matching
+      // movie/tv result — otherwise a coincidental person match shouldn't hijack
+      // a search that's really about a movie or show.
+      const firstPersonIndex = allResults.findIndex((item: any) => item.media_type === 'person');
+      const firstMovieOrTvIndex = allResults.findIndex((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
+      const isPersonSearch = personResults.length > 0 &&
+        (firstMovieOrTvIndex === -1 || firstPersonIndex < firstMovieOrTvIndex);
+
+      if (isPersonSearch) {
         // Take the first person result as most relevant
         const person = personResults[0];
         personName = person.name;
