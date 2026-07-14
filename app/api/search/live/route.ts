@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     const data = await response.json();
     const results = (data.results || [])
       .filter((item: any) => ['movie', 'tv', 'person'].includes(item.media_type))
-      .slice(0, 8);
+      .slice(0, 20);
     return NextResponse.json({ results });
   } catch (error) {
     console.error('Live search error:', error);
