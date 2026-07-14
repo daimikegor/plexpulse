@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { SiteHeader } from '@/components/SiteHeader';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 
 export function AppShell({ username, avatarUrl, children }: { username: string | null; avatarUrl?: string | null; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -26,14 +27,13 @@ export function AppShell({ username, avatarUrl, children }: { username: string |
       )}
       <Sidebar 
         username={username ?? ''} 
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
       />
       <div className="app-shell__content">
         <SiteHeader avatarUrl={avatarUrl} />
         {children}
       </div>
       <ScrollToTopButton />
+      <MobileBottomNav />
     </div>
   );
 }

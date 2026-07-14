@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Compass, Film, Tv, Ticket, LogOut } from 'lucide-react';
 
-export function Sidebar({ username, isAdmin, isOpen, onClose }: { username: string; isAdmin?: boolean; isOpen?: boolean; onClose?: () => void }) {
+export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
   
@@ -23,7 +23,7 @@ export function Sidebar({ username, isAdmin, isOpen, onClose }: { username: stri
   };
 
   return (
-    <aside className={`sidebar ${isOpen ? 'is-open' : ''}`}>
+    <aside className="sidebar">
       <div className="sidebar__brand">
         <div className="sidebar__bulbs"></div>
         <div className="sidebar__brand-row">
@@ -47,7 +47,6 @@ export function Sidebar({ username, isAdmin, isOpen, onClose }: { username: stri
         <Link 
           href="/dashboard" 
           className={`sidebar__nav-item ${pathname === '/dashboard' ? 'is-active' : ''}`}
-          onClick={onClose}
         >
           <Compass size={20} />
           <span>Discover</span>
@@ -55,7 +54,6 @@ export function Sidebar({ username, isAdmin, isOpen, onClose }: { username: stri
         <Link 
           href="/movies" 
           className={`sidebar__nav-item ${pathname === '/movies' ? 'is-active' : ''}`}
-          onClick={onClose}
         >
           <Film size={20} />
           <span>Movies</span>
@@ -63,7 +61,6 @@ export function Sidebar({ username, isAdmin, isOpen, onClose }: { username: stri
         <Link 
           href="/series" 
           className={`sidebar__nav-item ${pathname === '/series' ? 'is-active' : ''}`}
-          onClick={onClose}
         >
           <Tv size={20} />
           <span>Series</span>
