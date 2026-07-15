@@ -1,0 +1,8 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "experimental": {
+    "tools": {
+      "batch_commit": false   // disable opencode's built-in batch commit feature so nothing else triggers it accidentally
+    }
+  }
+}
