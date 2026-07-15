@@ -594,3 +594,35 @@ export async function getTvdbIdFromTmdb(tmdbId: string): Promise<string | null> 
     return null;
   }
 }
+
+export async function getMediaDetails(mediaType: 'movie' | 'tv', tmdbId: string) {
+  const cacheKey = `tmdb:detail:${mediaType}:${tmdbId}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) {
+      console.error('TMDB_API_KEY is not set in environment variables');
+      return null;
+    }
+
+    const endpoint = mediaType === 'movie'
+      ? `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=genres,videos,credits`
+      : `https://api.themoviedb.org/3/tv/${tmdbId}?append_to_response=genres,videos,credits`;
+
+    const response = await fetch(`${endpoint}&api_key=${API_KEY}`);
+    if (!response.ok) {
+      throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    await redis.setex(cacheKey, 7200, JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error fetching media details from TMDB:', error);
+    return null;
+  }
+}
