@@ -75,3 +75,11 @@ No lint or typecheck scripts are configured.
 - Redis: port 6379 internally, exposed as 6379 in docker-compose, defaults to host 
   port 6380 in Unraid template (to avoid conflicts with other Redis containers)
 - Docker networking: implicit compose default network (no custom network defined)
+
+## Media Workflow
+1. **PlexPulse** → adds title to Plex watchlist
+2. **Pulsarr** → monitors watchlist, routes to Radarr/Sonarr instances
+3. **Radarr/Sonarr** → pass download jobs to **nzbdav** (usenet streaming)
+4. **nzbdav** → notifies Arrs when ready
+5. **Arrs** → trigger partial library scan on Plex via Autopulse
+6. **PlexPulse** → detects "Available" status in `media-status.ts`
