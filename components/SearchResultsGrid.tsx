@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { PosterImage } from '@/components/PosterImage';
-import { DetailModal } from '@/components/DetailModal';
 import { useRouter } from 'next/navigation';
 
 export function SearchResultsGrid({ items, hideFilters }: { items: any[]; hideFilters?: boolean }) {
@@ -98,14 +97,6 @@ export function SearchResultsGrid({ items, hideFilters }: { items: any[]; hideFi
           );
         })}
       </div>
-      
-      {isModalOpen && selectedItem && (
-        <DetailModal 
-          item={selectedItem} 
-          isOpen={isModalOpen} 
-          onClose={closeModal} 
-        />
-      )}
     </div>
   );
 }
