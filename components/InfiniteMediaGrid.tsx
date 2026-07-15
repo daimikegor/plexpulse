@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { PosterImage } from '@/components/PosterImage';
-import { DetailModal } from '@/components/DetailModal';
+import Link from 'next/link';
 
 export function InfiniteMediaGrid({
   apiEndpoint,
@@ -21,8 +21,6 @@ export function InfiniteMediaGrid({
   const [page, setPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'movie' | 'tv'>('all');
   
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -68,11 +66,6 @@ export function InfiniteMediaGrid({
     }
   };
 
-  const handleItemClick = (item: any) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
-  };
-
   const filteredResults = activeFilter === 'all' ? results :
     results.filter((item: any) => item.media_type === activeFilter);
 
@@ -91,10 +84,10 @@ export function InfiniteMediaGrid({
       
       <div className="results-grid">
         {filteredResults.map((item: any) => (
-          <div 
+          <Link 
             key={item.id} 
+            href={`/detail/${item.media_type}/${item.id}`}
             className="ticket-wrap ticket-wrap--compact"
-            onClick={() => handleItemClick(item)}
           >
             <div className="ticket ticket--compact">
               <div className="ticket__poster-wrap">
@@ -109,7 +102,7 @@ export function InfiniteMediaGrid({
                 />
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -117,14 +110,6 @@ export function InfiniteMediaGrid({
       
       {isLoading && (
         <p className="empty-state">Loading more...</p>
-      )}
-
-      {isModalOpen && selectedItem && (
-        <DetailModal 
-          item={selectedItem} 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
-        />
       )}
     </>
   );

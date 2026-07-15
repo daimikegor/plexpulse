@@ -76,10 +76,10 @@ export function SearchResultsGrid({ items, hideFilters }: { items: any[]; hideFi
           }
           
           return (
-            <div 
+            <Link 
               key={item.id} 
+              href={`/detail/${item.media_type}/${item.id}`}
               className="ticket-wrap ticket-wrap--compact"
-              onClick={() => handlePosterClick(item)}
             >
               <div className="ticket ticket--compact">
                 <div className="ticket__poster-wrap">
@@ -94,7 +94,7 @@ export function SearchResultsGrid({ items, hideFilters }: { items: any[]; hideFi
                   />
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

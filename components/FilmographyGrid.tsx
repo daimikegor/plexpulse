@@ -1,25 +1,14 @@
 'use client';
 import { useState } from 'react';
 import { FilmographyItem } from '@/components/FilmographyItem';
-import { DetailModal } from '@/components/DetailModal';
+import Link from 'next/link';
+
 export function FilmographyGrid({ 
   items 
 }: { 
   items: any[]; 
 }) {
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'movie' | 'tv'>('all');
-  
-  const handleItemClick = (item: any) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
-  };
-  
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedItem(null);
-  };
   
   const filteredItems = activeFilter === 'all' 
     ? items 
@@ -50,21 +39,17 @@ export function FilmographyGrid({
       
       <div className="results-grid">
         {filteredItems.map((item: any) => (
-          <FilmographyItem 
+          <Link 
             key={item.id} 
-            item={item}
-            onClick={() => handleItemClick(item)}
-          />
+            href={`/detail/${item.media_type}/${item.id}`}
+            className="ticket-wrap"
+          >
+            <FilmographyItem 
+              item={item}
+            />
+          </Link>
         ))}
       </div>
-      
-      {isModalOpen && selectedItem && (
-        <DetailModal 
-          item={selectedItem} 
-          isOpen={isModalOpen} 
-          onClose={closeModal} 
-        />
-      )}
     </>
   );
 }

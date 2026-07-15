@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { PosterImage } from '@/components/PosterImage';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { DetailModal } from '@/components/DetailModal';
 import Link from 'next/link';
 
 export function TrendingSection({ 
@@ -18,8 +17,6 @@ export function TrendingSection({
   categorySlug?: string;
 }) {
   const [showScrollButtons, setShowScrollButtons] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const row = document.getElementById(rowId);
@@ -57,16 +54,6 @@ export function TrendingSection({
     }
   };
 
-  const handlePosterClick = (item: any) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedItem(null);
-  };
-
   return (
     <div className="shelf">
       <div className="shelf__head">
@@ -102,10 +89,10 @@ export function TrendingSection({
             id={rowId}
           >
             {trendingData.results.map((item: any) => (
-              <div 
+              <Link 
                 key={item.id} 
+                href={`/detail/${item.media_type}/${item.id}`}
                 className="ticket-wrap ticket-wrap--compact"
-                onClick={() => handlePosterClick(item)}
               >
                 <div className="ticket ticket--compact">
                   <div className="ticket__poster-wrap">
@@ -121,20 +108,12 @@ export function TrendingSection({
                     />
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       ) : (
         <p className="text-gray-400">Loading trending content...</p>
-      )}
-      
-      {isModalOpen && selectedItem && (
-        <DetailModal 
-          item={selectedItem} 
-          isOpen={isModalOpen} 
-          onClose={closeModal} 
-        />
       )}
     </div>
   );
