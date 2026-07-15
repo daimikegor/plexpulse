@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Ticket } from 'lucide-react';
+import { PlexPulseIcon } from '@/components/PlexPulseIcon';
 
 export default function Landing() {
   const [loading, setLoading] = useState(false);
@@ -84,7 +84,7 @@ export default function Landing() {
       <div className="login-page__brand">
         <div className="login-page__bulbs"></div>
         <div className="login-page__brand-row">
-          <Ticket size={40} className="login-page__mark" />
+          <PlexPulseIcon size={40} className="login-page__mark" />
           <h1 className="login-page__title">PlexPulse</h1>
         </div>
         <p className="login-page__tagline">Discover. Request. Watch.</p>

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Compass, Film, Tv, Ticket, LogOut, ShieldCheck, Clock } from 'lucide-react';
+import { Compass, Film, Tv, LogOut, ShieldCheck, Clock } from 'lucide-react';
+import { PlexPulseIcon } from '@/components/PlexPulseIcon';
 
 export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boolean }) {
   const pathname = usePathname();
@@ -27,7 +28,7 @@ export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boo
       <div className="sidebar__brand">
         <div className="sidebar__bulbs"></div>
         <div className="sidebar__brand-row">
-          <Ticket size={32} className="sidebar__mark" />
+          <PlexPulseIcon size={32} className="sidebar__mark" />
           <h1 className="sidebar__title">PlexPulse</h1>
         </div>
         <p className="sidebar__tagline">Discover. Request. Watch.</p>
