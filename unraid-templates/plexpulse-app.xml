@@ -11,7 +11,7 @@
   <Overview>PlexPulse - custom media discovery and request app. This image is NOT pulled from a registry; it must be built locally first. SSH into your server, clone the repo, and run: docker build -t plexpulse-app:latest . from inside the project folder before starting this container. See SETUP.md in the repo for full details on every variable below and important gotchas (build-time vs runtime variables, the Force Update requirement after rebuilding, etc).</Overview>
   <Category>Tools: MediaApp:Other</Category>
   <WebUI>http://[IP]:[PORT:3000]/</WebUI>
-  <Icon>https://raw.githubusercontent.com/daimikegor/plexpulse/master/app/icon.svg</Icon>
+  <Icon>https://raw.githubusercontent.com/daimikegor/plexpulse/master/public/icon.png</Icon>
   <ExtraParams/>
   <PostArgs/>
   <CPUset/>
