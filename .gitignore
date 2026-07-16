@@ -7,6 +7,4 @@ data/
 .next/
 .env.local
 dump.rdb
-.next/
-.env.local
-dump.rdb
+tsconfig.tsbuildinfo
