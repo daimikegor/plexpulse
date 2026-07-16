@@ -60,27 +60,35 @@ export function CastSection({
   if (!cast || cast.length === 0) return null;
 
   return (
-    <div className="mb-8">
-      <h2 className="text-xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">{heading}</h2>
+    <div className="shelf">
+      <div className="shelf__head">
+        <h2 className="shelf__heading">{heading}</h2>
+        {showScrollButtons && showNavButtons && (
+          <div className="shelf__nav-group">
+            <button 
+              onClick={() => handleScroll('left')}
+              className="shelf__nav"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button 
+              onClick={() => handleScroll('right')}
+              className="shelf__nav"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+      </div>
       
       {/* Cast with nav buttons similar to other sections */}
       <div className="relative">
-        {showScrollButtons && showNavButtons && (
-          <button 
-            onClick={() => handleScroll('left')}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft size={16} />
-          </button>
-        )}
-      
         <div 
           id="cast-row"
           className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
         >
           {cast.slice(0, 20).map((actor: CastMember) => (
-            <button key={actor.id} className="text-left flex-shrink-0">
+            <div key={actor.id} className="text-left flex-shrink-0 w-32">
               <div className="bg-gray-800 rounded-full p-2 mb-2 flex items-center justify-center w-32 h-32">
                 {actor.profile_path ? (
                   <img 
@@ -94,21 +102,11 @@ export function CastSection({
                   </div>
                 )}
               </div>
-              <h3 className="font-semibold text-white truncate" title={actor.name}>{actor.name}</h3>
-              <p className="text-sm text-gray-400 truncate" title={actor.character}>{actor.character}</p>
-            </button>
+              <h3 className="font-semibold text-white" title={actor.name}>{actor.name}</h3>
+              <p className="text-sm text-gray-400 line-clamp-2" title={actor.character}>{actor.character}</p>
+            </div>
           ))}
         </div>
-      
-        {showScrollButtons && showNavButtons && (
-          <button 
-            onClick={() => handleScroll('right')}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200"
-            aria-label="Scroll right"
-          >
-            <ChevronRight size={16} />
-          </button>
-        )}
       </div>
     </div>
   );
