@@ -4,3 +4,9 @@ old_settings_reference.py
 node_modules/
 .env
 data/
+.next/
+.env.local
+dump.rdb
+.next/
+.env.local
+dump.rdb

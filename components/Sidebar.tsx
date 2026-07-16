@@ -26,21 +26,9 @@ export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boo
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
-        <div className="sidebar__bulbs"></div>
         <div className="sidebar__brand-row">
           <PlexPulseIcon size={32} className="sidebar__mark" />
           <h1 className="sidebar__title">PlexPulse</h1>
-        </div>
-        <p className="sidebar__tagline">Discover. Request. Watch.</p>
-        
-        <div className="sidebar__user">
-          <button 
-            onClick={handleLogout}
-            className="btn btn--ghost sidebar__logout-btn"
-          >
-            <LogOut size={16} />
-            Log out
-          </button>
         </div>
       </div>
       
@@ -84,6 +72,14 @@ export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boo
           </Link>
         )}
       </nav>
+
+      <button 
+        onClick={handleLogout}
+        className="btn btn--ghost sidebar__logout-btn"
+      >
+        <LogOut size={16} />
+        Log out
+      </button>
     </aside>
   );
 }

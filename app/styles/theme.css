@@ -315,7 +315,7 @@ html, body {
 }
 
 .shelf {
-  margin-bottom: 1.75rem;
+  margin-bottom: 2.5rem;
 }
 
 .shelf__head {
@@ -373,11 +373,11 @@ html, body {
 }
 
 .shelf__heading {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   letter-spacing: -0.01em;
-  margin: 0;
+  margin: 0 0 1.25rem;
   padding: 0;
   background: none;
   border: none;
@@ -733,7 +733,7 @@ main {
 .results-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-  gap: 1.5rem;
+  gap: 1.75rem;
   align-items: stretch;
 }
 
@@ -1606,15 +1606,7 @@ main {
   margin-bottom: 1rem;
 }
 
-.sidebar__bulbs {
-  height: 4px;
-  max-width: 140px;
-  margin: 0 auto 1rem;
-  background-image: radial-gradient(circle, var(--gold) 2px, transparent 2.5px);
-  background-size: 18px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.85;
-}
+
 
 .sidebar__title {
   font-family: var(--font-display);
@@ -1633,7 +1625,7 @@ main {
 .sidebar__nav {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
   flex: 1;
 }
 
@@ -1641,11 +1633,11 @@ main {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.65rem 0.85rem;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
   color: var(--text-muted);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem;
   transition: background 0.15s ease, color 0.15s ease;
   text-decoration: none;
 }
