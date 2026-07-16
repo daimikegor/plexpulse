@@ -36,3 +36,9 @@ This document tracks the progress of UI layout and spacing refinements to match 
 ## Next Actions
 1. Testing of visual changes
 2. Review and validation against original requirements
+
+## Phase 4: Cast Section Chevron Navigation
+- [ ] Add chevron navigation to cast section in detail pages
+- [ ] Implement scroll functionality for cast items
+- [ ] Reuse existing ChevronLeft/ChevronRight components
+- [ ] Follow same pattern as homepage shelves (TrendingSection, GenreRow)
