@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 type CastMember = {
   id: string;
@@ -88,7 +89,11 @@ export function CastSection({
           className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
         >
           {cast.slice(0, 20).map((actor: CastMember) => (
-            <div key={actor.id} className="text-left flex-shrink-0 w-32">
+            <Link 
+              key={actor.id} 
+              href={`/person/${actor.id}`}
+              className="text-left flex-shrink-0 w-32"
+            >
               <div className="bg-gray-800 rounded-full p-2 mb-2 flex items-center justify-center w-32 h-32">
                 {actor.profile_path ? (
                   <img 
@@ -104,7 +109,7 @@ export function CastSection({
               </div>
               <h3 className="font-semibold text-white" title={actor.name}>{actor.name}</h3>
               <p className="text-sm text-gray-400 line-clamp-2" title={actor.character}>{actor.character}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
