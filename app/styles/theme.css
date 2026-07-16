@@ -263,7 +263,7 @@ html, body {
 
 .discover-shelves,
 .category-view {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 .discover-shelves.is-hidden,
 .category-view.is-hidden { display: none; }
@@ -277,15 +277,15 @@ html, body {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
 }
+
 .category-view__heading {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   margin: 0;
 }
-
 .filter-toggle {
   display: flex;
   gap: 0.4rem;
@@ -733,7 +733,7 @@ main {
 .results-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-  gap: 1.75rem;
+  gap: 2rem;
   align-items: stretch;
 }
 
@@ -1540,7 +1540,7 @@ main {
 .app-shell__content {
   flex: 1;
   min-width: 0;
-  padding: 2rem 2.5rem 4rem;
+  padding: 2.5rem 3rem 4rem;
 }
 
 .app-shell__page {
