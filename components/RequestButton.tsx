@@ -94,9 +94,9 @@ export function RequestButton({
       case 'error':
         return 'bg-red-500 text-white';
       case 'requested':
-        return 'bg-green-500 text-white';
+        return 'bg-[var(--pending)] text-white';
       case 'available':
-        return 'bg-green-500 text-white';
+        return 'bg-[var(--teal)] text-white';
       default:
         return 'bg-yellow-500 text-black hover:bg-yellow-400';
     }
