@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PosterImage } from '@/components/PosterImage';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export function SearchResultsGrid({ items, hideFilters }: { items: any[]; hideFilters?: boolean }) {
   const [activeFilter, setActiveFilter] = useState<'all' | 'movie' | 'tv'>('all');
