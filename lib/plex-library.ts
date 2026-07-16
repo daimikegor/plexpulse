@@ -22,16 +22,34 @@ async function getPlexLibraryGuids(mediaType: 'movie' | 'tv'): Promise<Set<strin
       const relevantSections = sections.filter((s: any) => s.type === targetType);
 
       for (const section of relevantSections) {
-        const itemsRes = await fetch(
-          `${serverUrl}/library/sections/${section.key}/all?includeGuids=1&X-Plex-Token=${token}`,
-          { headers: { 'Accept': 'application/json' } }
-        );
-        if (!itemsRes.ok) continue;
-        const itemsData = await itemsRes.json();
-        const items = itemsData.MediaContainer?.Metadata || [];
-        for (const item of items) {
-          const tmdbGuid = item.Guid?.find((g: any) => g.id?.startsWith('tmdb://'));
-          if (tmdbGuid) allGuids.push(tmdbGuid.id);
+        let start = 0;
+        const size = 100; // Plex default page size
+        let hasMore = true;
+        
+        while (hasMore) {
+          const itemsRes = await fetch(
+            `${serverUrl}/library/sections/${section.key}/all?includeGuids=1&X-Plex-Token=${token}&X-Plex-Container-Start=${start}&X-Plex-Container-Size=${size}`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+          if (!itemsRes.ok) break;
+          
+          const itemsData = await itemsRes.json();
+          const items = itemsData.MediaContainer?.Metadata || [];
+          
+          for (const item of items) {
+            const tmdbGuid = item.Guid?.find((g: any) => g.id?.startsWith('tmdb://'));
+            if (tmdbGuid) allGuids.push(tmdbGuid.id);
+          }
+          
+          // Check if we've retrieved all items
+          const totalSize = itemsData.MediaContainer?.totalSize || 0;
+          const returnedSize = itemsData.MediaContainer?.size || items.length;
+          
+          if (returnedSize < size || start + size >= totalSize) {
+            hasMore = false;
+          } else {
+            start += size;
+          }
         }
       }
     }
