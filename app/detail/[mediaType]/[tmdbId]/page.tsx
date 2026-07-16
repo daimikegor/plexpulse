@@ -1,5 +1,6 @@
 import { getMediaDetails } from '@/lib/tmdb';
 import { CastSection } from '@/components/CastSection';
+import Link from 'next/link';
 
 /** @type { import('next').Metadata } */
 const metadata = {
@@ -55,7 +56,17 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
             <div className="mb-4">
               <h2 className="text-sm font-semibold text-white mb-2">GENRES</h2>
               <p className="text-blue-400">
-                {details.genres.map((g: { name: string }) => g.name).join(', ')}
+                {details.genres.map((g: { id: string; name: string }, index: number) => (
+                  <span key={g.id}>
+                    <Link 
+                      href={`/genre/${mediaType}/${g.id}`}
+                      className="hover:text-yellow-400 transition-colors"
+                    >
+                      {g.name}
+                    </Link>
+                    {index < details.genres.length - 1 && ', '}
+                  </span>
+                ))}
               </p>
             </div>
           )}
