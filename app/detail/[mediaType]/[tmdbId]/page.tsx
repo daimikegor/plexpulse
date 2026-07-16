@@ -103,6 +103,17 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
                 new Date(details.release_date || details.first_air_date) <= new Date() 
                   ? 'RELEASED' : 'UPCOMING'}
               </span>
+              
+              {/* TV specific fields */}
+              {mediaType === 'tv' && (
+                <>
+                  {details.status && (
+                    <span className="inline-block bg-gray-800 px-3 py-1 rounded text-xs font-mono tracking-wider ml-2">
+                      {details.status}
+                    </span>
+                  )}
+                </>
+              )}
             </div>
             <div>
               <span className="inline-block bg-gray-800 px-3 py-1 rounded text-xs font-mono tracking-wider">
@@ -110,6 +121,25 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
               </span>
             </div>
           </div>
+
+          {/* TV-specific additional information */}
+          {mediaType === 'tv' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <p className="text-sm text-gray-300">
+                  <span className="font-semibold">Seasons:</span> {details.number_of_seasons}
+                </p>
+              </div>
+              
+              {details.next_episode_to_air && details.next_episode_to_air.air_date && (
+                <div>
+                  <p className="text-sm text-gray-300">
+                    <span className="font-semibold">Next episode:</span> {new Date(details.next_episode_to_air.air_date).toLocaleDateString()}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Trailer button */}
           {details.videos && details.videos.results && details.videos.results.length > 0 ? (
