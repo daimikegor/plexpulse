@@ -43,17 +43,6 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Backdrop banner */}
-      {details.backdrop_path && (
-        <div className="relative h-64 mb-4 rounded-lg overflow-hidden">
-          <img 
-            src={`https://image.tmdb.org/t/p/w1280${details.backdrop_path}`}
-            alt={`${details.title || details.name} backdrop`}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Poster */}
         <div className="lg:col-span-1">
@@ -61,7 +50,7 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
             <img 
               src={`https://image.tmdb.org/t/p/w500${details.poster_path}`}
               alt={details.title || details.name}
-              className="w-full rounded-lg"
+              className="w-48 rounded-lg mx-auto"
             />
           )}
         </div>
@@ -127,18 +116,18 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
       {details.credits?.cast && details.credits.cast.length > 0 && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">CAST</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="flex overflow-x-auto pb-4 space-x-4">
             {details.credits.cast.slice(0, 10).map((actor: CastMember) => (
-              <button key={actor.id} className="text-left hover-opacity">
-                <div className="bg-gray-800 rounded-lg p-3 aspect-square mb-2 flex items-center justify-center">
+              <button key={actor.id} className="text-left flex-shrink-0">
+                <div className="bg-gray-800 rounded-full p-2 mb-2 flex items-center justify-center w-32 h-32">
                   {actor.profile_path ? (
                     <img 
                       src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
                       alt={actor.name}
-                      className="w-full h-full object-cover rounded"
+                      className="w-full h-full object-cover rounded-full"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-600 rounded flex items-center justify-center text-white font-bold">
+                    <div className="w-full h-full bg-gray-600 rounded-full flex items-center justify-center text-white font-bold">
                       {actor.name.charAt(0)}
                     </div>
                   )}

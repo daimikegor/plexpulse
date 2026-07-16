@@ -1964,3 +1964,11 @@ main {
   background: rgba(79, 182, 160, 0.15);
   color: var(--teal);
 }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

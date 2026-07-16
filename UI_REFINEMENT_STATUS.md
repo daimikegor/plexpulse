@@ -31,6 +31,7 @@ This document tracks the progress of UI layout and spacing refinements to match 
 ## Files Modified
 - `app/styles/theme.css`
 - `components/Sidebar.tsx`
+- `app/detail/[mediaType]/[tmdbId]/page.tsx`
 
 ## Next Actions
 1. Testing of visual changes
