@@ -142,6 +142,7 @@ export function PosterImage({
         <button 
           onClick={async (e) => {
             e.stopPropagation();
+            e.preventDefault(); // Prevent default navigation behavior
             if (onRequestClick) {
               onRequestClick();
               return;
@@ -158,6 +159,9 @@ export function PosterImage({
                 })
               });
               setRequestStatus(response.ok ? 'success' : 'error');
+              if (response.ok) {
+                return; // Prevent further execution after successful request
+              }
             } catch (err) {
               setRequestStatus('error');
             }
