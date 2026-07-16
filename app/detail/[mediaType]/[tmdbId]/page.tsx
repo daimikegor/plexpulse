@@ -1,5 +1,7 @@
 import { getMediaDetails } from '@/lib/tmdb';
 import { CastSection } from '@/components/CastSection';
+import { RequestButton } from '@/components/RequestButton';
+import { TrailerButton } from '@/components/TrailerButton';
 import Link from 'next/link';
 
 /** @type { import('next').Metadata } */
@@ -23,6 +25,28 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
   // Extract year from release date or first air date
   const itemYear = details.release_date ? new Date(details.release_date).getFullYear() :
                   details.first_air_date ? new Date(details.first_air_date).getFullYear() : null;
+
+  // Try to fetch current status
+  let initialStatus: 'idle' | 'loading' | 'success' | 'error' | 'requested' | 'available' = 'idle';
+  try {
+    const statusResponse = await fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType}`, {
+      cache: 'no-store'
+    });
+    
+    if (statusResponse.ok) {
+      const statusData = await statusResponse.json();
+      // Map the API status to component status
+      if (statusData.status === 'requested') {
+        initialStatus = 'requested';
+      } else if (statusData.status === 'available') {
+        initialStatus = 'available';
+      }
+      // For 'none' status, we default to 'idle' (showing "Request" button)
+    }
+  } catch (error) {
+    console.error('Error fetching media status:', error);
+    // If there's an error fetching status, we default to idle (showing "Request" button)
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -93,15 +117,27 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
             </div>
           </div>
 
-          {/* Placeholder for trailer button */}
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 mb-6">
-            ▶️ Play Trailer
-          </button>
+          {/* Trailer button */}
+          {details.videos && details.videos.results && details.videos.results.length > 0 ? (
+            <TrailerButton videos={details.videos.results} />
+          ) : (
+            <button 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 mb-6 cursor-not-allowed opacity-50"
+              disabled
+            >
+              ▶️ Play Trailer
+            </button>
+          )}
 
-          {/* Placeholder for request button */}
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 font-semibold mb-6">
-            ✓ Request
-          </button>
+          {/* Request button - using the new component with correct initial status */}
+          <RequestButton 
+            mediaType={mediaType}
+            tmdbId={tmdbId}
+            title={details.title || details.name}
+            year={itemYear}
+            posterPath={details.poster_path}
+            initialStatus={initialStatus}
+          />
         </div>
       </div>
 

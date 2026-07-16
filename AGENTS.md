@@ -55,6 +55,7 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
   Always resolve via getTvdbIdFromTmdb() before querying Sonarr.
 - **Plex OAuth cleanup on exit paths**: The polling interval and message event listener 
   must be cleared on all exit paths (popup close, auth success, timeout) to prevent leaks.
+- **CRITICAL: app/detail/[mediaType]/[tmdbId]/page.tsx must NEVER contain onClick, useState, useEffect, or 'use client'. It is a server component (imports lib/tmdb.ts which uses Redis). ALL interactivity belongs in separate client component files (TrailerButton.tsx, RequestButton.tsx, etc.) that receive data via props. This exact bug has broken the build/runtime 4 times — check this before editing page.tsx.**
 
 ## Commands
 - `npm run dev` — start dev server (next dev)

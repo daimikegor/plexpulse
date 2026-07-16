@@ -2,45 +2,53 @@
 
 import { useState } from 'react';
 
-export function TrailerButton({ trailerKey }: { trailerKey?: string }) {
-  const [showTrailer, setShowTrailer] = useState(false);
+export function TrailerButton({ 
+  videos,
+  className = "inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 mb-6"
+}: { 
+  videos: any[];
+  className?: string;
+}) {
+  const [isDisabled, setIsDisabled] = useState(false);
   
-  const handlePlayTrailer = () => {
-    if (trailerKey) {
-      setShowTrailer(true);
+  const playTrailer = () => {
+    if (!videos || videos.length === 0) return;
+    
+    setIsDisabled(true);
+    try {
+      const trailer = videos.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube');
+      if (trailer) {
+        window.open(`https://www.youtube.com/watch?v=${trailer.key}`, '_blank');
+      } else {
+        // Fallback to first video if no trailer found
+        const firstVideo = videos[0];
+        if (firstVideo) {
+          window.open(`https://www.youtube.com/watch?v=${firstVideo.key}`, '_blank');
+        }
+      }
+    } catch (error) {
+      console.error('Error playing trailer:', error);
+    } finally {
+      setIsDisabled(false);
     }
   };
 
-  if (!showTrailer && !trailerKey) {
-    return null;
-  }
-
-  if (showTrailer) {
+  if (!videos || videos.length === 0) {
     return (
-      <div className="mb-6">
-        <button 
-          onClick={() => setShowTrailer(false)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 mb-2"
-        >
-          🔁 Close Trailer
-        </button>
-        <div className="aspect-video w-full">
-          <iframe 
-            src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
-            title="Trailer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="w-full h-full rounded-lg"
-          />
-        </div>
-      </div>
+      <button 
+        className={`${className} cursor-not-allowed opacity-50`}
+        disabled
+      >
+        ▶️ Play Trailer
+      </button>
     );
   }
 
   return (
     <button 
-      onClick={handlePlayTrailer}
-      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 mb-6"
+      className={className}
+      onClick={playTrailer}
+      disabled={isDisabled}
     >
       ▶️ Play Trailer
     </button>
