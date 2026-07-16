@@ -83,3 +83,6 @@ No lint or typecheck scripts are configured.
 4. **nzbdav** → notifies Arrs when ready
 5. **Arrs** → trigger partial library scan on Plex via Autopulse
 6. **PlexPulse** → detects "Available" status in `media-status.ts`
+
+## Git Workflow
+Never run git commands directly. Always delegate commits to the @git-commit subagent.
