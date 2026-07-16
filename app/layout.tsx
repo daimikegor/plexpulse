@@ -23,8 +23,8 @@ export default async function RootLayout({
   const session = sessionToken ? await getSession(sessionToken) : null;
 
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable}`}>
-      <body className="antialiased">
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable} scrollbar-hide`}>
+      <body className="antialiased scrollbar-hide">
         <AppShell username={session?.username ?? null} avatarUrl={session?.avatarUrl ?? null} isAdmin={session?.isAdmin ?? false}>{children}</AppShell>
       </body>
     </html>

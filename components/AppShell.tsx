@@ -21,7 +21,7 @@ export function AppShell({ username, avatarUrl, isAdmin, children }: { username:
   }
   
   return (
-    <div className="app-shell">
+    <div className="app-shell scrollbar-hide">
       {mobileMenuOpen && (
         <div className="sidebar-backdrop" onClick={() => setMobileMenuOpen(false)} />
       )}
@@ -29,9 +29,9 @@ export function AppShell({ username, avatarUrl, isAdmin, children }: { username:
         username={username ?? ''} 
         isAdmin={isAdmin}
       />
-      <div className="app-shell__content">
+      <div className="app-shell__content scrollbar-hide">
         <SiteHeader avatarUrl={avatarUrl} isAdmin={isAdmin} />
-        <div className="app-shell__page">
+        <div className="app-shell__page scrollbar-hide">
           {children}
         </div>
       </div>

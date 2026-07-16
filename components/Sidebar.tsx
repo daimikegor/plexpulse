@@ -24,7 +24,7 @@ export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boo
   };
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar scrollbar-hide">
       <div className="sidebar__brand">
         <div className="sidebar__brand-row">
           <PlexPulseIcon size={32} className="sidebar__mark" />
@@ -32,7 +32,7 @@ export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boo
         </div>
       </div>
       
-      <nav className="sidebar__nav">
+      <nav className="sidebar__nav scrollbar-hide">
         <Link 
           href="/dashboard" 
           className={`sidebar__nav-item ${pathname === '/dashboard' ? 'is-active' : ''}`}

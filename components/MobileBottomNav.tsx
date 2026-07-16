@@ -25,7 +25,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav className="mobile-bottom-nav">
+    <nav className="mobile-bottom-nav scrollbar-hide">
       {items.map(({ href, icon: Icon, label }) => (
         <Link
           key={href}

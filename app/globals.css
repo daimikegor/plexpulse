@@ -4,6 +4,12 @@
 
 @import "./styles/theme.css";
 
+/* Hide scrollbars globally */
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
