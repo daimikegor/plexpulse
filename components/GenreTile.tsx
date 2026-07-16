@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
-export const tilePalette = [
+const tilePalette = [
   ['rgba(107,36,50,0.55)', 'rgba(58,20,28,0.85)'],   // red
   ['rgba(138,106,31,0.55)', 'rgba(74,56,16,0.85)'],  // gold/amber
   ['rgba(61,16,16,0.55)', 'rgba(26,8,8,0.85)'],      // dark red

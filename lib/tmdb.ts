@@ -30,65 +30,9 @@ export async function getTrendingContent() {
   }
 }
 
-export async function getTrendingMovies() {
-  const cached = await redis.get('tmdb:trending:movies');
-  if (cached) {
-    return JSON.parse(cached);
-  }
 
-  try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
-      console.error('TMDB_API_KEY is not set in environment variables');
-      return { results: [] };
-    }
 
-    const response = await fetch(
-      `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`
-    );
 
-    if (!response.ok) {
-      throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    await redis.setex('tmdb:trending:movies', 7200, JSON.stringify(data));
-    return data;
-  } catch (error) {
-    console.error('Error fetching trending movies from TMDB:', error);
-    return { results: [] };
-  }
-}
-
-export async function getTrendingSeries() {
-  const cached = await redis.get('tmdb:trending:series');
-  if (cached) {
-    return JSON.parse(cached);
-  }
-
-  try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
-      console.error('TMDB_API_KEY is not set in environment variables');
-      return { results: [] };
-    }
-
-    const response = await fetch(
-      `https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}`
-    );
-
-    if (!response.ok) {
-      throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    await redis.setex('tmdb:trending:series', 7200, JSON.stringify(data));
-    return data;
-  } catch (error) {
-    console.error('Error fetching trending series from TMDB:', error);
-    return { results: [] };
-  }
-}
 
 export async function getPopularContent() {
   const cached = await redis.get('tmdb:popular');
@@ -390,43 +334,7 @@ export async function getTVGenresWithBackdrops() {
   }
 }
 
-export async function getGenreContent(mediaType: 'movie' | 'tv', genreId: string) {
-  const cached = await redis.get(`tmdb:genre:${mediaType}:${genreId}`);
-  if (cached) {
-    return JSON.parse(cached);
-  }
 
-  try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
-      console.error('TMDB_API_KEY is not set in environment variables');
-      return { results: [] };
-    }
-
-    const response = await fetch(
-      `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`
-    );
-
-    if (!response.ok) {
-      throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    // Add media_type to each result item
-    const resultsWithMediaType = data.results.map((item: any) => ({
-      ...item,
-      media_type: mediaType
-    }));
-
-    const finalData = { results: resultsWithMediaType };
-    await redis.setex(`tmdb:genre:${mediaType}:${genreId}`, 7200, JSON.stringify(finalData));
-    return finalData;
-  } catch (error) {
-    console.error(`Error fetching ${mediaType} genre content from TMDB:`, error);
-    return { results: [] };
-  }
-}
 
 export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
   try {
