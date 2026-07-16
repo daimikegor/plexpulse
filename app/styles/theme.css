@@ -1623,12 +1623,12 @@ main {
 .sidebar__nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem;
-  border-radius: 8px;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
   color: var(--text-muted);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   transition: background 0.15s ease, color 0.15s ease;
   text-decoration: none;
 }
