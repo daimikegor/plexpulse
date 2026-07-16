@@ -10,6 +10,7 @@ export function TrailerButton({
   className?: string;
 }) {
   const [isDisabled, setIsDisabled] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
   
   const playTrailer = () => {
     if (!videos || videos.length === 0) return;
@@ -18,12 +19,12 @@ export function TrailerButton({
     try {
       const trailer = videos.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube');
       if (trailer) {
-        window.open(`https://www.youtube.com/watch?v=${trailer.key}`, '_blank');
+        setShowTrailer(true);
       } else {
         // Fallback to first video if no trailer found
         const firstVideo = videos[0];
         if (firstVideo) {
-          window.open(`https://www.youtube.com/watch?v=${firstVideo.key}`, '_blank');
+          setShowTrailer(true);
         }
       }
     } catch (error) {
@@ -31,6 +32,10 @@ export function TrailerButton({
     } finally {
       setIsDisabled(false);
     }
+  };
+
+  const closeTrailer = () => {
+    setShowTrailer(false);
   };
 
   if (!videos || videos.length === 0) {
@@ -41,6 +46,33 @@ export function TrailerButton({
       >
         ▶️ Play Trailer
       </button>
+    );
+  }
+
+  if (showTrailer) {
+    const trailer = videos.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube');
+    const videoKey = trailer ? trailer.key : videos[0]?.key;
+    
+    if (!videoKey) return null;
+    
+    return (
+      <div className="relative">
+        <button 
+          className={`${className} mb-2`}
+          onClick={closeTrailer}
+        >
+          ✕ Close Trailer
+        </button>
+        <div className="relative pt-[56.25%] mb-4"> {/* 16:9 aspect ratio */}
+          <iframe
+            className="absolute top-0 left-0 w-full h-full"
+            src={`https://www.youtube.com/embed/${videoKey}?autoplay=1`}
+            title="Trailer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
     );
   }
 

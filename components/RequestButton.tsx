@@ -86,7 +86,7 @@ export function RequestButton({
   const getButtonClass = () => {
     switch (requestState) {
       case 'idle':
-        return 'bg-yellow-500 text-black hover:bg-yellow-400';
+        return 'bg-[var(--gold)] text-black hover:bg-[#F0B457]';
       case 'loading':
         return 'bg-gray-600 text-white cursor-not-allowed';
       case 'success':
@@ -94,11 +94,11 @@ export function RequestButton({
       case 'error':
         return 'bg-red-500 text-white';
       case 'requested':
-        return 'bg-[var(--pending)] text-white';
-      case 'available':
         return 'bg-[var(--teal)] text-white';
+      case 'available':
+        return 'bg-[#22C55E] text-white';
       default:
-        return 'bg-yellow-500 text-black hover:bg-yellow-400';
+        return 'bg-[var(--gold)] text-black hover:bg-[#F0B457]';
     }
   };
 

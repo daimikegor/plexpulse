@@ -2,6 +2,7 @@ import { getMediaDetails } from '@/lib/tmdb';
 import { CastSection } from '@/components/CastSection';
 import { RequestButton } from '@/components/RequestButton';
 import { TrailerButton } from '@/components/TrailerButton';
+import { getCachedMediaStatus } from '@/lib/media-status';
 import Link from 'next/link';
 
 /** @type { import('next').Metadata } */
@@ -29,20 +30,13 @@ export default async function MediaDetailPage({ params }: { params: { mediaType:
   // Try to fetch current status
   let initialStatus: 'idle' | 'loading' | 'success' | 'error' | 'requested' | 'available' = 'idle';
   try {
-    const statusResponse = await fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType}`, {
-      cache: 'no-store'
-    });
-    
-    if (statusResponse.ok) {
-      const statusData = await statusResponse.json();
-      // Map the API status to component status
-      if (statusData.status === 'requested') {
-        initialStatus = 'requested';
-      } else if (statusData.status === 'available') {
-        initialStatus = 'available';
-      }
-      // For 'none' status, we default to 'idle' (showing "Request" button)
+    const status = await getCachedMediaStatus(tmdbId, mediaType as 'movie' | 'tv');
+    if (status === 'requested') {
+      initialStatus = 'requested';
+    } else if (status === 'available') {
+      initialStatus = 'available';
     }
+    // For 'none' or null status, we default to 'idle' (showing "Request" button)
   } catch (error) {
     console.error('Error fetching media status:', error);
     // If there's an error fetching status, we default to idle (showing "Request" button)
