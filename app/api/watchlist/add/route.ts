@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const { title, year, mediaType, tmdbId, posterPath } = await request.json();
   const ratingKey = await findPlexRatingKey(title, year, mediaType, session.authToken);
   if (!ratingKey) {
-    return NextResponse.json({ error: 'No match found' }, { status: 404 });
+    return NextResponse.json({ error: "Couldn't add automatically — ask the admin to add this one manually." }, { status: 404 });
   }
   const added = await addToPlexWatchlist(ratingKey, session.authToken);
   if (!added) {

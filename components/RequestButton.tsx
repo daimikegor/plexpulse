@@ -20,6 +20,7 @@ export function RequestButton({
   const [requestState, setRequestState] = useState<'idle' | 'loading' | 'success' | 'error' | 'requested' | 'available'>(
     initialStatus === null ? 'idle' : initialStatus
   );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     // If initial status is not idle, we can assume it's already been requested or is available
@@ -56,6 +57,7 @@ export function RequestButton({
       } else {
         console.error('Failed to request:', result.error);
         setRequestState('error');
+        setErrorMessage(result.error);
       }
     } catch (error) {
       console.error('Request error:', error);
@@ -103,12 +105,17 @@ export function RequestButton({
   };
 
   return (
-    <button
-      onClick={handleRequest}
-      disabled={requestState === 'loading' || requestState === 'requested' || requestState === 'available'}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded font-semibold mb-6 ${getButtonClass()}`}
-    >
-      {getButtonText()}
-    </button>
+    <div className="flex flex-col items-start">
+      <button
+        onClick={handleRequest}
+        disabled={requestState === 'loading' || requestState === 'requested' || requestState === 'available'}
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded font-semibold mb-2 ${getButtonClass()}`}
+      >
+        {getButtonText()}
+      </button>
+      {requestState === 'error' && errorMessage && (
+        <p className="text-sm text-red-400 mt-2">{errorMessage}</p>
+      )}
+    </div>
   );
 }
