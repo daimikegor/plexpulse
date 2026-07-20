@@ -1,0 +1,28 @@
+# Secrets (mirrors .gitignore but applied at Docker build context time)
+.env
+.env.local
+.env.*
+.env.example
+data/
+dump.rdb
+
+# Version control
+.git
+.gitignore
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build / dev artifacts
+node_modules/
+.next/
+tsconfig.tsbuildinfo
+.old_app_reference.py
+.old_settings_reference.py
+
+# Logs and caches
+npm-debug.log*
+yarn-error.log*
