@@ -44,7 +44,7 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
 7. Drizzle queries use sqlite-core — no Postgres-specific features
 
 ## Security Fixes Applied
-- `/api/watchlist/add` POST: origin validation via `isTrustedOrigin()` — rejects requests whose Origin/Referer doesn't match `NEXT_PUBLIC_APP_URL`. Fails closed (no warning if env var missing).
+- `/api/watchlist/add` POST: origin validation via `isTrustedOrigin()` — rejects requests whose Origin/Referer doesn't match `NEXT_PUBLIC_APP_URL`. Logs a console.warn when the env var is missing but fails closed regardless.
 - `/api/auth/callback` HTML: postMessage target changed from wildcard `*` to `NEXT_PUBLIC_APP_URL` — prevents any site from spoofing the auth-complete event.
 - Redis auth: `docker-compose.yml` redis service gets `--requirepass`; `.env.example` has `REDIS_PASSWORD` + `REDIS_URL` with embedded password.
 - `NEXT_PUBLIC_APP_URL` is passed as a Docker build arg (Dockerfile ARG) and from compose via `${NEXT_PUBLIC_APP_URL:-default}`.
@@ -93,4 +93,5 @@ No lint or typecheck scripts are configured.
 6. **PlexPulse** → detects "Available" status in `media-status.ts`
 
 ## Git Workflow
-Never run git commands directly. Always delegate commits to the @git-commit subagent.
+- **Claude Code**: Run git commands directly with per-command approval (commit, push, etc.).
+- **OpenCode**: Always delegate commits to the @git-commit subagent.
