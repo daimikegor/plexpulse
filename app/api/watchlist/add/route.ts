@@ -8,7 +8,13 @@ import { userRequests } from '@/db/schema';
 // Accept requests only from the trusted app origin. Refuses if env var is absent.
 function isTrustedOrigin(request: Request): boolean {
   const expected = process.env.NEXT_PUBLIC_APP_URL;
-  if (!expected) return false; // refuse: without a configured origin we cannot validate
+  if (!expected) {
+    console.warn(
+      'NEXT_PUBLIC_APP_URL is not set — origin checks are disabled. ' +
+        'Set this to your app URL (e.g. http://localhost:3000 or https://plexpulse.example.com).',
+    );
+    return false; // refuse: without a configured origin we cannot validate
+  }
 
   // Strip trailing slash (Origin/Referer can include query strings or paths).
   const trusted = expected.replace(/\/+$/, '');
