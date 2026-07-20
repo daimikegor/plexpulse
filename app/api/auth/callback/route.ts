@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  // Plex redirects the popup here after approval. 
+  // Plex redirects the popup here after approval.
   // We close the popup and notify the opener to stop polling.
   return new NextResponse(`
     <!DOCTYPE html>
@@ -9,8 +9,9 @@ export async function GET() {
     <body style="background:#0E1015;color:#F3F1EA;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
       <p>Signing you in&hellip;</p>
       <script>
+        var appUrl = '${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}'.replace(/\/+$/, '');
         if (window.opener) {
-          window.opener.postMessage({ type: 'plex-auth-complete' }, '*');
+          window.opener.postMessage({ type: 'plex-auth-complete' }, appUrl);
           setTimeout(() => window.close(), 500);
         } else {
           document.body.innerHTML = '<p>You can close this window.</p>';
