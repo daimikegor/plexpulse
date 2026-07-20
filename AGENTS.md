@@ -22,7 +22,7 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
   - `tmdb.ts` — TMDB API calls with Redis caching (2h TTL for most, 24h for genre data)
   - `redis.ts` — Redis connection singleton
   - `session.ts` — Session/auth management (Redis-backed session tokens + cookie-based auth)
-  - `media-status.ts` — Status check orchestrator against Plex/Radarr/Sonarr (1h stale threshold)
+  - `media-status.ts` — Status check orchestrator against Plex/Radarr/Sonarr ('available' → 24h, 'requested' → 5min, 'none' → 6h)
   - `radarr.ts`, `sonarr.ts`, `plex-library.ts`, `plex-watchlist.ts` — individual service integrations
   - `db.ts` — Drizzle database connection
 - `db/schema.ts` — Drizzle schema: `users`, `media_status`, `user_requests` tables
@@ -43,6 +43,12 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
 6. API routes should validate authentication using `requireAuth()` when access is required
 7. Drizzle queries use sqlite-core — no Postgres-specific features
 
+## Security Fixes Applied
+- `/api/watchlist/add` POST: origin validation via `isTrustedOrigin()` — rejects requests whose Origin/Referer doesn't match `NEXT_PUBLIC_APP_URL`. Fails closed (no warning if env var missing).
+- `/api/auth/callback` HTML: postMessage target changed from wildcard `*` to `NEXT_PUBLIC_APP_URL` — prevents any site from spoofing the auth-complete event.
+- Redis auth: `docker-compose.yml` redis service gets `--requirepass`; `.env.example` has `REDIS_PASSWORD` + `REDIS_URL` with embedded password.
+- `NEXT_PUBLIC_APP_URL` is passed as a Docker build arg (Dockerfile ARG) and from compose via `${NEXT_PUBLIC_APP_URL:-default}`.
+
 ## Known Gotchas
 - **NEXT_PUBLIC_ env leak**: PLEX_CLIENT_ID was mistakenly prefixed with NEXT_PUBLIC_, 
   exposing it in client bundles. Keep all API keys as server-only env vars.
@@ -51,8 +57,10 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
   with @libsql/client — do NOT revert to better-sqlite3.
 - **Session cookie Secure flag**: NODE_ENV is unreliable in Docker (always 'production'). 
   Use the explicit IS_HTTPS env var for secure cookie configuration.
+- **Media status cache thresholds**: `'available' → 24h`, `'requested' → 5min`, `'none' → 6h`. The old 60s default caused hundreds of external API calls per page load — do not change back.
 - **TMDB-to-TVDB ID conversion needed for Sonarr**: Sonarr uses TVDB IDs, not TMDB IDs. 
   Always resolve via getTvdbIdFromTmdb() before querying Sonarr.
+- **Unraid template env vars don't expand ${...}**: unlike docker-compose env_file, Unraid templates pass values literally. Hardcode full URLs (e.g., `redis://:password@host:port`) in the UI — `${REDIS_PASSWORD}` will not work there.
 - **Plex OAuth cleanup on exit paths**: The polling interval and message event listener 
   must be cleared on all exit paths (popup close, auth success, timeout) to prevent leaks.
 - **CRITICAL: app/detail/[mediaType]/[tmdbId]/page.tsx must NEVER contain onClick, useState, useEffect, or 'use client'. It is a server component (imports lib/tmdb.ts which uses Redis). ALL interactivity belongs in separate client component files (TrailerButton.tsx, RequestButton.tsx, etc.) that receive data via props. This exact bug has broken the build/runtime 4 times — check this before editing page.tsx.**
@@ -73,8 +81,7 @@ No lint or typecheck scripts are configured.
 ## Deployment
 - Docker-based (Docker Compose or Unraid templates included)
 - Environment variables split between build-time and runtime — see SETUP.md
-- Redis: port 6379 internally, exposed as 6379 in docker-compose, defaults to host 
-  port 6380 in Unraid template (to avoid conflicts with other Redis containers)
+- Redis: **production uses a separate standalone Redis container at 10.0.0.97:6380 with requirepass auth**. The compose redis service is dev-only and not used in production.
 - Docker networking: implicit compose default network (no custom network defined)
 
 ## Media Workflow
