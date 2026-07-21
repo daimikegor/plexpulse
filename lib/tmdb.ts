@@ -1,5 +1,20 @@
 import { redis } from '@/lib/redis';
 
+// Returns auth config for TMDB API calls.
+// Prefers TMDB_READ_ACCESS_TOKEN (Bearer header) over TMDB_API_KEY (query param)
+// so credentials don't appear in server/proxy logs.
+function getTmdbAuth(): { headers: Record<string, string>; keyParam: string; missing: boolean } {
+  const readToken = process.env.TMDB_READ_ACCESS_TOKEN;
+  if (readToken) {
+    return { headers: { Authorization: `Bearer ${readToken}` }, keyParam: '', missing: false };
+  }
+  const apiKey = process.env.TMDB_API_KEY;
+  if (!apiKey) {
+    return { headers: {}, keyParam: '', missing: true };
+  }
+  return { headers: {}, keyParam: `api_key=${apiKey}`, missing: false };
+}
+
 export async function getTrendingContent() {
   const cached = await redis.get('tmdb:trending');
   if (cached) {
@@ -7,14 +22,15 @@ export async function getTrendingContent() {
   }
 
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return { results: [] };
     }
 
     const response = await fetch(
-      `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`
+      `https://api.themoviedb.org/3/trending/all/week?${keyParam}`,
+      { headers: h }
     );
 
     if (!response.ok) {
@@ -41,15 +57,15 @@ export async function getPopularContent() {
   }
 
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return { results: [] };
     }
 
     const [movieResponse, tvResponse] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`),
-      fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`)
+      fetch(`https://api.themoviedb.org/3/movie/popular?${keyParam}`, { headers: h }),
+      fetch(`https://api.themoviedb.org/3/tv/popular?${keyParam}`, { headers: h })
     ]);
 
     if (!movieResponse.ok || !tvResponse.ok) {
@@ -90,15 +106,15 @@ export async function getTopRatedContent() {
   }
 
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return { results: [] };
     }
 
     const [movieResponse, tvResponse] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`),
-      fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}`)
+      fetch(`https://api.themoviedb.org/3/movie/top_rated?${keyParam}`, { headers: h }),
+      fetch(`https://api.themoviedb.org/3/tv/top_rated?${keyParam}`, { headers: h })
     ]);
 
     if (!movieResponse.ok || !tvResponse.ok) {
@@ -139,15 +155,15 @@ export async function getUpcomingContent() {
   }
 
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return { results: [] };
     }
 
     const [movieResponse, tvResponse] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`),
-      fetch(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}`)
+      fetch(`https://api.themoviedb.org/3/movie/upcoming?${keyParam}`, { headers: h }),
+      fetch(`https://api.themoviedb.org/3/tv/on_the_air?${keyParam}`, { headers: h })
     ]);
 
     if (!movieResponse.ok || !tvResponse.ok) {
@@ -213,14 +229,14 @@ export async function getMovieGenresWithBackdrops() {
   }
 
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return { genres: [] };
     }
 
     // Get the genre list
-    const genreResponse = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}`);
+    const genreResponse = await fetch(`https://api.themoviedb.org/3/genre/movie/list?${keyParam}`, { headers: h });
     
     if (!genreResponse.ok) {
       throw new Error(`TMDB API error: ${genreResponse.status} ${genreResponse.statusText}`);
@@ -233,7 +249,8 @@ export async function getMovieGenresWithBackdrops() {
     const genrePromises = genres.map(async (genre: any) => {
       try {
         const discoverResponse = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genre.id}&sort_by=popularity.desc`
+          `https://api.themoviedb.org/3/discover/movie?${keyParam}${keyParam ? '&' : ''}with_genres=${genre.id}&sort_by=popularity.desc`,
+          { headers: h }
         );
         
         if (!discoverResponse.ok) {
@@ -277,14 +294,14 @@ export async function getTVGenresWithBackdrops() {
   }
 
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return { genres: [] };
     }
 
     // Get the genre list
-    const genreResponse = await fetch(`https://api.themoviedb.org/3/genre/tv/list?api_key=${API_KEY}`);
+    const genreResponse = await fetch(`https://api.themoviedb.org/3/genre/tv/list?${keyParam}`, { headers: h });
     
     if (!genreResponse.ok) {
       throw new Error(`TMDB API error: ${genreResponse.status} ${genreResponse.statusText}`);
@@ -297,7 +314,8 @@ export async function getTVGenresWithBackdrops() {
     const genrePromises = genres.map(async (genre: any) => {
       try {
         const discoverResponse = await fetch(
-          `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=${genre.id}&sort_by=popularity.desc`
+          `https://api.themoviedb.org/3/discover/tv?${keyParam}${keyParam ? '&' : ''}with_genres=${genre.id}&sort_by=popularity.desc`,
+          { headers: h }
         );
         
         if (!discoverResponse.ok) {
@@ -338,13 +356,14 @@ export async function getTVGenresWithBackdrops() {
 
 export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return { results: [], page: 1, total_pages: 1 };
     }
     const response = await fetch(
-      `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`
+      `https://api.themoviedb.org/3/discover/${mediaType}?${keyParam}${keyParam ? '&' : ''}sort_by=popularity.desc&page=${page}`,
+      { headers: h }
     );
     if (!response.ok) {
       throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
@@ -367,10 +386,11 @@ export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
 
 export async function getTrendingPage(page: number) {
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) return { results: [], page: 1, total_pages: 1 };
     const response = await fetch(
-      `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&page=${page}`
+      `https://api.themoviedb.org/3/trending/all/week?${keyParam}${keyParam ? '&' : ''}page=${page}`,
+      { headers: h }
     );
     if (!response.ok) throw new Error(`TMDB API error: ${response.status}`);
     const data = await response.json();
@@ -383,11 +403,11 @@ export async function getTrendingPage(page: number) {
 
 export async function getPopularPage(page: number) {
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) return { results: [], page: 1, total_pages: 1 };
     const [movieRes, tvRes] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&page=${page}`),
-      fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&page=${page}`)
+      fetch(`https://api.themoviedb.org/3/movie/popular?${keyParam}${keyParam ? '&' : ''}page=${page}`, { headers: h }),
+      fetch(`https://api.themoviedb.org/3/tv/popular?${keyParam}${keyParam ? '&' : ''}page=${page}`, { headers: h })
     ]);
     if (!movieRes.ok || !tvRes.ok) throw new Error('TMDB API error');
     const movieData = await movieRes.json();
@@ -408,11 +428,11 @@ export async function getPopularPage(page: number) {
 
 export async function getTopRatedPage(page: number) {
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) return { results: [], page: 1, total_pages: 1 };
     const [movieRes, tvRes] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&page=${page}`),
-      fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}&page=${page}`)
+      fetch(`https://api.themoviedb.org/3/movie/top_rated?${keyParam}${keyParam ? '&' : ''}page=${page}`, { headers: h }),
+      fetch(`https://api.themoviedb.org/3/tv/top_rated?${keyParam}${keyParam ? '&' : ''}page=${page}`, { headers: h })
     ]);
     if (!movieRes.ok || !tvRes.ok) throw new Error('TMDB API error');
     const movieData = await movieRes.json();
@@ -433,11 +453,11 @@ export async function getTopRatedPage(page: number) {
 
 export async function getUpcomingPage(page: number) {
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) return { results: [], page: 1, total_pages: 1 };
     const [movieRes, tvRes] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&page=${page}`),
-      fetch(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&page=${page}`)
+      fetch(`https://api.themoviedb.org/3/movie/upcoming?${keyParam}${keyParam ? '&' : ''}page=${page}`, { headers: h }),
+      fetch(`https://api.themoviedb.org/3/tv/on_the_air?${keyParam}${keyParam ? '&' : ''}page=${page}`, { headers: h })
     ]);
     if (!movieRes.ok || !tvRes.ok) throw new Error('TMDB API error');
     const movieData = await movieRes.json();
@@ -469,10 +489,11 @@ export async function getUpcomingPage(page: number) {
 
 export async function getGenreContentPage(mediaType: 'movie' | 'tv', genreId: string, page: number) {
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) return { results: [], page: 1, total_pages: 1 };
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) return { results: [], page: 1, total_pages: 1 };
     const response = await fetch(
-      `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=${page}`
+      `https://api.themoviedb.org/3/discover/${mediaType}?${keyParam}${keyParam ? '&' : ''}with_genres=${genreId}&sort_by=popularity.desc&page=${page}`,
+      { headers: h }
     );
     if (!response.ok) throw new Error(`TMDB API error: ${response.status}`);
     const data = await response.json();
@@ -489,10 +510,11 @@ export async function getGenreContentPage(mediaType: 'movie' | 'tv', genreId: st
 
 export async function getTvdbIdFromTmdb(tmdbId: string): Promise<string | null> {
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) return null;
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) return null;
     const response = await fetch(
-      `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids?api_key=${API_KEY}`
+      `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids?${keyParam}`,
+      { headers: h }
     );
     if (!response.ok) return null;
     const data = await response.json();
@@ -511,8 +533,8 @@ export async function getMediaDetails(mediaType: 'movie' | 'tv', tmdbId: string)
   }
 
   try {
-    const API_KEY = process.env.TMDB_API_KEY;
-    if (!API_KEY) {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) {
       console.error('TMDB_API_KEY is not set in environment variables');
       return null;
     }
@@ -521,7 +543,7 @@ export async function getMediaDetails(mediaType: 'movie' | 'tv', tmdbId: string)
       ? `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=genres,videos,credits`
       : `https://api.themoviedb.org/3/tv/${tmdbId}?append_to_response=genres,videos,credits`;
 
-    const response = await fetch(`${endpoint}&api_key=${API_KEY}`);
+    const response = await fetch(`${endpoint}${keyParam ? '&' + keyParam : ''}`, { headers: h });
     if (!response.ok) {
       throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
     }

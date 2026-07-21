@@ -12,8 +12,8 @@ async function getPlexLibraryGuids(mediaType: 'movie' | 'tv'): Promise<Set<strin
 
   try {
     const sectionsRes = await fetch(
-      `${serverUrl}/library/sections?X-Plex-Token=${token}`,
-      { headers: { 'Accept': 'application/json' } }
+      `${serverUrl}/library/sections`,
+      { headers: { 'Accept': 'application/json', 'X-Plex-Token': token } }
     );
     if (sectionsRes.ok) {
       const sectionsData = await sectionsRes.json();
@@ -28,8 +28,8 @@ async function getPlexLibraryGuids(mediaType: 'movie' | 'tv'): Promise<Set<strin
         
         while (hasMore) {
           const itemsRes = await fetch(
-            `${serverUrl}/library/sections/${section.key}/all?includeGuids=1&X-Plex-Token=${token}&X-Plex-Container-Start=${start}&X-Plex-Container-Size=${size}`,
-            { headers: { 'Accept': 'application/json' } }
+            `${serverUrl}/library/sections/${section.key}/all?includeGuids=1&X-Plex-Container-Start=${start}&X-Plex-Container-Size=${size}`,
+            { headers: { 'Accept': 'application/json', 'X-Plex-Token': token } }
           );
           if (!itemsRes.ok) break;
           
