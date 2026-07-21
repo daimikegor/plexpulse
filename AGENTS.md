@@ -22,7 +22,7 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
   - `tmdb.ts` — TMDB API calls with Redis caching (2h TTL for most, 24h for genre data)
   - `redis.ts` — Redis connection singleton
   - `session.ts` — Session/auth management (Redis-backed session tokens + cookie-based auth)
-  - `media-status.ts` — Status check orchestrator against Plex/Radarr/Sonarr ('available' → 24h, 'requested' → 5min, 'none' → 6h)
+  - `media-status.ts` — Status check orchestrator against Plex/Radarr/Sonarr ('available' → 24h, 'requested' → 5min, 'none' → 30min)
   - `radarr.ts`, `sonarr.ts`, `plex-library.ts`, `plex-watchlist.ts` — individual service integrations
   - `db.ts` — Drizzle database connection
 - `db/schema.ts` — Drizzle schema: `users`, `media_status`, `user_requests` tables
@@ -57,7 +57,12 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
   with @libsql/client — do NOT revert to better-sqlite3.
 - **Session cookie Secure flag**: NODE_ENV is unreliable in Docker (always 'production'). 
   Use the explicit IS_HTTPS env var for secure cookie configuration.
-- **Media status cache thresholds**: `'available' → 24h`, `'requested' → 5min`, `'none' → 6h`. The old 60s default caused hundreds of external API calls per page load — do not change back.
+- **Media status cache thresholds**: `'available' → 24h`, `'requested' → 5min`, `'none' → 30min`. The old 60s default caused hundreds of external API calls per page load — do not change back.
+- **Plex library GUID detection — three-layer cascading cache bug**: `getPlexLibraryGuids()` in `lib/plex-library.ts` scans the entire Plex library and caches extracted TMDB IDs in Redis (120s TTL). Three bugs combined to produce persistent false negatives:
+  1. **GUID format blind spot**: only matched `startsWith('tmdb://')`, missing legacy agent GUIDs like `com.plexapp.agents.tmdb://123?lang=en`. Fixed by using `includes('tmdb://')` + regex to extract numeric ID.
+  2. **Empty/partial scans cached**: if a network error or parse failure occurred mid-scan, the partial result was cached anyway, poisoning all status checks in that 120s window. Fixed by only caching when `allGuids.length > 0`.
+  3. **Fragile pagination**: `totalSize || 0` treated a missing `totalSize` as 0, causing an immediate pagination stop after page 1. Fixed with `!= null` check.
+  The `'none'` DB cache TTL (was 6h) amplified any transient miss — reduced to 30min. When editing `plex-library.ts` or `media-status.ts`, do not reintroduce any of these three failure modes.
 - **TMDB-to-TVDB ID conversion needed for Sonarr**: Sonarr uses TVDB IDs, not TMDB IDs. 
   Always resolve via getTvdbIdFromTmdb() before querying Sonarr.
 - **Unraid template env vars don't expand ${...}**: unlike docker-compose env_file, Unraid templates pass values literally. Hardcode full URLs (e.g., `redis://:password@host:port`) in the UI — `${REDIS_PASSWORD}` will not work there.
