@@ -40,15 +40,6 @@ mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
         .replace(/\s+/g, ' ')           // collapse whitespace
         .trim();
 
-    // Log all candidates so we can inspect title/year mismatches
-    console.log(`Plex Discover search for "${title}" (${year}, normalized query: "${query}"): ${externalResults.length} external results`);
-    externalResults.slice(0, 10).forEach((r: any, i: number) => {
-      const meta = r.Metadata;
-      if (meta) {
-        console.log(`  [${i}] raw="${meta.title}" (${meta.year})  words="${words(meta.title)}"`);
-      }
-    });
-
     // Try to find a result matching both word-sequence title and year
     const targetWords = words(title);
     const match = externalResults.find((r: any) => {
