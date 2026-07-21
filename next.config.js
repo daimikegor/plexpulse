@@ -24,7 +24,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
-              'img-src \'self\' https://image.tmdb.org https://*.plex.tv data:',
+              'img-src \'self\' https://image.tmdb.org https://plex.tv https://*.plex.tv data:',
               'frame-src https://www.youtube.com',
               "connect-src 'self'",
               "font-src 'self'",
