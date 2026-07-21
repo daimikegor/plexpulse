@@ -8,3 +8,4 @@ data/
 .env.local
 dump.rdb
 tsconfig.tsbuildinfo
+.next/
