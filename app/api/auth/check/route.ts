@@ -3,8 +3,17 @@ import crypto from 'crypto';
 import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { redis } from '@/lib/redis';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function GET(req: NextRequest) {
+  const rl = await rateLimit(req, RATE_LIMITS['auth-check']);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const pinId = searchParams.get('pinId');
 

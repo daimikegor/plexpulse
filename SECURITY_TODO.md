@@ -22,7 +22,7 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 
 ## 🔴 Critical
 
-- [ ] **No rate limiting** — any endpoint can be abused. Add rate-limit middleware or at minimum throttle `/api/search/live` and `/api/media-status` (global, all routes).
+- [x] **No rate limiting** — added Redis-backed fixed-window rate limiter (`lib/rate-limit.ts`) with Lua EVAL for atomic INCR+EXPIRE, applied to all 10 API routes with tiered limits (5–60 req/min). Zero new dependencies. (`lib/rate-limit.ts`, `lib/origin.ts`, all `app/api/**/route.ts`)
 - [ ] **`/api/media-status` unauthenticated** — anyone can enumerate library contents and bypass cache with `?force=1`. Add `requireAuth()` or restrict `force` to authenticated users (`app/api/media-status/route.ts:4-18`).
 - [ ] **`/api/search/live` unauthenticated + uncached** — every request hits TMDB live with no Redis caching or auth. Add Redis cache layer and auth check (`app/api/search/live/route.ts:3-30`).
 - [ ] **No CSP or security headers** — no XSS/clickjacking/MIME-sniffing protection. Add `headers()` export in `next.config.js` with CSP, `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, `Referrer-Policy`.
