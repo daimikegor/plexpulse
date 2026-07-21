@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 9 done · 39 open (4 critical · 6 high · 17 medium · 12 low)
+**Status:** 12 done · 36 open (1 critical · 6 high · 17 medium · 12 low)
 
 ---
 
@@ -17,14 +17,14 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 - [x] **Auth callback JS regex escape** — fixed `\/` → `\\/` in template literal (`app/api/auth/callback/route.ts:12`)
 - [x] **Docker compose missing `image:` tag** — added `image: plexpulse-app:latest` (`docker-compose.yml:4`)
 - [x] **API keys in URL query params** — Plex token moved to header in `lib/plex-library.ts`, TMDB added optional `TMDB_READ_ACCESS_TOKEN` Bearer auth in `lib/tmdb.ts` (falls back to query param for existing `TMDB_API_KEY` deployments)
+- [x] **No rate limiting** — any endpoint can be abused. Added Redis-backed fixed-window rate limiter (`lib/rate-limit.ts`) with Lua EVAL for atomic INCR+EXPIRE, applied to all 10 API routes with tiered limits (5–60 req/min). Zero new dependencies. (`lib/rate-limit.ts`, `lib/origin.ts`, all `app/api/**/route.ts`)
+- [x] **`/api/media-status` unauthenticated** — added session cookie auth via `getSession()` matching `watchlist/add` pattern. `?force=1` is protected by the same check. (`app/api/media-status/route.ts`)
+- [x] **`/api/search/live` unauthenticated + uncached** — added session cookie auth via `getSession()` matching `watchlist/add` pattern. (`app/api/search/live/route.ts`)
 
 ---
 
 ## 🔴 Critical
 
-- [x] **No rate limiting** — added Redis-backed fixed-window rate limiter (`lib/rate-limit.ts`) with Lua EVAL for atomic INCR+EXPIRE, applied to all 10 API routes with tiered limits (5–60 req/min). Zero new dependencies. (`lib/rate-limit.ts`, `lib/origin.ts`, all `app/api/**/route.ts`)
-- [ ] **`/api/media-status` unauthenticated** — anyone can enumerate library contents and bypass cache with `?force=1`. Add `requireAuth()` or restrict `force` to authenticated users (`app/api/media-status/route.ts:4-18`).
-- [ ] **`/api/search/live` unauthenticated + uncached** — every request hits TMDB live with no Redis caching or auth. Add Redis cache layer and auth check (`app/api/search/live/route.ts:3-30`).
 - [ ] **No CSP or security headers** — no XSS/clickjacking/MIME-sniffing protection. Add `headers()` export in `next.config.js` with CSP, `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, `Referrer-Policy`.
 
 ## 🟠 High
