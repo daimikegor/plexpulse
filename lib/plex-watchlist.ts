@@ -30,6 +30,15 @@ mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
     const searchResults = data.MediaContainer?.SearchResults || [];
     const externalResults = searchResults.find((s: any) => s.id === 'external')?.SearchResult || [];
 
+    // Log all candidates so we can inspect title/year mismatches
+    console.log(`Plex Discover search for "${title}" (${year}, normalized query: "${query}"): ${externalResults.length} external results`);
+    externalResults.slice(0, 10).forEach((r: any, i: number) => {
+      const meta = r.Metadata;
+      if (meta) {
+        console.log(`  [${i}] raw="${meta.title}" (${meta.year})  normalized="${norm(meta.title)}"`);
+      }
+    });
+
     // Try to find a result matching both normalized title and year
     const match = externalResults.find((r: any) => {
       const meta = r.Metadata;
