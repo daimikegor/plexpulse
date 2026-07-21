@@ -42,7 +42,7 @@ export async function getCachedMediaStatus(tmdbId: string, mediaType: 'movie' | 
     ? 24 * 60 * 60 * 1000     // 24 hours — library availability rarely changes on its own
     : result.status === 'requested'
       ? 5 * 60 * 1000          // 5 minutes — download progress updates matter, but not every second
-      : 6 * 60 * 60 * 1000;    // 6 hours — no reason to re-check availability every minute
+      : 30 * 60 * 1000;        // 30 minutes — long enough to debounce, short enough to self-correct
   const cutoff = new Date(Date.now() - staleThreshold);
   if (new Date(result.lastChecked) < cutoff) return null;
   return result.status as 'none' | 'requested' | 'available';

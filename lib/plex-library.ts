@@ -37,15 +37,23 @@ async function getPlexLibraryGuids(mediaType: 'movie' | 'tv'): Promise<Set<strin
           const items = itemsData.MediaContainer?.Metadata || [];
           
           for (const item of items) {
-            const tmdbGuid = item.Guid?.find((g: any) => g.id?.startsWith('tmdb://'));
-            if (tmdbGuid) allGuids.push(tmdbGuid.id);
+            // Match both modern (tmdb://123) and legacy (com.plexapp.agents.tmdb://123?lang=en) formats
+            const tmdbGuid = item.Guid?.find((g: any) => {
+              const id = g.id || '';
+              return id.includes('tmdb://');
+            });
+            if (tmdbGuid) {
+              const match = tmdbGuid.id.match(/tmdb:\/\/(\d+)/);
+              if (match) allGuids.push(match[1]);
+            }
           }
           
           // Check if we've retrieved all items
-          const totalSize = itemsData.MediaContainer?.totalSize || 0;
+          const totalSize = itemsData.MediaContainer?.totalSize;
           const returnedSize = itemsData.MediaContainer?.size || items.length;
-          
-          if (returnedSize < size || start + size >= totalSize) {
+
+          // Stop if: empty page, page smaller than requested, or we know we've covered totalSize
+          if (returnedSize === 0 || returnedSize < size || (totalSize != null && start + size >= totalSize)) {
             hasMore = false;
           } else {
             start += size;
@@ -57,12 +65,17 @@ async function getPlexLibraryGuids(mediaType: 'movie' | 'tv'): Promise<Set<strin
     console.error('Error building Plex library guid cache:', error);
   }
 
-  await redis.setex(cacheKey, 120, JSON.stringify(allGuids));
+  // Only cache if we got results — empty cache would poison status checks for 2 min
+  if (allGuids.length > 0) {
+    await redis.setex(cacheKey, 120, JSON.stringify(allGuids));
+  } else {
+    console.warn('Plex library GUID scan returned zero results — not caching');
+  }
   return new Set(allGuids);
 }
 
 export async function checkPlexLibrary(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<boolean> {
   const guids = await getPlexLibraryGuids(mediaType);
-  return guids.has(`tmdb://${tmdbId}`);
+  return guids.has(tmdbId);
 }
 
