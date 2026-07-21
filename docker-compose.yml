@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    image: plexpulse-app:latest
     build:
       context: .
       args:
