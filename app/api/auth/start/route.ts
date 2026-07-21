@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const nonce = crypto.randomBytes(16).toString('hex');
     await redis.set(`pin_nonce:${data.id}`, nonce, 'EX', 300); // 5 min TTL, matches PIN lifetime
 
-    return NextResponse.json({ pinId: data.id, code: data.code, nonce });
+    return NextResponse.json({ pinId: data.id, code: data.code, nonce, clientID });
   } catch (error) {
     console.error('PIN creation failed:', error);
     return NextResponse.json({ error: 'Failed to initiate Plex login' }, { status: 500 });

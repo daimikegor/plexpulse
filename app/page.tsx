@@ -12,7 +12,7 @@ export default function Landing() {
     
     // 1. Request PIN from backend (returns nonce for CSRF protection)
     const startRes = await fetch('/api/auth/start', { method: 'POST' });
-    const { pinId, code, nonce: startNonce } = await startRes.json();
+    const { pinId, code, nonce: startNonce, clientID } = await startRes.json();
     let pollNonce = startNonce;
     
     if (!pinId) {
@@ -26,7 +26,7 @@ export default function Landing() {
     const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
     const popup = window.open(
-      `https://app.plex.tv/auth#?clientID=${process.env.NEXT_PUBLIC_PLEX_CLIENT_ID}&code=${code}&forwardUrl=${encodeURIComponent(`${window.location.origin}/api/auth/callback`)}`,
+      `https://app.plex.tv/auth#?clientID=${clientID}&code=${code}&forwardUrl=${encodeURIComponent(`${window.location.origin}/api/auth/callback`)}`,
       'PlexAuth',
       `width=${width},height=${height},left=${left},top=${top}`
     );

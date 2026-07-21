@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 19 done · 29 open (0 critical · 2 high · 15 medium · 12 low)
+**Status:** 21 done · 27 open (0 critical · 0 high · 15 medium · 12 low)
 
 ---
 
@@ -27,6 +27,8 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 - [x] **No CSRF tokens on auth endpoints** — added `isTrustedOrigin()` to both `POST /api/auth/start` and `POST /api/auth/logout`. Untrusted origins receive 403. (`app/api/auth/start/route.ts:16-18`, `app/api/auth/logout/route.ts:16-18`)
 - [x] **Only watchlist/add uses `isTrustedOrigin`** — added `isTrustedOrigin()` to `POST /api/auth/logout` and `POST /api/auth/start`, bringing all auth POST endpoints under origin validation. (`app/api/auth/start/route.ts:16-18`, `app/api/auth/logout/route.ts:16-18`)
 - [x] **5 API routes unauthenticated** — all 5 routes now require session cookie auth via `getSession()`, matching the `media-status`/`search/live` pattern. Discover, genre-content, and category return 401 for unauthenticated requests. (`app/api/discover/route.ts`, `app/api/genre-content/route.ts`, `app/api/category/route.ts`, `app/api/search/live/route.ts`, `app/api/media-status/route.ts`)
+- [x] **Docker runs as root** — added `chown -R node:node /app/data` and `USER node` in the runner stage. Container now runs as non-root. (`Dockerfile:21,29`)
+- [x] **Plex Client ID in client bundle** — removed `NEXT_PUBLIC_PLEX_CLIENT_ID` entirely. The start endpoint now returns `clientID` from the server-side `PLEX_CLIENT_ID` env var, and the client uses it to construct the Plex auth URL. Removed from Dockerfile build args, docker-compose.yml, and .env.example. (`app/api/auth/start/route.ts:41`, `app/page.tsx:15,29`, `Dockerfile:9-10`, `docker-compose.yml:9`, `.env.example:3`)
 
 ---
 
@@ -36,8 +38,7 @@ _None remaining — all 4 critical findings resolved._
 
 ## 🟠 High
 
-- [ ] **Docker runs as root** — no `USER node` directive. Add `RUN chown -R node:node /app/data` + `USER node` in runner stage (`Dockerfile:18`).
-- [ ] **Plex Client ID in client bundle** — partially addressed (ARG wired for Docker build), but still `NEXT_PUBLIC_` in source. Move to server-side URL construction via `/api/auth/start` (`app/page.tsx:28`).
+_None remaining — all 6 high findings resolved._
 
 ## 🟡 Medium
 
