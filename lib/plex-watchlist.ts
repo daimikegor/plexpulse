@@ -1,7 +1,20 @@
 export async function findPlexRatingKey(title: string, year: number | undefined,
 mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
   const searchType = mediaType === 'movie' ? 'movies' : 'tv';
-  const url = `https://discover.provider.plex.tv/library/search?query=${encodeURIComponent(title)}&searchTypes=${searchType}&searchProviders=discover&includeMetadata=1`;
+
+  // Normalize Unicode characters that Plex Discover won't match in search queries
+  // (e.g. TMDB uses … while Plex uses ...). Applied to both the query and the
+  // result comparison below.
+  const norm = (s: string) =>
+    s.toLowerCase()
+      .replace(/…/g, '...')       // ellipsis → three periods
+      .replace(/[‘’]/g, "'")  // smart single quotes → apostrophe
+      .replace(/[“”]/g, '"')  // smart double quotes
+      .replace(/[–—]/g, '-')  // en/em dash → hyphen
+      .replace(/ /g, ' ');         // non-breaking space → space
+
+  const query = norm(title);
+  const url = `https://discover.provider.plex.tv/library/search?query=${encodeURIComponent(query)}&searchTypes=${searchType}&searchProviders=discover&includeMetadata=1`;
   try {
     const response = await fetch(url, {
       headers: {
@@ -10,24 +23,14 @@ mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
       }
     });
     if (!response.ok) {
-      console.error(`Plex Discover search failed: ${response.status} ${response.statusText} for query "${title}"`);
+      console.error(`Plex Discover search failed: ${response.status} ${response.statusText} for query "${query}"`);
       return null;
     }
     const data = await response.json();
     const searchResults = data.MediaContainer?.SearchResults || [];
     const externalResults = searchResults.find((s: any) => s.id === 'external')?.SearchResult || [];
 
-    // Normalize titles before comparison — TMDB and Plex often differ on Unicode
-    // characters (e.g. TMDB uses … while Plex uses ...).
-    const norm = (s: string) =>
-      s.toLowerCase()
-        .replace(/…/g, '...')       // ellipsis → three periods
-        .replace(/[‘’]/g, "'")  // smart single quotes → apostrophe
-        .replace(/[“”]/g, '"')  // smart double quotes
-        .replace(/[–—]/g, '-')  // en/em dash → hyphen
-        .replace(/ /g, ' ');         // non-breaking space → space
-
-    // Try to find a result matching both title (case-insensitive) and year
+    // Try to find a result matching both normalized title and year
     const match = externalResults.find((r: any) => {
       const meta = r.Metadata;
       if (!meta) return false;
