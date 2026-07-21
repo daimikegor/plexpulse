@@ -16,13 +16,23 @@ mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
     const data = await response.json();
     const searchResults = data.MediaContainer?.SearchResults || [];
     const externalResults = searchResults.find((s: any) => s.id === 'external')?.SearchResult || [];
-    
+
+    // Normalize titles before comparison — TMDB and Plex often differ on Unicode
+    // characters (e.g. TMDB uses … while Plex uses ...).
+    const norm = (s: string) =>
+      s.toLowerCase()
+        .replace(/…/g, '...')       // ellipsis → three periods
+        .replace(/[‘’]/g, "'")  // smart single quotes → apostrophe
+        .replace(/[“”]/g, '"')  // smart double quotes
+        .replace(/[–—]/g, '-')  // en/em dash → hyphen
+        .replace(/ /g, ' ');         // non-breaking space → space
+
     // Try to find a result matching both title (case-insensitive) and year
     const match = externalResults.find((r: any) => {
       const meta = r.Metadata;
       if (!meta) return false;
       const metaYear = meta.year;
-      const titleMatch = meta.title?.toLowerCase() === title.toLowerCase();
+      const titleMatch = norm(meta.title) === norm(title);
       const yearMatch = !year || metaYear === year;
       return titleMatch && yearMatch;
     });
