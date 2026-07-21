@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 12 done · 36 open (1 critical · 6 high · 17 medium · 12 low)
+**Status:** 13 done · 35 open (0 critical · 6 high · 17 medium · 12 low)
 
 ---
 
@@ -20,12 +20,13 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 - [x] **No rate limiting** — any endpoint can be abused. Added Redis-backed fixed-window rate limiter (`lib/rate-limit.ts`) with Lua EVAL for atomic INCR+EXPIRE, applied to all 10 API routes with tiered limits (5–60 req/min). Zero new dependencies. (`lib/rate-limit.ts`, `lib/origin.ts`, all `app/api/**/route.ts`)
 - [x] **`/api/media-status` unauthenticated** — added session cookie auth via `getSession()` matching `watchlist/add` pattern. `?force=1` is protected by the same check. (`app/api/media-status/route.ts`)
 - [x] **`/api/search/live` unauthenticated + uncached** — added session cookie auth via `getSession()` matching `watchlist/add` pattern. (`app/api/search/live/route.ts`)
+- [x] **No CSP or security headers** — added `headers()` export in `next.config.js` with CSP (default-src 'self', img-src TMDB + Plex CDN, frame-src YouTube, script-src 'unsafe-inline' for OAuth callback), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `Referrer-Policy: strict-origin-when-cross-origin`. (`next.config.js`)
 
 ---
 
 ## 🔴 Critical
 
-- [ ] **No CSP or security headers** — no XSS/clickjacking/MIME-sniffing protection. Add `headers()` export in `next.config.js` with CSP, `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, `Referrer-Policy`.
+_None remaining — all 4 critical findings resolved._
 
 ## 🟠 High
 
