@@ -30,21 +30,32 @@ mediaType: 'movie' | 'tv', plexToken: string): Promise<string | null> {
     const searchResults = data.MediaContainer?.SearchResults || [];
     const externalResults = searchResults.find((s: any) => s.id === 'external')?.SearchResult || [];
 
+    // Strip all punctuation so only the sequence of words is compared. This
+    // catches title variations where ellipses, dashes, or colons are placed
+    // differently (e.g. TMDB: "Once Upon a Time… in Hollywood" vs
+    // Plex: "Once Upon a Time in… Hollywood").
+    const words = (s: string) =>
+      norm(s)
+        .replace(/[^a-z0-9\s]/g, ' ')  // nuke remaining punctuation
+        .replace(/\s+/g, ' ')           // collapse whitespace
+        .trim();
+
     // Log all candidates so we can inspect title/year mismatches
     console.log(`Plex Discover search for "${title}" (${year}, normalized query: "${query}"): ${externalResults.length} external results`);
     externalResults.slice(0, 10).forEach((r: any, i: number) => {
       const meta = r.Metadata;
       if (meta) {
-        console.log(`  [${i}] raw="${meta.title}" (${meta.year})  normalized="${norm(meta.title)}"`);
+        console.log(`  [${i}] raw="${meta.title}" (${meta.year})  words="${words(meta.title)}"`);
       }
     });
 
-    // Try to find a result matching both normalized title and year
+    // Try to find a result matching both word-sequence title and year
+    const targetWords = words(title);
     const match = externalResults.find((r: any) => {
       const meta = r.Metadata;
       if (!meta) return false;
       const metaYear = meta.year;
-      const titleMatch = norm(meta.title) === norm(title);
+      const titleMatch = words(meta.title) === targetWords;
       const yearMatch = !year || metaYear === year;
       return titleMatch && yearMatch;
     });
