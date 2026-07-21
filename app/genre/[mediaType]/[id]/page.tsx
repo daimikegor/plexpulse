@@ -6,21 +6,24 @@ export default async function GenrePage({
   params,
   searchParams
 }: {
-  params: { mediaType: string; id: string };
-  searchParams: { name?: string };
+  params: Promise<{ mediaType: string; id: string }>;
+  searchParams: Promise<{ name?: string }>;
 }) {
   await requireAuth();
-  
-  const data = await getGenreContentPage(params.mediaType as 'movie' | 'tv', params.id, 1);
-  const genreName = searchParams.name || 'Genre';
+
+  const { mediaType, id } = await params;
+  const { name: genreName } = await searchParams;
+
+  const data = await getGenreContentPage(mediaType as 'movie' | 'tv', id, 1);
+  const displayName = genreName || 'Genre';
   
   return (
     <main>
       <h1 className="search-context-heading">
-        {genreName} {params.mediaType === 'movie' ? 'Movies' : 'Series'}
+        {displayName} {mediaType === 'movie' ? 'Movies' : 'Series'}
       </h1>
       <InfiniteMediaGrid
-        apiEndpoint={`/api/genre-content?mediaType=${params.mediaType}&genreId=${params.id}`}
+        apiEndpoint={`/api/genre-content?mediaType=${mediaType}&genreId=${id}`}
         initialResults={data.results} 
         initialPage={data.page}
         initialTotalPages={data.total_pages} />

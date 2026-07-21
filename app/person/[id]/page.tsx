@@ -3,10 +3,10 @@ import { getTrendingContent } from '@/lib/tmdb';
 import { PosterImage } from '@/components/PosterImage';
 import { FilmographyGrid } from '@/components/FilmographyGrid';
 
-export default async function PersonPage({ params }: { params: { id: string } }) {
+export default async function PersonPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAuth();
-  
-  const personId = params.id;
+
+  const { id: personId } = await params;
   
   try {
     const API_KEY = process.env.TMDB_API_KEY;

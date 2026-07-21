@@ -19,7 +19,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const sessionToken = cookies().get('session_token')?.value;
+  const sessionToken = (await cookies()).get('session_token')?.value;
   const session = sessionToken ? await getSession(sessionToken) : null;
 
   return (

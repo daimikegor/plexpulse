@@ -10,8 +10,8 @@ const metadata = {
   title: 'Media Details | PlexPulse'
 };
 
-export default async function MediaDetailPage({ params }: { params: { mediaType: string, tmdbId: string } }) {
-  const { mediaType, tmdbId } = params;
+export default async function MediaDetailPage({ params }: { params: Promise<{ mediaType: string, tmdbId: string }> }) {
+  const { mediaType, tmdbId } = await params;
 
   if (mediaType !== 'movie' && mediaType !== 'tv') return <div>Invalid media type</div>;
   if (!tmdbId) return <div>No media ID provided</div>;

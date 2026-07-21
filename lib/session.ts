@@ -38,7 +38,7 @@ export async function getSession(sessionToken: string) {
 }
 
 export async function requireAuth() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionToken = cookieStore.get('session_token')?.value;
   
   if (!sessionToken) {

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { redis } from '@/lib/redis';
 
 export async function POST() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionToken = cookieStore.get('session_token')?.value;
   
   if (sessionToken) {

@@ -5,17 +5,19 @@ import { GenreTile } from '@/components/GenreTile';
 export default async function GenresPage({
   params
 }: {
-  params: { mediaType: string };
+  params: Promise<{ mediaType: string }>;
 }) {
   await requireAuth();
-  
+
+  const { mediaType } = await params;
+
   let data;
   let heading = "Not Found";
-  
-  if (params.mediaType === 'movie') {
+
+  if (mediaType === 'movie') {
     data = await getMovieGenresWithBackdrops();
     heading = "Movie Genres";
-  } else if (params.mediaType === 'tv') {
+  } else if (mediaType === 'tv') {
     data = await getTVGenresWithBackdrops();
     heading = "Series Genres";
   } else {
@@ -27,7 +29,7 @@ export default async function GenresPage({
       <h1 className="search-context-heading">{heading}</h1>
       <div className="genre-tile-grid">
         {data.genres.map((genre: any) => (
-          <GenreTile key={genre.id} genre={genre} mediaType={params.mediaType as 'movie' | 'tv'} />
+          <GenreTile key={genre.id} genre={genre} mediaType={mediaType as 'movie' | 'tv'} />
         ))}
       </div>
     </main>

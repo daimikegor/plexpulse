@@ -5,14 +5,16 @@ import { InfiniteMediaGrid } from '@/components/InfiniteMediaGrid';
 export default async function CategoryPage({
   params
 }: {
-  params: { type: string };
+  params: Promise<{ type: string }>;
 }) {
   await requireAuth();
+
+  const { type } = await params;
 
   let data;
   let heading = "Not Found";
 
-  switch (params.type) {
+  switch (type) {
     case 'trending':
       data = await getTrendingPage(1);
       heading = "Trending This Week";
@@ -38,7 +40,7 @@ export default async function CategoryPage({
       <h1 className="search-context-heading">{heading}</h1>
       {data.results.length > 0 ? (
         <InfiniteMediaGrid
-          apiEndpoint={`/api/category?type=${params.type}`}
+          apiEndpoint={`/api/category?type=${type}`}
           initialResults={data.results}
           initialPage={data.page}
           initialTotalPages={data.total_pages}

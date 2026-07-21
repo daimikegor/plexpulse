@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const sessionToken = cookies().get('session_token')?.value;
+  const sessionToken = (await cookies()).get('session_token')?.value;
   if (!sessionToken) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
