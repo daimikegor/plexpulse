@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 8 done · 40 open (5 critical · 6 high · 17 medium · 12 low)
+**Status:** 9 done · 39 open (4 critical · 6 high · 17 medium · 12 low)
 
 ---
 
@@ -16,12 +16,12 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 - [x] **Plex Discover title matching** — word-sequence matching replaces exact string compare (`lib/plex-watchlist.ts:33-41`)
 - [x] **Auth callback JS regex escape** — fixed `\/` → `\\/` in template literal (`app/api/auth/callback/route.ts:12`)
 - [x] **Docker compose missing `image:` tag** — added `image: plexpulse-app:latest` (`docker-compose.yml:4`)
+- [x] **API keys in URL query params** — Plex token moved to header in `lib/plex-library.ts`, TMDB added optional `TMDB_READ_ACCESS_TOKEN` Bearer auth in `lib/tmdb.ts` (falls back to query param for existing `TMDB_API_KEY` deployments)
 
 ---
 
 ## 🔴 Critical
 
-- [ ] **API keys in URL query params** — TMDB key and Plex token visible in server/proxy logs. Move to headers (`lib/tmdb.ts`, `lib/plex-library.ts:14-15,30-31`). Radarr/Sonarr already do this correctly.
 - [ ] **No rate limiting** — any endpoint can be abused. Add rate-limit middleware or at minimum throttle `/api/search/live` and `/api/media-status` (global, all routes).
 - [ ] **`/api/media-status` unauthenticated** — anyone can enumerate library contents and bypass cache with `?force=1`. Add `requireAuth()` or restrict `force` to authenticated users (`app/api/media-status/route.ts:4-18`).
 - [ ] **`/api/search/live` unauthenticated + uncached** — every request hits TMDB live with no Redis caching or auth. Add Redis cache layer and auth check (`app/api/search/live/route.ts:3-30`).
