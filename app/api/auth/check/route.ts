@@ -38,14 +38,15 @@ export async function GET(req: NextRequest) {
       });
       const userData = await userRes.json();
 
-      // Admin claim verification (checks if token can read library sections)
-      let isAdmin = false;
-      try {
-        const libCheck = await fetch(`${process.env.PLEX_SERVER_URL}/library/sections`, {
-          headers: { 'X-Plex-Token': data.authToken }
-        });
-        if (libCheck.ok) isAdmin = true;
-      } catch {}
+      // Admin check: user must be in the ADMIN_PLEX_IDS allowlist
+      const adminIds = (process.env.ADMIN_PLEX_IDS || '')
+        .split(',')
+        .map(id => id.trim())
+        .filter(Boolean);
+      const isAdmin = adminIds.includes(String(userData.id));
+      if (!process.env.ADMIN_PLEX_IDS) {
+        console.warn('ADMIN_PLEX_IDS not set — no users will have admin access');
+      }
 
       // Upsert user record
       await db.insert(users).values({

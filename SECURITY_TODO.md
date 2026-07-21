@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 13 done · 35 open (0 critical · 6 high · 17 medium · 12 low)
+**Status:** 15 done · 33 open (0 critical · 5 high · 16 medium · 12 low)
 
 ---
 
@@ -20,7 +20,9 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 - [x] **No rate limiting** — any endpoint can be abused. Added Redis-backed fixed-window rate limiter (`lib/rate-limit.ts`) with Lua EVAL for atomic INCR+EXPIRE, applied to all 10 API routes with tiered limits (5–60 req/min). Zero new dependencies. (`lib/rate-limit.ts`, `lib/origin.ts`, all `app/api/**/route.ts`)
 - [x] **`/api/media-status` unauthenticated** — added session cookie auth via `getSession()` matching `watchlist/add` pattern. `?force=1` is protected by the same check. (`app/api/media-status/route.ts`)
 - [x] **`/api/search/live` unauthenticated + uncached** — added session cookie auth via `getSession()` matching `watchlist/add` pattern. (`app/api/search/live/route.ts`)
+- [x] **Backwards `isAdmin` check** — any Plex home user with library access becomes admin. Replaced with configurable `ADMIN_PLEX_IDS` env var allowlist that checks `userData.id` against a comma-separated list of authorized Plex IDs. Warns when unset. (`app/api/auth/check/route.ts:41-49`, `.env.example:10-12`)
 - [x] **No CSP or security headers** — added `headers()` export in `next.config.js` with CSP (default-src 'self', img-src TMDB + Plex CDN, frame-src YouTube, script-src 'unsafe-inline' for OAuth callback), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `Referrer-Policy: strict-origin-when-cross-origin`. (`next.config.js`)
+- [x] **Admin check silently swallows errors** — removed the silent `try/catch` around Plex library-sections fetch. `isAdmin` is now derived from the `ADMIN_PLEX_IDS` allowlist, and a warning is logged when the env var is unset. (`app/api/auth/check/route.ts:47-49`)
 
 ---
 
@@ -31,7 +33,6 @@ _None remaining — all 4 critical findings resolved._
 ## 🟠 High
 
 - [ ] **Login CSRF on `/api/auth/check`** — attacker can link victim to attacker's Plex PIN, hijacking session. Add CSRF token or nonce binding between start and check steps (`app/api/auth/check/route.ts:7-9`, `app/api/auth/start/route.ts`).
-- [ ] **Backwards `isAdmin` check** — any Plex home user with library access becomes admin. Replace with configurable `ADMIN_PLEX_IDS` env var allowlist (`app/api/auth/check/route.ts:33-39`).
 - [ ] **5 API routes unauthenticated** — discover, search/live, genre-content, category, media-status all lack auth. Add `requireAuth()` to each (`app/api/discover/route.ts`, `app/api/search/live/route.ts`, `app/api/genre-content/route.ts`, `app/api/category/route.ts`, `app/api/media-status/route.ts`).
 - [ ] **Docker runs as root** — no `USER node` directive. Add `RUN chown -R node:node /app/data` + `USER node` in runner stage (`Dockerfile:18`).
 - [ ] **No CSRF tokens on auth endpoints** — logout and auth-start POST have no origin validation. Add `isTrustedOrigin()` or SameSite strict (`app/api/auth/logout/route.ts:5`, `app/api/auth/start/route.ts:3`).
@@ -45,7 +46,6 @@ _None remaining — all 4 critical findings resolved._
 - [ ] **Logout kills only current session** — multi-device users can't terminate all sessions. Add `plexId`-based scan-and-delete (`app/api/auth/logout/route.ts:11`).
 - [ ] **`/api/watchlist/add` no body validation** — `mediaType` unchecked before DB insert. Validate `mediaType === 'movie' || mediaType === 'tv'` (`app/api/watchlist/add/route.ts:41`).
 - [ ] **`parseInt` NaN risk** — unvalidated page params produce `NaN` in TMDB URLs. Add `isNaN(page) || page < 1` guard (`app/api/category/route.ts:7`, `app/api/discover/route.ts:7`, `app/api/genre-content/route.ts:8`).
-- [ ] **Admin check silently swallows errors** — if Plex server unreachable, all users silently lose admin. Log warning when check fails (`app/api/auth/check/route.ts:35-39`).
 - [ ] **No TLS for production Redis** — auth tokens traverse network in cleartext. Add `tls: {}` to ioredis config or use `rediss://` URL scheme (`lib/redis.ts:3`).
 - [ ] **Redis defaults to unauthenticated localhost** — `REDIS_URL` fallback has no auth. Throw startup error if missing in production (`lib/redis.ts:3`).
 - [ ] **Redis key collision via crafted `tmdbId`** — `:` in tmdbId could poison cache keys. Sanitize to digits only at API boundary, or use Redis hashes (`lib/tmdb.ts:507`).
