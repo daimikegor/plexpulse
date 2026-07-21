@@ -25,5 +25,6 @@ COPY --from=builder /app/db ./db
 COPY --from=builder /app/migrate.js ./migrate.js
 EXPOSE 3000
 ENV PORT=3000
-USER node
-CMD ["sh", "-c", "node migrate.js && node server.js"]
+# Fix permissions on volume mounts at runtime (volume overrides build-time chown),
+# then drop to unprivileged node user.
+CMD ["sh", "-c", "chown -R node:node /app/data 2>/dev/null; exec su node -c 'node migrate.js && node server.js'"]
