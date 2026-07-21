@@ -16,8 +16,19 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const pinId = searchParams.get('pinId');
+  const nonce = searchParams.get('nonce');
 
-  if (!pinId) return NextResponse.json({ error: 'Missing pinId' }, { status: 400 });
+  if (!pinId || !nonce) {
+    return NextResponse.json({ error: 'Missing pinId or nonce' }, { status: 400 });
+  }
+
+  // Validate CSRF nonce bound to this PIN at start time
+  const storedNonce = await redis.get(`pin_nonce:${pinId}`);
+  if (!storedNonce || storedNonce !== nonce) {
+    return NextResponse.json({ error: 'Invalid or expired nonce' }, { status: 403 });
+  }
+  // One-time use: delete nonce after validation
+  await redis.del(`pin_nonce:${pinId}`);
 
   try {
     const res = await fetch(`https://plex.tv/api/v2/pins/${pinId}`, {
@@ -62,22 +73,27 @@ export async function GET(req: NextRequest) {
       // Create secure session & map to Redis for fast retrieval
       const sessionToken = crypto.randomBytes(32).toString('hex');
       await redis.set(
-        `session:${sessionToken}`, 
-        JSON.stringify({ plexId: userData.id, authToken: data.authToken }), 
+        `session:${sessionToken}`,
+        JSON.stringify({ plexId: userData.id, authToken: data.authToken }),
         'EX', 604800 // 7 days TTL
       );
 
       const resObj = NextResponse.json({ authenticated: true });
       resObj.cookies.set('session_token', sessionToken, {
-        httpOnly: true, 
-        secure: process.env.IS_HTTPS === 'true', 
-        sameSite: 'lax', 
+        httpOnly: true,
+        secure: process.env.IS_HTTPS === 'true',
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7
       });
       return resObj;
     }
 
-    return NextResponse.json({ authenticated: false });
+    // Auth not yet complete — re-generate nonce for next poll (PIN still valid, but
+    // the old nonce was consumed above)
+    const freshNonce = crypto.randomBytes(16).toString('hex');
+    await redis.set(`pin_nonce:${pinId}`, freshNonce, 'EX', 300);
+
+    return NextResponse.json({ authenticated: false, nonce: freshNonce });
   } catch (error) {
     console.error('Auth check failed:', error);
     return NextResponse.json({ error: 'Authentication check failed' }, { status: 500 });

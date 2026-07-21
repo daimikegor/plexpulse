@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { redis } from '@/lib/redis';
+import { isTrustedOrigin } from '@/lib/origin';
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
@@ -10,8 +13,12 @@ export async function POST(request: Request) {
     );
   }
 
+  if (!isTrustedOrigin(request)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const clientID = process.env.PLEX_CLIENT_ID || 'plexpulse-default-id';
-  
+
   try {
     const res = await fetch('https://plex.tv/api/v2/pins', {
       method: 'POST',
@@ -26,8 +33,12 @@ export async function POST(request: Request) {
 
     if (!res.ok) throw new Error('Failed to create PIN');
     const data = await res.json();
-    
-    return NextResponse.json({ pinId: data.id, code: data.code });
+
+    // Bind a CSRF nonce to this PIN to prevent login hijacking
+    const nonce = crypto.randomBytes(16).toString('hex');
+    await redis.set(`pin_nonce:${data.id}`, nonce, 'EX', 300); // 5 min TTL, matches PIN lifetime
+
+    return NextResponse.json({ pinId: data.id, code: data.code, nonce });
   } catch (error) {
     console.error('PIN creation failed:', error);
     return NextResponse.json({ error: 'Failed to initiate Plex login' }, { status: 500 });

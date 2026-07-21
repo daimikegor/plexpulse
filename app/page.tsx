@@ -10,9 +10,10 @@ export default function Landing() {
   const handleSignIn = async () => {
     setLoading(true);
     
-    // 1. Request PIN from backend
+    // 1. Request PIN from backend (returns nonce for CSRF protection)
     const startRes = await fetch('/api/auth/start', { method: 'POST' });
-    const { pinId, code } = await startRes.json();
+    const { pinId, code, nonce: startNonce } = await startRes.json();
+    let pollNonce = startNonce;
     
     if (!pinId) {
       alert('Failed to initiate login');
@@ -30,24 +31,26 @@ export default function Landing() {
       `width=${width},height=${height},left=${left},top=${top}`
     );
 
-    // 3. Poll backend for token approval
+    // 3. Poll backend for token approval (nonce rotates each poll)
     let popupClosedHandled = false;
     const pollInterval = setInterval(async () => {
       if (popup?.closed && !popupClosedHandled) {
         popupClosedHandled = true;
         clearInterval(pollInterval);
-        
+
         // Do a few final checks after popup closes, as Plex may take a moment to finalize the token
+        let postCloseNonce = pollNonce;
         for (let i = 0; i < 3; i++) {
           await new Promise(resolve => setTimeout(resolve, 2000));
           try {
-            const checkRes = await fetch(`/api/auth/check?pinId=${pinId}`);
+            const checkRes = await fetch(`/api/auth/check?pinId=${pinId}&nonce=${postCloseNonce}`);
             const data = await checkRes.json();
             if (data.authenticated) {
               router.push('/dashboard');
               router.refresh();
               return;
             }
+            if (data.nonce) postCloseNonce = data.nonce;
           } catch (e) {
             console.error('Final polling error', e);
           }
@@ -59,14 +62,16 @@ export default function Landing() {
       if (popupClosedHandled) return;
 
       try {
-        const checkRes = await fetch(`/api/auth/check?pinId=${pinId}`);
+        const checkRes = await fetch(`/api/auth/check?pinId=${pinId}&nonce=${pollNonce}`);
         const data = await checkRes.json();
-        
+
         if (data.authenticated) {
           clearInterval(pollInterval);
           router.push('/dashboard');
           router.refresh();
         }
+        // Rotate nonce for next poll (server issues a fresh one each check)
+        if (data.nonce) pollNonce = data.nonce;
       } catch (e) {
         console.error('Polling error', e);
       }

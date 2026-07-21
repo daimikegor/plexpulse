@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 15 done · 33 open (0 critical · 5 high · 16 medium · 12 low)
+**Status:** 18 done · 30 open (0 critical · 3 high · 15 medium · 12 low)
 
 ---
 
@@ -23,6 +23,9 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 - [x] **Backwards `isAdmin` check** — any Plex home user with library access becomes admin. Replaced with configurable `ADMIN_PLEX_IDS` env var allowlist that checks `userData.id` against a comma-separated list of authorized Plex IDs. Warns when unset. (`app/api/auth/check/route.ts:41-49`, `.env.example:10-12`)
 - [x] **No CSP or security headers** — added `headers()` export in `next.config.js` with CSP (default-src 'self', img-src TMDB + Plex CDN, frame-src YouTube, script-src 'unsafe-inline' for OAuth callback), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `Referrer-Policy: strict-origin-when-cross-origin`. (`next.config.js`)
 - [x] **Admin check silently swallows errors** — removed the silent `try/catch` around Plex library-sections fetch. `isAdmin` is now derived from the `ADMIN_PLEX_IDS` allowlist, and a warning is logged when the env var is unset. (`app/api/auth/check/route.ts:47-49`)
+- [x] **Login CSRF on `/api/auth/check`** — added nonce binding between start and check: `/api/auth/start` generates a crypto nonce, stores it in Redis (`pin_nonce:{pinId}`, 5min TTL), and returns it to the client. `/api/auth/check` validates the nonce before proceeding, then issues a fresh nonce for subsequent polls (one-time-use, rotating). (`app/api/auth/start/route.ts`, `app/api/auth/check/route.ts`, `app/page.tsx`)
+- [x] **No CSRF tokens on auth endpoints** — added `isTrustedOrigin()` to both `POST /api/auth/start` and `POST /api/auth/logout`. Untrusted origins receive 403. (`app/api/auth/start/route.ts:16-18`, `app/api/auth/logout/route.ts:16-18`)
+- [x] **Only watchlist/add uses `isTrustedOrigin`** — added `isTrustedOrigin()` to `POST /api/auth/logout` and `POST /api/auth/start`, bringing all auth POST endpoints under origin validation. (`app/api/auth/start/route.ts:16-18`, `app/api/auth/logout/route.ts:16-18`)
 
 ---
 
@@ -32,10 +35,8 @@ _None remaining — all 4 critical findings resolved._
 
 ## 🟠 High
 
-- [ ] **Login CSRF on `/api/auth/check`** — attacker can link victim to attacker's Plex PIN, hijacking session. Add CSRF token or nonce binding between start and check steps (`app/api/auth/check/route.ts:7-9`, `app/api/auth/start/route.ts`).
 - [ ] **5 API routes unauthenticated** — discover, search/live, genre-content, category, media-status all lack auth. Add `requireAuth()` to each (`app/api/discover/route.ts`, `app/api/search/live/route.ts`, `app/api/genre-content/route.ts`, `app/api/category/route.ts`, `app/api/media-status/route.ts`).
 - [ ] **Docker runs as root** — no `USER node` directive. Add `RUN chown -R node:node /app/data` + `USER node` in runner stage (`Dockerfile:18`).
-- [ ] **No CSRF tokens on auth endpoints** — logout and auth-start POST have no origin validation. Add `isTrustedOrigin()` or SameSite strict (`app/api/auth/logout/route.ts:5`, `app/api/auth/start/route.ts:3`).
 - [ ] **Plex Client ID in client bundle** — partially addressed (ARG wired for Docker build), but still `NEXT_PUBLIC_` in source. Move to server-side URL construction via `/api/auth/start` (`app/page.tsx:28`).
 
 ## 🟡 Medium
@@ -51,7 +52,6 @@ _None remaining — all 4 critical findings resolved._
 - [ ] **Redis key collision via crafted `tmdbId`** — `:` in tmdbId could poison cache keys. Sanitize to digits only at API boundary, or use Redis hashes (`lib/tmdb.ts:507`).
 - [ ] **Person ID path injection** — unvalidated URL param in server-side fetch. Validate numeric only (`app/person/[id]/page.tsx:19-20`).
 - [ ] **Plex token in URL query strings** — visible in server/proxy logs. Switch to `X-Plex-Token` header, matching `plex-watchlist.ts` pattern (`lib/plex-library.ts:14-15,30-31`).
-- [ ] **Only watchlist/add uses `isTrustedOrigin`** — logout and start have no origin validation. Add to both POST endpoints (`app/api/auth/logout/route.ts:5`, `app/api/auth/start/route.ts:3`).
 - [ ] **Docker base image stale** — `node:20.18.0-slim` is ~1.5 years old. Update to `node:20-slim` or pin to latest 20.x (`Dockerfile:1`).
 - [ ] **`npm ci` without `--ignore-scripts`** — postinstall scripts from dependencies execute during build. Evaluate hardening, test with `@libsql/client` (may need native builds) (`Dockerfile:6`).
 - [ ] **`@tailwindcss/line-clamp` redundant** — built into Tailwind 3.3+, not even registered as plugin. Remove from dependencies (`package.json:14`).
