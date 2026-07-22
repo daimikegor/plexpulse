@@ -130,12 +130,31 @@ of those five source files, add or update the matching test in the same change.
 ## Request/Availability Status Logic
 
 - "Requested" = title found in any connected Radarr/Sonarr instance
-- "Available" status is determined by fetching your full Plex library's TMDB guids
-  (via /library/sections/{id}/all?includeGuids=1) and caching that list in Redis for
-  120 seconds. This means newly added content should appear as "Available" within
-  about 2 minutes, without requiring a manual cache refresh or webhook. (An earlier
-  attempt used Plex's server-side guid= query filter for a lighter-weight per-title
-  check, but this did not reliably return matches even for confirmed library items,
-  so it was reverted in favor of this caching approach.)
-- Status results are cached in the media_status database table, refreshed on-demand
-  when a poster's status hasn't been checked or the cache is stale
+- "Available" status is determined by checking a title's TMDB ID against a full
+  scan of your Plex library's GUIDs (via /library/sections/{id}/all?includeGuids=1),
+  matching both modern (`tmdb://123`) and legacy (`com.plexapp.agents.tmdb://123`)
+  GUID formats. Unlike the original design, scan results are no longer held only in
+  a short-lived Redis cache — they're persisted to the `plex_library_scan` SQLite
+  table (one row per media type, storing the full GUID list, item count, and last
+  scan outcome), so they survive container restarts and Redis flushes.
+- **Self-bootstrapping**: if a status check finds no scan row yet for a media type
+  (e.g. a brand-new install), it treats the library as empty for that request and
+  fires off a background scan so the *next* check has real data — no manual step
+  required to get the first scan going.
+- **Automatic daily scan**: `lib/scan-scheduler.ts` schedules a recurring scan
+  based on `SCAN_SCHEDULE_HOURS` (default 24, set to 0 to disable). On every
+  startup it reads the most recent `last_scan_at` from `plex_library_scan` and
+  schedules the next run for whatever's left of the interval, rather than always
+  waiting a full interval after boot — so frequent container restarts/redeploys
+  don't perpetually delay a scan that's actually already overdue. A short initial
+  delay (5 min) is used when no prior scan exists, to let the container settle.
+- **Manual rescan**: admins can trigger an on-demand scan (all media types, or a
+  specific one) via `POST /api/admin/plex-scan` from the admin dashboard. It's a
+  fire-and-forget call — the scan runs in the background and the endpoint responds
+  immediately (202) rather than blocking on the scan's completion.
+- A `scan_in_progress` flag on each row guards against overlapping scans for the
+  same media type; a scan that's been "in progress" for more than 30 minutes is
+  treated as stale (e.g. a crashed process) and a new one is allowed to proceed.
+- Status results are additionally cached in the `media_status` database table,
+  refreshed on-demand when a poster's status hasn't been checked or the cache is
+  stale.
