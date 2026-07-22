@@ -2,11 +2,13 @@
 const nextConfig = {
   output: 'standalone',
 
-  // Strip console.* from client-side bundles in production so error objects
-  // with potential internal details don't leak to the browser console.
-  // Server-side console calls (API routes, server components) are unaffected.
+  // Turbopack's removeConsole strips console.* from BOTH client and server
+  // bundles (unlike webpack which only stripped client).  We keep console
+  // output enabled — server logs are essential for diagnosing the app in
+  // production, and this is a self-hosted container with no public audience
+  // that would benefit from hiding console output.
   compiler: {
-    removeConsole: true,
+    removeConsole: false,
   },
 
   images: {
