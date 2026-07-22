@@ -58,9 +58,18 @@ async function scanOneMediaType(mediaType: 'movie' | 'tv'): Promise<void> {
     .where(eq(plexLibraryScan.id, mediaType))
     .get();
 
+  const STALE_SCAN_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
   if (existing && existing.scanInProgress) {
-    console.log(`[plex-scan] ${mediaType}: scan already in progress — skipping`);
-    return;
+    const age = Date.now() - existing.lastScanAt.getTime();
+    if (age < STALE_SCAN_THRESHOLD_MS) {
+      console.log(`[plex-scan] ${mediaType}: scan already in progress — skipping`);
+      return;
+    }
+    console.warn(
+      `[plex-scan] ${mediaType}: stale scanInProgress detected ` +
+      `(${Math.round(age / 1000)}s old) — clearing and proceeding`,
+    );
+    // Fall through — the upsert below will re-claim the slot
   }
 
   // Claim the slot.  Upsert so it works whether or not a row exists yet.
