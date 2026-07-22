@@ -29,6 +29,9 @@ COPY --from=builder /app/migrate.js ./migrate.js
 RUN mkdir -p ./.next/cache && chown -R node:node ./.next/cache
 EXPOSE 3000
 ENV PORT=3000
+# Health check: probe the Next.js server every 30s
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 # Fix permissions on volume mounts and cache dir at runtime (volume overrides
 # build-time chown), then drop to unprivileged node user.
 CMD ["sh", "-c", "chown -R node:node /app/data /app/.next/cache 2>/dev/null; exec su node -c 'node migrate.js && node server.js'"]

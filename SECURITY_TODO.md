@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 36 done · 12 open (0 critical · 0 high · 0 medium · 12 low)
+**Status:** 48 done · 0 open — all findings resolved ✓
 
 ---
 
@@ -44,6 +44,18 @@ Living tracker for the 2026-07-20 security audit findings. Update checkboxes as 
 - [x] **Docker base image stale** — updated from `node:20.18.0-slim` (~1.5 years old) to `node:20-slim` (tracks latest 20.x patch releases). (`Dockerfile:1`)
 - [x] **`npm ci` without `--ignore-scripts`** — added `--ignore-scripts` to `npm ci` in Dockerfile. Safe: `@libsql/client` uses WASM (no native builds), and no other dependency requires postinstall scripts. (`Dockerfile:6`)
 - [x] **`@tailwindcss/line-clamp` redundant** — removed from dependencies. Built into Tailwind 3.3+ and was never registered as a plugin. (`package.json`)
+- [x] **No `middleware.ts`** — added `proxy.ts` (Next.js 16 convention) as a catch-all auth guard: verifies `session_token` cookie on all non-public routes, returns 401 for API / redirect for pages. Public paths (`/`, `/api/auth/*`, static assets) are exempt. Also applies security headers as belt-and-suspenders. (`proxy.ts`)
+- [x] **`console.error` in production** — added `compiler.removeConsole: true` to `next.config.js`. Strips all `console.*` from client-side bundles in production; server-side console calls (API routes, server components) are unaffected. (`next.config.js`)
+- [x] **No HEALTHCHECK in Dockerfile** — added Node.js-based health check probing `http://localhost:3000/` every 30s with 5s timeout and 3 retries. No additional packages needed (uses built-in `http` module). (`Dockerfile:31-32`)
+- [x] **No restart policy in docker-compose.yml** — added `restart: unless-stopped` to both `app` and `redis` services so containers auto-recover from crashes. (`docker-compose.yml`)
+- [x] **`.gitignore` doesn't block `.env.*`** — replaced separate `.env` / `.env.local` entries with `.env*` glob and `!.env.example` exception. Prevents `.env.production`, `.env.staging`, etc. from being committed. (`.gitignore`)
+- [x] **Misleading `isTrustedOrigin` log message** — changed from "origin checks are disabled" to "rejecting all cross-origin requests" — the function fails closed (returns `false`), not open. (`lib/origin.ts:12`)
+- [x] **No DB foreign keys** — added `.references(() => users.plexId)` on `userRequests.plexId` to document the relationship and generate FK constraints in Drizzle migrations. (`db/schema.ts:19`)
+- [x] **No Redis `maxmemory`** — added `--maxmemory 256mb --maxmemory-policy allkeys-lru` to Redis command in docker-compose.yml, preventing unbounded cache growth from crashing Redis and taking sessions with it. (`docker-compose.yml:22`)
+- [x] **SQLite DB unencrypted at rest** — added conditional `encryptionKey` support via `DB_ENCRYPTION_KEY` env var. When set, libSQL encrypts the database file. When unset, behavior is unchanged (unencrypted). (`lib/db.ts:5-7`)
+- [x] **YouTube iframe permissive `allow`** — restricted from 6 permissions to 3: `autoplay; encrypted-media; picture-in-picture`. Removed unnecessary `accelerometer`, `clipboard-write`, `gyroscope`. (`components/TrailerButton.tsx:71`)
+- [x] **`innerHTML` in auth callback** — replaced `document.body.innerHTML` with `document.body.textContent` in the fallback path (no `window.opener`). Content is static text, safe for `textContent`. (`app/api/auth/callback/route.ts:26`)
+- [x] **`document.querySelector` with dynamic `src`** — replaced fragile attribute selector with React `ref` (`imageRef`) on the `next/image` component. Error handler now uses `imageRef.current` directly. (`components/PosterImage.tsx:131,185-189`)
 
 ---
 
@@ -61,15 +73,4 @@ _None remaining — all 15 medium findings resolved._
 
 ## 🟢 Low
 
-- [ ] **No `middleware.ts`** — new routes can be added without auth by accident. Add a global auth guard or at minimum security headers middleware.
-- [ ] **`console.error` in production** — client components log error objects with potential internal details. Strip in production builds.
-- [ ] **No HEALTHCHECK in Dockerfile** — can't detect hung containers. Add `HEALTHCHECK` instruction.
-- [ ] **No restart policy in docker-compose.yml** — container failures don't auto-recover. Add `restart: unless-stopped` to both services.
-- [ ] **`.gitignore` doesn't block `.env.*`** — `.env.production` etc. could be committed. Change `.env` → `.env*` with `!.env.example` exception.
-- [ ] **Misleading `isTrustedOrigin` log message** — says "disabled" but actually fails closed. Change to "rejecting all requests" (`app/api/watchlist/add/route.ts:13`).
-- [ ] **No DB foreign keys** — orphaned request records possible. Add `.references()` to schema (`db/schema.ts:18-26`).
-- [ ] **No Redis `maxmemory`** — cache growth could crash Redis, taking sessions with it. Add `--maxmemory 256mb --maxmemory-policy allkeys-lru` (`docker-compose.yml:20`).
-- [ ] **SQLite DB unencrypted at rest** — contains Plex IDs, usernames, request history. Use libSQL encryption key (`lib/db.ts:3-6`).
-- [ ] **YouTube iframe permissive `allow`** — clipboard-write and gyroscope unnecessary. Restrict to `autoplay; encrypted-media; picture-in-picture` (`components/TrailerButton.tsx:67-73`).
-- [ ] **`innerHTML` in auth callback** — static content (safe), but flagged by scanners. Replace with `textContent` (`app/api/auth/callback/route.ts:17`).
-- [ ] **`document.querySelector` with dynamic `src`** — fragile selector in PosterImage. Replace with React ref (`components/PosterImage.tsx:91-94`).
+_None remaining — all 12 low findings resolved._

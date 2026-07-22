@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+
+  // Strip console.* from client-side bundles in production so error objects
+  // with potential internal details don't leak to the browser console.
+  // Server-side console calls (API routes, server components) are unaffected.
+  compiler: {
+    removeConsole: true,
+  },
+
   images: {
     remotePatterns: [
       {

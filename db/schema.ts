@@ -17,7 +17,7 @@ export const mediaStatus = sqliteTable('media_status', {
 
 export const userRequests = sqliteTable('user_requests', {
   id: text('id').primaryKey(), // format: `${plexId}-${mediaType}-${tmdbId}`
-  plexId: text('plex_id').notNull(),
+  plexId: text('plex_id').notNull().references(() => users.plexId),
   tmdbId: text('tmdb_id').notNull(),
   mediaType: text('media_type').notNull(),
   title: text('title').notNull(),

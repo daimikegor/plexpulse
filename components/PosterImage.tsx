@@ -129,6 +129,7 @@ export function PosterImage({
   const [requestStatus, setRequestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [liveStatus, setLiveStatus] = useState<'none' | 'requested' | 'available' | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!tmdbId || !containerRef.current) return;
@@ -181,10 +182,9 @@ export function PosterImage({
   }, [requestStatus, tmdbId, mediaType]);
 
   const handleError = () => {
-    // Simply hide the broken image by setting display to none
-    const imgElement = document.querySelector(`img[src="${src}"]`);
-    if (imgElement) {
-      (imgElement as HTMLImageElement).style.display = 'none';
+    // Hide the broken image using the React ref instead of querySelector
+    if (imageRef.current) {
+      imageRef.current.style.display = 'none';
     }
   };
 
@@ -203,8 +203,9 @@ export function PosterImage({
   return (
     <div ref={containerRef} className="relative group w-full h-full">
       {src ? (
-        <Image 
-          src={imageSrc} 
+        <Image
+          ref={imageRef}
+          src={imageSrc}
           alt={alt}
           fill
           onError={handleError}

@@ -23,7 +23,7 @@ export async function GET(request: Request) {
           window.opener.postMessage({ type: 'plex-auth-complete' }, appUrl);
           setTimeout(() => window.close(), 500);
         } else {
-          document.body.innerHTML = '<p>You can close this window.</p>';
+          document.body.textContent = 'You can close this window.';
         }
       </script>
     </body></html>

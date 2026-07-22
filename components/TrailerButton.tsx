@@ -68,7 +68,7 @@ export function TrailerButton({
             className="absolute top-0 left-0 w-full h-full"
             src={`https://www.youtube.com/embed/${videoKey}?autoplay=1`}
             title="Trailer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
           />
         </div>

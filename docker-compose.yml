@@ -3,6 +3,7 @@ version: '3.8'
 services:
   app:
     image: plexpulse-app:latest
+    restart: unless-stopped
     build:
       context: .
       args:
@@ -18,7 +19,8 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: redis-server --requirepass ${REDIS_PASSWORD} --save ""
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD} --save "" --maxmemory 256mb --maxmemory-policy allkeys-lru
     ports:
       - "6380:6379"
     volumes:

@@ -9,7 +9,7 @@ export function isTrustedOrigin(request: Request): boolean {
   const expected = process.env.NEXT_PUBLIC_APP_URL;
   if (!expected) {
     console.warn(
-      'NEXT_PUBLIC_APP_URL is not set — origin checks are disabled. ' +
+      'NEXT_PUBLIC_APP_URL is not set — rejecting all cross-origin requests. ' +
         'Set this to your app URL (e.g. http://localhost:3000 or https://plexpulse.example.com).',
     );
     return false; // refuse: without a configured origin we cannot validate
