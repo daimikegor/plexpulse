@@ -69,6 +69,7 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
 - **Plex OAuth cleanup on exit paths**: The polling interval and message event listener 
   must be cleared on all exit paths (popup close, auth success, timeout) to prevent leaks.
 - **CRITICAL: app/detail/[mediaType]/[tmdbId]/page.tsx must NEVER contain onClick, useState, useEffect, or 'use client'. It is a server component (imports lib/tmdb.ts which uses Redis). ALL interactivity belongs in separate client component files (TrailerButton.tsx, RequestButton.tsx, etc.) that receive data via props. This exact bug has broken the build/runtime 4 times — check this before editing page.tsx.**
+- **Next.js standalone server loopback binding**: The Next.js standalone output's server uses the `HOSTNAME` env var to decide which interface to bind to. Without `ENV HOSTNAME=0.0.0.0` in the Dockerfile runner stage, the server binds only to the container's external network interface — external browser traffic still works, but any internal health check or same-container request to `127.0.0.1` or `localhost` fails with `ECONNREFUSED`. Always pair `ENV NODE_ENV=production` with `ENV HOSTNAME=0.0.0.0` in the runner stage.
 
 ## Commands
 - `npm run dev` — start dev server (next dev)
