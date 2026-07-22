@@ -1,9 +1,9 @@
-FROM node:20.18.0-slim AS base
+FROM node:20-slim AS base
 WORKDIR /app
 
 FROM base AS deps
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 FROM base AS builder
 ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
