@@ -355,6 +355,12 @@ export async function getTVGenresWithBackdrops() {
 
 
 export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
+  const cacheKey = `tmdb:discover:${mediaType}:${page}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
   try {
     const { headers: h, keyParam, missing } = getTmdbAuth();
     if (missing) {
@@ -373,11 +379,13 @@ export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
       ...item,
       media_type: mediaType
     }));
-    return {
+    const result = {
       results: resultsWithMediaType,
       page: data.page,
       total_pages: data.total_pages
     };
+    await redis.setex(cacheKey, 7200, JSON.stringify(result));
+    return result;
   } catch (error) {
     console.error(`Error fetching discover page for ${mediaType}:`, error);
     return { results: [], page: 1, total_pages: 1 };
@@ -385,6 +393,12 @@ export async function getDiscoverPage(mediaType: 'movie' | 'tv', page: number) {
 }
 
 export async function getTrendingPage(page: number) {
+  const cacheKey = `tmdb:category:trending:${page}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
   try {
     const { headers: h, keyParam, missing } = getTmdbAuth();
     if (missing) return { results: [], page: 1, total_pages: 1 };
@@ -394,7 +408,9 @@ export async function getTrendingPage(page: number) {
     );
     if (!response.ok) throw new Error(`TMDB API error: ${response.status}`);
     const data = await response.json();
-    return { results: data.results, page: data.page, total_pages: data.total_pages };
+    const result = { results: data.results, page: data.page, total_pages: data.total_pages };
+    await redis.setex(cacheKey, 7200, JSON.stringify(result));
+    return result;
   } catch (error) {
     console.error('Error fetching trending page:', error);
     return { results: [], page: 1, total_pages: 1 };
@@ -402,6 +418,12 @@ export async function getTrendingPage(page: number) {
 }
 
 export async function getPopularPage(page: number) {
+  const cacheKey = `tmdb:category:popular:${page}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
   try {
     const { headers: h, keyParam, missing } = getTmdbAuth();
     if (missing) return { results: [], page: 1, total_pages: 1 };
@@ -415,11 +437,13 @@ export async function getPopularPage(page: number) {
     const movies = movieData.results.map((item: any) => ({ ...item, media_type: 'movie' }));
     const tvs = tvData.results.map((item: any) => ({ ...item, media_type: 'tv' }));
     const merged = [...movies, ...tvs].sort((a, b) => b.popularity - a.popularity);
-    return {
+    const result = {
       results: merged,
       page,
       total_pages: Math.min(movieData.total_pages, tvData.total_pages)
     };
+    await redis.setex(cacheKey, 7200, JSON.stringify(result));
+    return result;
   } catch (error) {
     console.error('Error fetching popular page:', error);
     return { results: [], page: 1, total_pages: 1 };
@@ -427,6 +451,12 @@ export async function getPopularPage(page: number) {
 }
 
 export async function getTopRatedPage(page: number) {
+  const cacheKey = `tmdb:category:top-rated:${page}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
   try {
     const { headers: h, keyParam, missing } = getTmdbAuth();
     if (missing) return { results: [], page: 1, total_pages: 1 };
@@ -440,11 +470,13 @@ export async function getTopRatedPage(page: number) {
     const movies = movieData.results.map((item: any) => ({ ...item, media_type: 'movie' }));
     const tvs = tvData.results.map((item: any) => ({ ...item, media_type: 'tv' }));
     const merged = [...movies, ...tvs].sort((a, b) => b.popularity - a.popularity);
-    return {
+    const result = {
       results: merged,
       page,
       total_pages: Math.min(movieData.total_pages, tvData.total_pages)
     };
+    await redis.setex(cacheKey, 7200, JSON.stringify(result));
+    return result;
   } catch (error) {
     console.error('Error fetching top rated page:', error);
     return { results: [], page: 1, total_pages: 1 };
@@ -452,6 +484,12 @@ export async function getTopRatedPage(page: number) {
 }
 
 export async function getUpcomingPage(page: number) {
+  const cacheKey = `tmdb:category:upcoming:${page}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
   try {
     const { headers: h, keyParam, missing } = getTmdbAuth();
     if (missing) return { results: [], page: 1, total_pages: 1 };
@@ -476,11 +514,13 @@ export async function getUpcomingPage(page: number) {
       const dateB = b.release_date || b.first_air_date;
       return new Date(dateA).getTime() - new Date(dateB).getTime();
     });
-    return {
+    const result = {
       results: merged,
       page,
       total_pages: Math.min(movieData.total_pages, tvData.total_pages)
     };
+    await redis.setex(cacheKey, 7200, JSON.stringify(result));
+    return result;
   } catch (error) {
     console.error('Error fetching upcoming page:', error);
     return { results: [], page: 1, total_pages: 1 };
@@ -488,6 +528,12 @@ export async function getUpcomingPage(page: number) {
 }
 
 export async function getGenreContentPage(mediaType: 'movie' | 'tv', genreId: string, page: number) {
+  const cacheKey = `tmdb:genre-content:${mediaType}:${genreId}:${page}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
   try {
     const { headers: h, keyParam, missing } = getTmdbAuth();
     if (missing) return { results: [], page: 1, total_pages: 1 };
@@ -501,7 +547,9 @@ export async function getGenreContentPage(mediaType: 'movie' | 'tv', genreId: st
       ...item,
       media_type: mediaType
     }));
-    return { results: resultsWithMediaType, page: data.page, total_pages: data.total_pages };
+    const result = { results: resultsWithMediaType, page: data.page, total_pages: data.total_pages };
+    await redis.setex(cacheKey, 7200, JSON.stringify(result));
+    return result;
   } catch (error) {
     console.error('Error fetching genre content page:', error);
     return { results: [], page: 1, total_pages: 1 };
