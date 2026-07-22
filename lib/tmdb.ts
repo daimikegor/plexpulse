@@ -578,6 +578,23 @@ export async function getTvdbIdFromTmdb(tmdbId: string): Promise<string | null> 
   }
 }
 
+export async function getTmdbIdFromTvdb(tvdbId: string): Promise<string | null> {
+  try {
+    const { headers: h, keyParam, missing } = getTmdbAuth();
+    if (missing) return null;
+    const response = await fetch(
+      `https://api.themoviedb.org/3/find/${tvdbId}?external_source=tvdb_id&${keyParam}`,
+      { headers: h }
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.tv_results?.[0]?.id ? String(data.tv_results[0].id) : null;
+  } catch (error) {
+    console.error('Error fetching TMDB id from TVDB:', error);
+    return null;
+  }
+}
+
 export async function getMediaDetails(mediaType: 'movie' | 'tv', tmdbId: string) {
   // Sanitize: prevent Redis key collision via crafted tmdbId containing ':'
   if (!/^\d+$/.test(tmdbId)) {

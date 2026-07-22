@@ -71,6 +71,37 @@ movies, but Sonarr does not for TV). PlexPulse converts TMDB TV IDs to TVDB IDs 
 TMDB's /tv/{id}/external_ids endpoint before checking Sonarr — see lib/tmdb.ts's
 getTvdbIdFromTmdb function and lib/sonarr.ts.
 
+## Webhook Fast-Path (Radarr/Sonarr → PlexPulse)
+
+`POST /api/webhooks/arr-import` lets Radarr/Sonarr notify PlexPulse the instant an
+import/upgrade completes, so status flips to "Available" within seconds instead of
+waiting for the 24h scheduled scan (`SCAN_SCHEDULE_HOURS`, `lib/scan-scheduler.ts`).
+The scheduled scan is unaffected and still runs as a safety net.
+
+Set `ARR_WEBHOOK_SECRET` and `PLEXPULSE_WEBHOOK_URL` in `.env`, then register the
+webhook against all configured Radarr/Sonarr instances:
+
+```
+node --env-file=.env scripts/setup-arr-webhooks.js --dry-run   # inspect payloads first
+node --env-file=.env scripts/setup-arr-webhooks.js              # register for real
+```
+
+The script introspects each instance's `GET /api/v3/notification/schema` response
+rather than hardcoding field names, since these vary slightly by Servarr version —
+use `--dry-run` to sanity-check the assembled payload against a real instance before
+registering all of them.
+
+**Manual webhook setup** (fallback if the script fails for a given instance):
+Settings → Connect → **+** → Webhook.
+- Name: `PlexPulse`
+- Triggers: check only **On Import** and **On Upgrade** (leave On Grab and everything
+  else unchecked)
+- URL: `<PLEXPULSE_WEBHOOK_URL>/api/webhooks/arr-import?token=<ARR_WEBHOOK_SECRET>`
+- Method: `POST`
+- Leave auth fields blank
+- Save, then use the instance's own "Test" button — PlexPulse responds 200 without
+  acting on the test event.
+
 ## Environment Variables: Build-Time vs Runtime
 
 Only two variables are needed WHEN THE IMAGE IS BUILT (docker build), because
