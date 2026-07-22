@@ -9,3 +9,4 @@ data/
 dump.rdb
 tsconfig.tsbuildinfo
 .next/
+.aider.chat.history.md
