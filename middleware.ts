@@ -11,10 +11,14 @@ import type { NextRequest } from 'next/server';
  *    headers() config in next.config.js (some headers only work in middleware).
  */
 
-// Paths that do NOT require authentication
+// Paths that do NOT require authentication.
+// /api/webhooks/ is exempt from the session-cookie check because it's called
+// server-to-server by Radarr/Sonarr, which can't hold a session cookie — those
+// routes authenticate with their own shared-secret token check instead.
 const PUBLIC_PATHS = [
   '/',
   '/api/auth/',
+  '/api/webhooks/',
   '/icon.svg',
   '/_next/',
   '/favicon.ico',
@@ -26,7 +30,7 @@ function isPublic(pathname: string): boolean {
   );
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 

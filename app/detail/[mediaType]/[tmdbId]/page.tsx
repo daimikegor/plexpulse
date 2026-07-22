@@ -1,3 +1,4 @@
+import { requireAuth } from '@/lib/session';
 import { getMediaDetails } from '@/lib/tmdb';
 import { CastSection } from '@/components/CastSection';
 import { RequestButton } from '@/components/RequestButton';
@@ -11,6 +12,8 @@ const metadata = {
 };
 
 export default async function MediaDetailPage({ params }: { params: Promise<{ mediaType: string, tmdbId: string }> }) {
+  await requireAuth();
+
   const { mediaType, tmdbId } = await params;
 
   if (mediaType !== 'movie' && mediaType !== 'tv') return <div>Invalid media type</div>;
