@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { redis } from '@/lib/redis';
+import { createSession } from '@/lib/session';
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function GET(req: NextRequest) {
@@ -70,13 +71,9 @@ export async function GET(req: NextRequest) {
         set: { username: userData.username || userData.title, isAdmin, avatarUrl: userData.thumb || null }
       });
 
-      // Create secure session & map to Redis for fast retrieval
-      const sessionToken = crypto.randomBytes(32).toString('hex');
-      await redis.set(
-        `session:${sessionToken}`,
-        JSON.stringify({ plexId: userData.id, authToken: data.authToken }),
-        'EX', 604800 // 7 days TTL
-      );
+      // Create encrypted session in Redis (also tracks in user_sessions set
+      // so logout can terminate all devices at once)
+      const sessionToken = await createSession(String(userData.id), data.authToken);
 
       const resObj = NextResponse.json({ authenticated: true });
       resObj.cookies.set('session_token', sessionToken, {
