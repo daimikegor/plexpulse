@@ -7,14 +7,26 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
   await requireAuth();
 
   const { id: personId } = await params;
-  
+
+  // Validate numeric-only to prevent path injection in the TMDB URL
+  if (!/^\d+$/.test(personId)) {
+    return (
+      <main>
+        <div className="text-center">
+          <h1 className="search-context-heading">Invalid Person ID</h1>
+          <p>The person ID must be a numeric value.</p>
+        </div>
+      </main>
+    );
+  }
+
   try {
     const API_KEY = process.env.TMDB_API_KEY;
-    
+
     if (!API_KEY) {
       throw new Error('TMDB_API_KEY is not set in environment variables');
     }
-    
+
     // Fetch person details with combined credits
     const personResponse = await fetch(
       `https://api.themoviedb.org/3/person/${personId}?api_key=${API_KEY}&append_to_response=combined_credits`

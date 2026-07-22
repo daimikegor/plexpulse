@@ -30,6 +30,12 @@ export async function POST(request: Request) {
   }
 
   const { title, year, mediaType, tmdbId, posterPath } = await request.json();
+
+  // Validate required fields before any downstream processing
+  if (mediaType !== 'movie' && mediaType !== 'tv') {
+    return NextResponse.json({ error: 'Invalid mediaType — must be "movie" or "tv"' }, { status: 400 });
+  }
+
   const ratingKey = await findPlexRatingKey(title, year, mediaType, session.authToken);
   if (!ratingKey) {
     return NextResponse.json({ error: "Couldn't add automatically — ask the admin to add this one manually." }, { status: 404 });

@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const mediaType = searchParams.get('mediaType') as 'movie' | 'tv';
-  const page = parseInt(searchParams.get('page') || '1', 10);
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
 
   if (mediaType !== 'movie' && mediaType !== 'tv') {
     return NextResponse.json({ error: 'Invalid mediaType' }, { status: 400 });

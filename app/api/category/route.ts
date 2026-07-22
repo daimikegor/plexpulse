@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
-  const page = parseInt(searchParams.get('page') || '1', 10);
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
 
   let data;
   switch (type) {
