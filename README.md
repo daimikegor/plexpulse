@@ -48,9 +48,17 @@ PlexPulse status updates: Requested → Available
 
 ## Screenshots
 
-_Add a few screenshots here — the dashboard, live search, and a detail modal are
-good candidates to show off the Plex-themed UI. Drop images in a `docs/` or
-`.github/` folder and reference them with `![Dashboard](docs/dashboard.png)`._
+**Dashboard** — trending, popular, and top-rated shelves at a glance
+![Dashboard](docs/screenshots/dashboard.png)
+
+**Live search** — results as you type, across movies, TV shows, and people
+![Search](docs/screenshots/search.png)
+
+**Detail page** — cast, trailer, and one-click request
+![Detail page](docs/screenshots/detail-page.png)
+
+**Admin panel** — every user's request history in one place
+![Admin panel](docs/screenshots/admin-panel.png)
 
 ## Tech Stack
 
