@@ -4,7 +4,105 @@ import Image from 'next/image';
 import { Check, Clock, Film } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
-const statusRequestCache = new Map<string, Promise<any>>();
+// ---------------------------------------------------------------------------
+// Batch queue — collects status requests across PosterImage instances and
+// fires a single POST /api/media-status/batch every 50ms.
+// ---------------------------------------------------------------------------
+
+const BATCH_WINDOW_MS = 50;
+
+interface BatchSubscriber {
+  resolve: (data: { status: string }) => void;
+  reject: (err: unknown) => void;
+}
+
+const batchQueue = new Map<string, BatchSubscriber[]>();
+let batchTimer: ReturnType<typeof setTimeout> | null = null;
+
+// In-flight request cache — prevents duplicate batch entries for the same key
+// across batch windows (a second PosterImage for the same tmdbId gets the
+// cached resolved promise rather than re-enqueuing).
+const statusRequestCache = new Map<string, Promise<{ status: string }>>();
+
+async function flushBatch(): Promise<void> {
+  batchTimer = null;
+
+  const entries = Array.from(batchQueue.entries());
+  batchQueue.clear();
+
+  if (entries.length === 0) return;
+
+  const items = entries.map(([key]) => {
+    const dashIdx = key.indexOf('-');
+    return {
+      tmdbId: key.slice(dashIdx + 1),
+      mediaType: key.slice(0, dashIdx) as 'movie' | 'tv',
+    };
+  });
+
+  try {
+    const response = await fetch('/api/media-status/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+    });
+
+    if (!response.ok) {
+      // 401, 429, etc. — reject all queued subscribers
+      const error = new Error(`Batch request failed: ${response.status}`);
+      for (const [, subs] of entries) {
+        for (const s of subs) s.reject(error);
+      }
+      return;
+    }
+
+    const data = await response.json();
+    const resultMap = new Map<string, string>();
+    for (const r of data.results) {
+      resultMap.set(`${r.mediaType}-${r.tmdbId}`, r.status);
+    }
+
+    for (const [key, subs] of entries) {
+      const status = resultMap.get(key) ?? 'none';
+      for (const s of subs) s.resolve({ status });
+    }
+  } catch (err) {
+    // Network error — reject all
+    for (const [, subs] of entries) {
+      for (const s of subs) s.reject(err);
+    }
+  }
+}
+
+function enqueueBatchRequest(
+  tmdbId: string,
+  mediaType: 'movie' | 'tv',
+): Promise<{ status: string }> {
+  const key = `${mediaType}-${tmdbId}`;
+
+  // Deduplicate across batch windows: if same key was already requested, reuse
+  let cached = statusRequestCache.get(key);
+  if (cached) return cached;
+
+  // Create a new promise and queue it
+  const promise = new Promise<{ status: string }>((resolve, reject) => {
+    const subs = batchQueue.get(key);
+    if (subs) {
+      subs.push({ resolve, reject });
+    } else {
+      batchQueue.set(key, [{ resolve, reject }]);
+    }
+  });
+
+  statusRequestCache.set(key, promise);
+
+  // Schedule flush if not already pending
+  if (!batchTimer) {
+    batchTimer = setTimeout(flushBatch, BATCH_WINDOW_MS);
+  }
+
+  return promise;
+}
 
 export function PosterImage({ 
   src, 
@@ -39,14 +137,10 @@ export function PosterImage({
     const fetchStatus = () => {
       if (hasFetched) return;
       hasFetched = true;
-      const cacheKey = `${tmdbId}-${mediaType === 'tv' ? 'tv' : 'movie'}`;
-      let request = statusRequestCache.get(cacheKey);
-      if (!request) {
-        request = fetch(`/api/media-status?tmdbId=${tmdbId}&mediaType=${mediaType === 'tv' ? 'tv' : 'movie'}`)
-          .then(res => res.json());
-        statusRequestCache.set(cacheKey, request);
-      }
-      request.then(data => setLiveStatus(data.status)).catch(() => setLiveStatus(null));
+      const mType = mediaType === 'tv' ? 'tv' : 'movie';
+      enqueueBatchRequest(tmdbId, mType)
+        .then(data => setLiveStatus(data.status as 'none' | 'requested' | 'available'))
+        .catch(() => setLiveStatus(null));
     };
 
     const observer = new IntersectionObserver(
