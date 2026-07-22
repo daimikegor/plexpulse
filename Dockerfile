@@ -15,6 +15,7 @@ RUN npm run build
 
 FROM base AS runner
 ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
 WORKDIR /app
 RUN mkdir -p ./data && chown -R node:node ./data
 COPY --from=builder /app/public ./public
