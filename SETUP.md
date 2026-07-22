@@ -9,7 +9,7 @@ Required variables and where to find them:
 - TMDB_API_KEY — from themoviedb.org account settings, API section
 - DATABASE_URL — defaults to file:./data/plexpulse.db, don't need to set manually
 - NEXT_PUBLIC_APP_URL, SESSION_SECRET — core app/auth config
-- PLEX_SERVER_URL — your Plex Media Server's address, e.g. http://10.0.0.15:32400
+- PLEX_SERVER_URL — your Plex Media Server's address, e.g. http://10.0.0.X:32400
 - PLEX_SERVER_TOKEN — Plex Media Server's own access token (different from user OAuth
   tokens). Get it by opening any item in Plex Web, "..." menu -> Get Info -> View XML,
   and copying the X-Plex-Token value from the URL.

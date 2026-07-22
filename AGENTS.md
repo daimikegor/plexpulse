@@ -99,7 +99,7 @@ When editing any of these five files, add or update the corresponding test(s) in
 ## Deployment
 - Docker-based (Docker Compose or Unraid templates included)
 - Environment variables split between build-time and runtime — see SETUP.md
-- Redis: **production uses a separate standalone Redis container at 10.0.0.97:6380 with requirepass auth**. The compose redis service is dev-only and not used in production.
+- Redis: **production uses a separate standalone Redis container at 10.0.0.X:6380 with requirepass auth**. The compose redis service is dev-only and not used in production.
 - Docker networking: implicit compose default network (no custom network defined)
 
 ## Media Workflow
