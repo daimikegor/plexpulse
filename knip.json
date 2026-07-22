@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "app/**/page.tsx",
+    "app/**/layout.tsx",
+    "app/**/route.ts",
+    "next.config.{js,ts,mjs}",
+    "migrate.js"
+  ],
+  "project": ["**/*.{ts,tsx,js,jsx}"],
+  "ignore": [".claude/**"],
+  "rules": {
+    "exports": "warn",
+    "files": "warn",
+    "dependencies": "warn",
+    "types": "warn",
+    "enumMembers": "off"
+  }
+}
