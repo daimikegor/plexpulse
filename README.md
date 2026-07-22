@@ -14,12 +14,11 @@ Radarr, Sonarr, and Plex library.
 - Infinite scroll on every list
 - Live-as-you-type search across movies, TV shows, and people
 - One-click request → adds to your Plex watchlist automatically
-- Requests work by adding titles to your Plex watchlist — actually downloading and
-  organizing them is handled by [Pulsarr](https://github.com/jamcalli/Pulsarr),
-  which watches your watchlist and routes new items to Sonarr/Radarr
-  automatically. PlexPulse doesn't talk to Sonarr/Radarr to *add* things directly
-  (only to check status) — Pulsarr (or a similar tool) is required for requests to
-  actually result in anything being downloaded.
+- Requests work by adding titles to your Plex watchlist — routing them to
+  Radarr/Sonarr is handled by [Pulsarr](https://github.com/jamcalli/Pulsarr),
+  which watches your watchlist and routes new items automatically. PlexPulse
+  doesn't talk to Sonarr/Radarr to *add* things directly (only to check status)
+  — Pulsarr (or a similar tool) is required for requests to actually be routed.
 - Live Requested/Available status, checked against Radarr, Sonarr, and your Plex
   library directly (supports multiple instances of each)
 - Personal request history ("My Requests")
@@ -28,6 +27,24 @@ Radarr, Sonarr, and Plex library.
   to keep "Available" status accurate without manual refreshes
 - Fully responsive — dedicated mobile layout with bottom navigation
 - Real Plex avatar shown in the header
+
+## How It Works
+
+```
+Request in PlexPulse
+        │
+        ▼
+Added to your Plex Watchlist
+        │
+        ▼
+Detected by Pulsarr
+        │
+        ▼
+Routed to Radarr / Sonarr
+        │
+        ▼
+PlexPulse status updates: Requested → Available
+```
 
 ## Screenshots
 
@@ -123,7 +140,7 @@ See [SETUP.md](./SETUP.md) for:
 - [Seerr](https://github.com/seerr-team/seerr) (formerly known as Overseerr) — design and feature inspiration for the request/discovery flow
 - [TMDB](https://www.themoviedb.org/) — movie/TV metadata and artwork
 - [Plex](https://www.plex.tv/) — media server and watchlist integration
-- [Radarr](https://radarr.video/) / [Sonarr](https://sonarr.tv/) — status checks against your download automation
+- [Radarr](https://radarr.video/) / [Sonarr](https://sonarr.tv/) — status tracking for your requests
 - [Pulsarr](https://github.com/jamcalli/Pulsarr) — watches the Plex watchlist and routes requests to Radarr/Sonarr
 
 ## License
