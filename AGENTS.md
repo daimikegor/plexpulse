@@ -77,8 +77,20 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
 - `npm start` — start prod server (next start)
 - `npm run db:generate` — generate Drizzle schema migrations
 - `npm run db:migrate` — apply Drizzle migrations
+- `npm run test` — run the Vitest suite once
+- `npm run test:watch` — run Vitest in watch mode
 
 No lint or typecheck scripts are configured.
+
+## Testing
+Vitest (`vitest.config.ts`, `test/mocks/` for shared Redis/DB fakes) covers the highest-risk logic touched in the 2026-07-22 hardening pass:
+- `lib/rate-limit.test.ts` — Redis-backed rate limiter: limit/remaining accounting, fail-open behavior on Redis outage, IP extraction precedence, window bucketing.
+- `lib/session.test.ts` — encrypted session storage, legacy plaintext back-compat, sliding TTL, `requireAuth()` redirect paths.
+- `app/api/auth/csrf-flow.test.ts` — the nonce-based CSRF flow across `start`/`check` routes, including one-time-use replay protection and the admin allowlist.
+- `lib/plex-library.test.ts` — the scan concurrency guard, the stale-`scanInProgress` fix, GUID extraction (modern + legacy formats), pagination edge cases.
+- `lib/plex-watchlist.test.ts` — Plex title word-sequence matching (punctuation/quote/dash normalization) and year matching.
+
+When editing any of these five files, add or update the corresponding test(s) in the same change — this suite exists specifically to catch regressions of bugs (like the plex-library cascading cache bug above) that have already bitten this project once.
 
 ### Docker
 - Entry point runs `node migrate.js && node server.js` on container start
