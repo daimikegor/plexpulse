@@ -64,8 +64,8 @@ export function Sidebar({ username, isAdmin }: { username: string; isAdmin?: boo
         
         {isAdmin && (
           <Link 
-            href="/admin/requests" 
-            className={`sidebar__nav-item ${pathname === '/admin/requests' ? 'is-active' : ''}`}
+            href="/admin"
+            className={`sidebar__nav-item ${pathname.startsWith('/admin') ? 'is-active' : ''}`}
           >
             <ShieldCheck size={20} />
             <span>Admin</span>

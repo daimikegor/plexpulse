@@ -38,6 +38,18 @@ const { createClient } = require('@libsql/client');
         requested_at INTEGER NOT NULL
       )
     `);
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS plex_library_scan (
+        id TEXT PRIMARY KEY,
+        media_type TEXT NOT NULL,
+        guids TEXT NOT NULL DEFAULT '[]',
+        item_count INTEGER NOT NULL DEFAULT 0,
+        last_scan_at INTEGER NOT NULL DEFAULT 0,
+        last_scan_success BOOLEAN NOT NULL DEFAULT 0,
+        last_scan_error TEXT,
+        scan_in_progress BOOLEAN NOT NULL DEFAULT 0
+      )
+    `);
     console.log('Database migration completed.');
   } catch (error) {
     console.error('Migration failed:', error);

@@ -24,3 +24,14 @@ export const userRequests = sqliteTable('user_requests', {
   posterPath: text('poster_path'),
   requestedAt: integer('requested_at', { mode: 'timestamp' }).notNull(),
 });
+
+export const plexLibraryScan = sqliteTable('plex_library_scan', {
+  id: text('id').primaryKey(), // "movie" | "tv"
+  mediaType: text('media_type').notNull(),
+  guids: text('guids').notNull(), // JSON-serialized array of TMDB ID strings
+  itemCount: integer('item_count').notNull().default(0),
+  lastScanAt: integer('last_scan_at', { mode: 'timestamp' }).notNull(),
+  lastScanSuccess: integer('last_scan_success', { mode: 'boolean' }).notNull().default(false),
+  lastScanError: text('last_scan_error'),
+  scanInProgress: integer('scan_in_progress', { mode: 'boolean' }).notNull().default(false),
+});

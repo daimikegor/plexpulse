@@ -166,4 +166,6 @@ export const RATE_LIMITS: Record<string, RateLimitConfig> = {
   'auth-callback': { endpoint: 'auth-callback', limit: 30, windowSeconds: 60 },
   'auth-logout': { endpoint: 'auth-logout', limit: 10, windowSeconds: 60 },
   'watchlist-add': { endpoint: 'watchlist-add', limit: 20, windowSeconds: 60 },
+  'admin-plex-scan': { endpoint: 'admin-plex-scan', limit: 5, windowSeconds: 60 },
+  'admin-plex-scan-status': { endpoint: 'admin-plex-scan-status', limit: 30, windowSeconds: 60 },
 };
