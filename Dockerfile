@@ -23,8 +23,12 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder /app/db ./db
 COPY --from=builder /app/migrate.js ./migrate.js
+# Next.js writes to .next/cache at runtime (image optimization, fetch cache, etc.).
+# The standalone output may or may not include this directory — create it if missing
+# so the chown always has a target.
+RUN mkdir -p ./.next/cache && chown -R node:node ./.next/cache
 EXPOSE 3000
 ENV PORT=3000
-# Fix permissions on volume mounts at runtime (volume overrides build-time chown),
-# then drop to unprivileged node user.
-CMD ["sh", "-c", "chown -R node:node /app/data 2>/dev/null; exec su node -c 'node migrate.js && node server.js'"]
+# Fix permissions on volume mounts and cache dir at runtime (volume overrides
+# build-time chown), then drop to unprivileged node user.
+CMD ["sh", "-c", "chown -R node:node /app/data /app/.next/cache 2>/dev/null; exec su node -c 'node migrate.js && node server.js'"]
