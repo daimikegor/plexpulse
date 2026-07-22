@@ -8,16 +8,43 @@ Required variables and where to find them:
 
 - TMDB_API_KEY — from themoviedb.org account settings, API section
 - DATABASE_URL — defaults to file:./data/plexpulse.db, don't need to set manually
-- NEXT_PUBLIC_APP_URL, SESSION_SECRET, NEXT_PUBLIC_PLEX_CLIENT_ID — core app/auth config
+- NEXT_PUBLIC_APP_URL, SESSION_SECRET — core app/auth config
 - PLEX_SERVER_URL — your Plex Media Server's address, e.g. http://10.0.0.15:32400
 - PLEX_SERVER_TOKEN — Plex Media Server's own access token (different from user OAuth
   tokens). Get it by opening any item in Plex Web, "..." menu -> Get Info -> View XML,
   and copying the X-Plex-Token value from the URL.
+- PLEX_CLIENT_ID / NEXT_PUBLIC_PLEX_CLIENT_ID — these are two separate variables for
+  two different purposes, not a typo. `PLEX_CLIENT_ID` (server-only) identifies this
+  app to Plex when the server kicks off the PIN login request. `NEXT_PUBLIC_PLEX_CLIENT_ID`
+  is the same identifier baked into the browser bundle so client-side polling can check
+  the PIN's status. Both should be set to the same value. Keep any *other* secrets
+  (API keys, tokens) off the `NEXT_PUBLIC_` prefix — anything with that prefix is
+  exposed in client-side JS (see the PLEX_CLIENT_ID leak gotcha below).
+- ADMIN_PLEX_IDS — comma-separated list of numeric Plex user IDs who get access to
+  the `/admin` dashboard (all users' request history). Find your own ID at
+  https://app.plex.tv/desktop after logging in — it's in the URL: `/users/<id>/...`.
+  Leave blank and no one has admin access.
 - RADARR_1_URL / RADARR_1_API_KEY (and _2, _3 for additional instances) — each
   Radarr instance's base URL and API key. API key found in each instance's web UI:
   Settings -> General -> Security -> API Key.
 - SONARR_1_URL / SONARR_1_API_KEY (and _2, _3) — same pattern as Radarr, for each
   Sonarr instance.
+- SCAN_SCHEDULE_HOURS — how often (in hours) the in-process scheduler triggers a full
+  Plex library scan to refresh "Available" status data. Defaults to 24. Set to 0 to
+  disable the automatic scan entirely and rely only on on-demand status checks.
+- REDIS_PASSWORD — required. Sets `--requirepass` on the Redis container in
+  docker-compose.yml; generate one with `openssl rand -hex 32`. Must match the
+  password embedded in REDIS_URL.
+- REDIS_URL — full Redis connection string including the password, e.g.
+  `redis://:<REDIS_PASSWORD>@redis:6379`. In docker-compose this can reference
+  `${REDIS_PASSWORD}` via env_file expansion; see the Unraid note below for why that
+  doesn't work there.
+- IS_HTTPS — set to `true` only when the app is served over HTTPS (e.g. behind a
+  Cloudflare Tunnel), `false` otherwise. Controls whether session cookies get the
+  `Secure` flag. NODE_ENV alone can't be used for this because it's always
+  `production` inside the Docker image regardless of whether traffic is actually
+  HTTPS — getting this wrong either breaks login (cookie rejected) or ships a
+  non-Secure cookie over HTTPS.
 
 ## Database Migrations
 
@@ -91,6 +118,14 @@ rebuilding. Always verify with:
   docker inspect --format='{{.Image}}' plexpulse-app
   docker images plexpulse-app --format "{{.ID}}"
 These two values should match after any update.
+
+## Testing
+
+`npm run test` runs the Vitest suite once; `npm run test:watch` runs it in watch
+mode. Coverage focuses on the highest-risk logic: the rate limiter, session/CSRF
+auth, the Plex library scan guard, and Plex watchlist title matching — see
+AGENTS.md for the full breakdown of what each test file covers. If you edit any
+of those five source files, add or update the matching test in the same change.
 
 ## Request/Availability Status Logic
 

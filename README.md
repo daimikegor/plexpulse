@@ -24,8 +24,16 @@ Radarr, Sonarr, and Plex library.
   library directly (supports multiple instances of each)
 - Personal request history ("My Requests")
 - Admin dashboard showing every user's request history
+- Automatic daily Plex library scan (configurable, survives container restarts)
+  to keep "Available" status accurate without manual refreshes
 - Fully responsive — dedicated mobile layout with bottom navigation
 - Real Plex avatar shown in the header
+
+## Screenshots
+
+_Add a few screenshots here — the dashboard, live search, and a detail modal are
+good candidates to show off the Plex-themed UI. Drop images in a `docs/` or
+`.github/` folder and reference them with `![Dashboard](docs/dashboard.png)`._
 
 ## Tech Stack
 
@@ -82,6 +90,22 @@ Build and run the app and Redis containers manually using the Dockerfile
 included in this repo, supplying the same environment variables documented in
 `.env.example` and SETUP.md.
 
+## Security
+
+Since PlexPulse handles Plex auth tokens and talks to your Radarr/Sonarr/Plex
+instances, it's had a dedicated hardening pass:
+
+- Origin validation on state-changing requests (watchlist adds) — rejects any
+  request whose Origin/Referer doesn't match your configured app URL
+- OAuth callback postMessage locked to your app's origin, not broadcast wildcard
+- Nonce-based CSRF protection with one-time-use replay protection on the auth flow
+- Redis-backed rate limiting (fails open on Redis outage, so an outage never
+  locks out real users)
+- Encrypted session storage (with legacy-format back-compat)
+- Redis requires a password (`--requirepass`) rather than running open
+- A Vitest suite (`npm run test`) covers all of the above — see AGENTS.md for
+  the full list of what's tested
+
 ## Configuration
 
 See [SETUP.md](./SETUP.md) for:
@@ -92,6 +116,15 @@ See [SETUP.md](./SETUP.md) for:
   not Drizzle's built-in migration runner)
 - Sonarr's TVDB ID requirement and how this project handles it
 - Cloudflare Tunnel setup for external access
+- Running the test suite (`npm run test`)
+
+## Acknowledgments
+
+- [Seerr](https://github.com/seerr-team/seerr) (formerly known as Overseerr) — design and feature inspiration for the request/discovery flow
+- [TMDB](https://www.themoviedb.org/) — movie/TV metadata and artwork
+- [Plex](https://www.plex.tv/) — media server and watchlist integration
+- [Radarr](https://radarr.video/) / [Sonarr](https://sonarr.tv/) — status checks against your download automation
+- [Pulsarr](https://github.com/jamcalli/Pulsarr) — watches the Plex watchlist and routes requests to Radarr/Sonarr
 
 ## License
 
