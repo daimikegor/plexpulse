@@ -145,4 +145,4 @@ See [SETUP.md](./SETUP.md) for:
 
 ## License
 
-Personal project, not currently licensed for redistribution.
+MIT License — see [LICENSE](./LICENSE) file.
