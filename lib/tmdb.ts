@@ -528,6 +528,11 @@ export async function getUpcomingPage(page: number) {
 }
 
 export async function getGenreContentPage(mediaType: 'movie' | 'tv', genreId: string, page: number) {
+  // Sanitize: prevent Redis key collision via crafted genreId containing ':'
+  if (!/^\d+$/.test(genreId)) {
+    console.warn(`Invalid genreId rejected: ${genreId}`);
+    return { results: [], page: 1, total_pages: 1 };
+  }
   const cacheKey = `tmdb:genre-content:${mediaType}:${genreId}:${page}`;
   const cached = await redis.get(cacheKey);
   if (cached) {
@@ -574,6 +579,11 @@ export async function getTvdbIdFromTmdb(tmdbId: string): Promise<string | null> 
 }
 
 export async function getMediaDetails(mediaType: 'movie' | 'tv', tmdbId: string) {
+  // Sanitize: prevent Redis key collision via crafted tmdbId containing ':'
+  if (!/^\d+$/.test(tmdbId)) {
+    console.warn(`Invalid tmdbId rejected: ${tmdbId}`);
+    return null;
+  }
   const cacheKey = `tmdb:detail:${mediaType}:${tmdbId}`;
   const cached = await redis.get(cacheKey);
   if (cached) {

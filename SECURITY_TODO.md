@@ -2,7 +2,7 @@
 
 Living tracker for the 2026-07-20 security audit findings. Update checkboxes as items are fixed.
 
-**Status:** 21 done · 27 open (0 critical · 0 high · 15 medium · 12 low)
+**Status:** 31 done · 17 open (0 critical · 0 high · 5 medium · 12 low)
 
 ---
 
@@ -42,16 +42,16 @@ _None remaining — all 6 high findings resolved._
 
 ## 🟡 Medium
 
-- [ ] **Plex auth tokens unencrypted in Redis** — `session:{token}` stores raw `authToken` with 7-day TTL. Encrypt with `SESSION_SECRET` or reduce TTL (`app/api/auth/check/route.ts:54-58`, `lib/session.ts:10`).
-- [ ] **`SESSION_SECRET` unused in code** — defined in `.env.example` but never read. Either encrypt Redis sessions with it or remove the dead config (`.env.example:3`, all code).
-- [ ] **No token rotation / sliding expiration** — stolen token valid for full 7 days. Rotate tokens on use or add sliding TTL (`app/api/auth/check/route.ts:57`).
-- [ ] **Logout kills only current session** — multi-device users can't terminate all sessions. Add `plexId`-based scan-and-delete (`app/api/auth/logout/route.ts:11`).
-- [ ] **`/api/watchlist/add` no body validation** — `mediaType` unchecked before DB insert. Validate `mediaType === 'movie' || mediaType === 'tv'` (`app/api/watchlist/add/route.ts:41`).
-- [ ] **`parseInt` NaN risk** — unvalidated page params produce `NaN` in TMDB URLs. Add `isNaN(page) || page < 1` guard (`app/api/category/route.ts:7`, `app/api/discover/route.ts:7`, `app/api/genre-content/route.ts:8`).
-- [ ] **No TLS for production Redis** — auth tokens traverse network in cleartext. Add `tls: {}` to ioredis config or use `rediss://` URL scheme (`lib/redis.ts:3`).
-- [ ] **Redis defaults to unauthenticated localhost** — `REDIS_URL` fallback has no auth. Throw startup error if missing in production (`lib/redis.ts:3`).
-- [ ] **Redis key collision via crafted `tmdbId`** — `:` in tmdbId could poison cache keys. Sanitize to digits only at API boundary, or use Redis hashes (`lib/tmdb.ts:507`).
-- [ ] **Person ID path injection** — unvalidated URL param in server-side fetch. Validate numeric only (`app/person/[id]/page.tsx:19-20`).
+- [x] **Plex auth tokens unencrypted in Redis** — `session:{token}` stores raw `authToken` with 7-day TTL. Encrypt with `SESSION_SECRET` or reduce TTL (`app/api/auth/check/route.ts:54-58`, `lib/session.ts:10`).
+- [x] **`SESSION_SECRET` unused in code** — defined in `.env.example` but never read. Either encrypt Redis sessions with it or remove the dead config (`.env.example:3`, all code).
+- [x] **No token rotation / sliding expiration** — stolen token valid for full 7 days. Rotate tokens on use or add sliding TTL (`app/api/auth/check/route.ts:57`).
+- [x] **Logout kills only current session** — multi-device users can't terminate all sessions. Add `plexId`-based scan-and-delete (`app/api/auth/logout/route.ts:11`).
+- [x] **`/api/watchlist/add` no body validation** — `mediaType` unchecked before DB insert. Validate `mediaType === 'movie' || mediaType === 'tv'` (`app/api/watchlist/add/route.ts:41`).
+- [x] **`parseInt` NaN risk** — unvalidated page params produce `NaN` in TMDB URLs. Add `isNaN(page) || page < 1` guard (`app/api/category/route.ts:7`, `app/api/discover/route.ts:7`, `app/api/genre-content/route.ts:8`).
+- [x] **No TLS for production Redis** — auth tokens traverse network in cleartext. Add `tls: {}` to ioredis config or use `rediss://` URL scheme (`lib/redis.ts:3`).
+- [x] **Redis defaults to unauthenticated localhost** — `REDIS_URL` fallback has no auth. Throw startup error if missing in production (`lib/redis.ts:3`).
+- [x] **Redis key collision via crafted `tmdbId`** — `:` in tmdbId could poison cache keys. Sanitize to digits only at API boundary, or use Redis hashes (`lib/tmdb.ts:507`).
+- [x] **Person ID path injection** — unvalidated URL param in server-side fetch. Validate numeric only (`app/person/[id]/page.tsx:19-20`).
 - [ ] **Plex token in URL query strings** — visible in server/proxy logs. Switch to `X-Plex-Token` header, matching `plex-watchlist.ts` pattern (`lib/plex-library.ts:14-15,30-31`).
 - [ ] **Docker base image stale** — `node:20.18.0-slim` is ~1.5 years old. Update to `node:20-slim` or pin to latest 20.x (`Dockerfile:1`).
 - [ ] **`npm ci` without `--ignore-scripts`** — postinstall scripts from dependencies execute during build. Evaluate hardening, test with `@libsql/client` (may need native builds) (`Dockerfile:6`).
