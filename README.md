@@ -21,6 +21,9 @@ Radarr, Sonarr, and Plex library.
   — Pulsarr (or a similar tool) is required for requests to actually be routed.
 - Live Requested/Available status, checked against Radarr, Sonarr, and your Plex
   library directly (supports multiple instances of each)
+- Optional webhook fast-path: Radarr/Sonarr can notify PlexPulse the instant an
+  import/upgrade completes, so status flips to "Available" within seconds
+  instead of waiting for the next scheduled scan — see SETUP.md
 - Personal request history ("My Requests")
 - Admin dashboard showing every user's request history
 - Automatic daily Plex library scan (configurable, survives container restarts)
@@ -83,7 +86,9 @@ Next.js 14 (App Router), TypeScript, Tailwind CSS, Drizzle ORM with libSQL
 ```bash
    docker compose up -d --build
 ```
-4. Visit `http://localhost:3000`
+4. Visit `http://localhost:3000` (the default port mapping in `docker-compose.yml`
+   — if you've changed the `ports:` mapping there, check with
+   `docker port plexpulse-app` rather than assuming 3000)
 
 ### Option 2: Unraid
 
@@ -103,7 +108,11 @@ Two Unraid Community Applications-style templates are included in the
 ```
 4. Start `plexpulse-app` from the Docker tab's template dropdown, filling in
    your environment variables (see SETUP.md for the full list and where to
-   find each value)
+   find each value). The template's default host port is 3000, but you can
+   (and may need to) map it to a different host port at add-container time —
+   check the actual mapping afterward with `docker port plexpulse-app` rather
+   than assuming 3000, especially if anything else on your server already
+   uses it
 
 **Important:** whenever you rebuild the image after pulling new code, use
 Unraid's "Force Update" (or stop/remove and re-add the container) — a plain
@@ -141,6 +150,7 @@ See [SETUP.md](./SETUP.md) for:
   not Drizzle's built-in migration runner)
 - Sonarr's TVDB ID requirement and how this project handles it
 - Cloudflare Tunnel setup for external access
+- Setting up the Radarr/Sonarr webhook fast-path (`scripts/setup-arr-webhooks.js`)
 - Running the test suite (`npm run test`)
 
 ## Acknowledgments

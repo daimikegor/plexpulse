@@ -16,6 +16,7 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
 - `app/` — Next.js App Router pages and API routes
   - `api/auth/` — Plex OAuth flow (start → callback → check → logout)
   - `api/tmdb/`, `api/discover/`, `api/search/live/`, `api/watchlist/`, `api/media-status/`, `api/genre-content/`, `api/category/` — data fetchers
+  - `api/webhooks/arr-import/` — Radarr/Sonarr webhook receiver (see "Webhook Fast-Path" below)
   - `dashboard/`, `movies/`, `series/`, `search/`, `genres/`, `genre/`, `category/`, `person/`, `requests/`, `admin/` — UI pages
 - `components/` — React components (InfiniteMediaGrid, LiveSearchResults, DetailModal, AppShell, MobileBottomNav, Sidebar, PosterImage, etc.)
 - `lib/` — business logic and integrations
@@ -26,6 +27,7 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
   - `radarr.ts`, `sonarr.ts`, `plex-library.ts`, `plex-watchlist.ts` — individual service integrations
   - `db.ts` — Drizzle database connection
 - `db/schema.ts` — Drizzle schema: `users`, `media_status`, `user_requests` tables
+- `scripts/setup-arr-webhooks.js` — one-time CLI script that registers the arr-import webhook against every configured Radarr/Sonarr instance
 
 ### Patterns
 - All TMDB functions follow the same pattern: Redis cache check → API fetch → Redis setex with TTL → return data. Graceful degradation on errors.
@@ -70,6 +72,8 @@ Self-hosted media discovery and request app for Plex servers. Users browse trend
   must be cleared on all exit paths (popup close, auth success, timeout) to prevent leaks.
 - **CRITICAL: app/detail/[mediaType]/[tmdbId]/page.tsx must NEVER contain onClick, useState, useEffect, or 'use client'. It is a server component (imports lib/tmdb.ts which uses Redis). ALL interactivity belongs in separate client component files (TrailerButton.tsx, RequestButton.tsx, etc.) that receive data via props. This exact bug has broken the build/runtime 4 times — check this before editing page.tsx.**
 - **Next.js standalone server loopback binding**: The Next.js standalone output's server uses the `HOSTNAME` env var to decide which interface to bind to. Without `ENV HOSTNAME=0.0.0.0` in the Dockerfile runner stage, the server binds only to the container's external network interface — external browser traffic still works, but any internal health check or same-container request to `127.0.0.1` or `localhost` fails with `ECONNREFUSED`. Always pair `ENV NODE_ENV=production` with `ENV HOSTNAME=0.0.0.0` in the runner stage.
+- **`.env` does not reach an Unraid-deployed container**: `docker-compose.yml` loads `.env` at runtime via its `env_file:` directive (a Compose mechanism, unrelated to `.dockerignore`), so Compose deployments get every var in `.env` automatically. Unraid templates have no equivalent — there is no `env_file` mechanism, so a var only reaches the container if it's typed into the template's own environment-variable fields in the Unraid UI. This means any var the *running app* reads (`RADARR_*`, `SONARR_*`, `ARR_WEBHOOK_SECRET`, `TMDB_API_KEY`, etc.) must be set directly in the Unraid template for an Unraid deployment — a repo `.env` file on that host is only useful for `docker build` (which never sees it either, per `.dockerignore`) or for running standalone scripts (e.g. `scripts/setup-arr-webhooks.js`) directly on the host outside the container. See "Webhook Fast-Path" in SETUP.md for a concrete example (`PLEXPULSE_WEBHOOK_URL` only needs to exist in a local `.env` for the script; `ARR_WEBHOOK_SECRET` needs to exist in *both* places since the running app reads it too).
+- **`middleware.ts` file/export naming — do not rename back to `proxy`**: this project's global auth-guard + security-header middleware previously shipped as `proxy.ts` exporting a function named `proxy`, which Next.js silently never loaded (confirmed via `.next/server/middleware-manifest.json` showing an empty `"middleware": {}` in production) — both the **filename** and the **exported function name** must be exactly `middleware.ts` / `export function middleware(...)` for Next.js to load it (fixed in commit `4f99a90`). If you see a Next.js warning suggesting the "middleware" convention is deprecated in favor of "proxy," **ignore it for this codebase** — that warning describes a *future* Next.js convention change; using `proxy` as either the filename or the export name in the current Next.js version (16.2.10) actively breaks the build. Verify with a fresh `npm run build` that `.next/server/middleware-manifest.json` shows a populated `"middleware"` object before trusting any future change here. That same fix added `requireAuth()` to two pages that had no independent auth check and were silently relying on the (previously inert) middleware — `app/detail/[mediaType]/[tmdbId]/page.tsx` and `app/admin/requests/page.tsx` — and added `/api/webhooks/` to the middleware's `PUBLIC_PATHS`, since that route authenticates Radarr/Sonarr via its own shared-secret token rather than a session cookie.
 
 ## Commands
 - `npm run dev` — start dev server (next dev)
@@ -108,7 +112,7 @@ When editing any of these five files, add or update the corresponding test(s) in
 3. **Radarr/Sonarr** → pass download jobs to **nzbdav** (usenet streaming)
 4. **nzbdav** → notifies Arrs when ready
 5. **Arrs** → trigger partial library scan on Plex via Autopulse
-6. **PlexPulse** → detects "Available" status in `media-status.ts`
+6. **PlexPulse** → detects "Available" status in `media-status.ts`, either via the 24h scheduled scan (`lib/scan-scheduler.ts`) or, faster, the event-driven `POST /api/webhooks/arr-import` fast path that Radarr/Sonarr call directly on import/upgrade completion (see SETUP.md)
 
 ## Git Workflow
 - **Claude Code**: Run git commands directly with per-command approval (commit, push, etc.).

@@ -29,6 +29,18 @@ Required variables and where to find them:
   Settings -> General -> Security -> API Key.
 - SONARR_1_URL / SONARR_1_API_KEY (and _2, _3) — same pattern as Radarr, for each
   Sonarr instance.
+- ARR_WEBHOOK_SECRET — shared secret Radarr/Sonarr must send as `?token=` on
+  webhook deliveries to `POST /api/webhooks/arr-import`. Generate with
+  `openssl rand -hex 32`. See "Webhook Fast-Path" below — read by the running
+  app, so it needs to be set wherever your deployment's env vars actually live
+  (not just a local `.env` if you're on Unraid).
+- PLEXPULSE_WEBHOOK_URL — the LAN URL Radarr/Sonarr use to reach PlexPulse,
+  e.g. `http://10.0.0.X:<port>`. The container's internal port is 3000, but
+  the host port it's published on depends on your own deployment (it may or
+  may not be 3000) — verify yours with `docker port plexpulse-app` rather than
+  assuming. Only used by `scripts/setup-arr-webhooks.js`, not read by the
+  running app — a local `.env` is enough, it never needs to go in the Unraid
+  template.
 - SCAN_SCHEDULE_HOURS — how often (in hours) the in-process scheduler triggers a full
   Plex library scan to refresh "Available" status data. Defaults to 24. Set to 0 to
   disable the automatic scan entirely and rely only on on-demand status checks.
@@ -78,8 +90,24 @@ import/upgrade completes, so status flips to "Available" within seconds instead 
 waiting for the 24h scheduled scan (`SCAN_SCHEDULE_HOURS`, `lib/scan-scheduler.ts`).
 The scheduled scan is unaffected and still runs as a safety net.
 
-Set `ARR_WEBHOOK_SECRET` and `PLEXPULSE_WEBHOOK_URL` in `.env`, then register the
-webhook against all configured Radarr/Sonarr instances:
+**Where these two env vars actually need to live** (easy to get wrong — see the
+"Environment Variables: Build-Time vs Runtime" section below for the full
+Unraid-vs-`.env` distinction):
+- `ARR_WEBHOOK_SECRET` is read by the **running app** (checked against the
+  `?token=` query param on every webhook delivery), so it must be set wherever
+  the container actually gets its env vars in your deployment — for
+  docker-compose, that's your `.env` (loaded via `env_file:`); for **Unraid,
+  that means adding it as a field in the `plexpulse-app` template's
+  environment variables**, not just your local `.env` (Unraid never reads a
+  repo `.env` file).
+- `PLEXPULSE_WEBHOOK_URL` is only read by `scripts/setup-arr-webhooks.js`
+  itself when you run it — the running app never reads it. It only needs to
+  exist in a local `.env` on whatever machine you run the script from; it does
+  **not** need to be added to the Unraid template.
+
+Set both in your local `.env` (plus `ARR_WEBHOOK_SECRET` in the Unraid template
+if that's your deployment), then register the webhook against all configured
+Radarr/Sonarr instances:
 
 ```
 node --env-file=.env scripts/setup-arr-webhooks.js --dry-run   # inspect payloads first
@@ -91,12 +119,20 @@ rather than hardcoding field names, since these vary slightly by Servarr version
 use `--dry-run` to sanity-check the assembled payload against a real instance before
 registering all of them.
 
+`PLEXPULSE_WEBHOOK_URL` must be the host/port your Radarr/Sonarr instances can
+actually reach PlexPulse on. **Don't assume it's port 3000** — the container's
+internal port 3000 can be published to a different host port (e.g. because
+3000 is already taken by another app on your server). Verify the real published
+port with `docker port plexpulse-app` before setting this.
+
 **Manual webhook setup** (fallback if the script fails for a given instance):
 Settings → Connect → **+** → Webhook.
 - Name: `PlexPulse`
 - Triggers: check only **On Import** and **On Upgrade** (leave On Grab and everything
   else unchecked)
 - URL: `<PLEXPULSE_WEBHOOK_URL>/api/webhooks/arr-import?token=<ARR_WEBHOOK_SECRET>`
+  (same port caveat as above — verify with `docker port plexpulse-app` rather
+  than assuming 3000)
 - Method: `POST`
 - Leave auth fields blank
 - Save, then use the instance's own "Test" button — PlexPulse responds 200 without
@@ -118,9 +154,29 @@ without a full .env file, create a minimal one first with just these two
 variables before running the build.
 
 Every other variable (TMDB_API_KEY, PLEX_SERVER_TOKEN, PLEX_CLIENT_ID, all
-RADARR_*/SONARR_* variables, REDIS_URL, SESSION_SECRET) is read fresh at runtime
-and can be supplied purely through the container's environment (e.g. Unraid's
-Docker template UI) without needing to be present during the build.
+RADARR_*/SONARR_* variables, ARR_WEBHOOK_SECRET, REDIS_URL, SESSION_SECRET) is
+read fresh at runtime and can be supplied purely through the container's
+environment (e.g. Unraid's Docker template UI) without needing to be present
+during the build.
+
+**Where "the container's environment" actually comes from differs by deployment
+method** — this trips people up because a repo `.env` file works for one
+method and silently does nothing for the other:
+- **Docker Compose**: `docker-compose.yml` has `env_file: - .env`, which loads
+  your local `.env` into the container at `docker compose up` time. This is a
+  Compose-level mechanism, separate from `.dockerignore` (which only affects
+  what gets copied into the *image* during `docker build` — `.env` is excluded
+  there too, but that doesn't matter for Compose since `env_file` never goes
+  through the build context at all).
+- **Unraid**: there is no `env_file` equivalent. The Unraid template UI's own
+  fields are the *only* way a variable reaches the container — a `.env` file
+  sitting on the Unraid host (e.g. left over from cloning the repo to run
+  `docker build`) is never read by the running container. Every runtime
+  variable the app needs (RADARR_*/SONARR_*/ARR_WEBHOOK_SECRET/TMDB_API_KEY/etc.)
+  must be typed directly into the `plexpulse-app` template's environment
+  variables. The one exception is `PLEXPULSE_WEBHOOK_URL` (see "Webhook
+  Fast-Path" above) — it's only used by a standalone script run on the host,
+  never by the container itself, so it only needs to exist in a local `.env`.
 
 ## Additional Database Tables
 

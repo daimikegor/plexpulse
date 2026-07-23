@@ -57,4 +57,6 @@
   <Config Name="SONARR_2_API_KEY" Target="SONARR_2_API_KEY" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"></Config>
   <Config Name="SONARR_3_URL" Target="SONARR_3_URL" Default="" Mode="" Description="Optional third Sonarr instance" Type="Variable" Display="always" Required="false" Mask="false"></Config>
   <Config Name="SONARR_3_API_KEY" Target="SONARR_3_API_KEY" Default="" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+
+  <Config Name="ARR_WEBHOOK_SECRET" Target="ARR_WEBHOOK_SECRET" Default="" Mode="" Description="Optional: shared secret for the Radarr/Sonarr webhook fast-path (POST /api/webhooks/arr-import). Generate with: openssl rand -hex 32 - see SETUP.md" Type="Variable" Display="always" Required="false" Mask="true"></Config>
 </Container>
