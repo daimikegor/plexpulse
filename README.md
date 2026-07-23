@@ -23,7 +23,7 @@ Radarr, Sonarr, and Plex library.
   library directly (supports multiple instances of each)
 - Optional webhook fast-path: Radarr/Sonarr can notify PlexPulse the instant an
   import/upgrade completes — status flips to "Requested" immediately and
-  "Available" within about a minute via a live Plex check, instead of waiting
+  "Available" within a few minutes via a live Plex check, instead of waiting
   on the next scheduled scan — see SETUP.md
 - Personal request history ("My Requests")
 - Admin dashboard showing every user's request history

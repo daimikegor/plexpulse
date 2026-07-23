@@ -87,7 +87,7 @@ getTvdbIdFromTmdb function and lib/sonarr.ts.
 
 `POST /api/webhooks/arr-import` lets Radarr/Sonarr notify PlexPulse the instant an
 import/upgrade completes. Status flips to "Requested" immediately, and then to
-"Available" within about a minute via a live, targeted Plex check with a bounded
+"Available" within a few minutes via a live, targeted Plex check with a bounded
 retry — see "Request/Availability Status Logic" below for exactly how that works.
 This is instead of waiting for the 24h scheduled scan (`SCAN_SCHEDULE_HOURS`,
 `lib/scan-scheduler.ts`), which is unaffected and still runs as the ultimate
@@ -256,12 +256,12 @@ of those five source files, add or update the matching test in the same change.
   queries Plex's `/library/sections/{id}/recentlyAdded` endpoint directly for
   the one title just imported, instead of relying on the scan snapshot. It's
   called from the arr-import webhook (`app/api/webhooks/arr-import/route.ts`)
-  with a bounded retry — immediate check, then +15s, then +45s (~60s total),
-  entirely in the background after the webhook has already responded. If Plex
-  confirms the title within that window, status is written straight to
-  "Available" via `markMediaAvailable()` in `lib/media-status.ts`. This is
-  deliberately separate from the scan/snapshot logic above and doesn't read or
-  write `plex_library_scan` at all.
+  with a bounded retry — immediate check, then +15s, +45s, +90s, +180s
+  (~5.3 minutes total), entirely in the background after the webhook has
+  already responded. If Plex confirms the title within that window, status is
+  written straight to "Available" via `markMediaAvailable()` in
+  `lib/media-status.ts`. This is deliberately separate from the scan/snapshot
+  logic above and doesn't read or write `plex_library_scan` at all.
   - **Movies**: `recentlyAdded` items are movies directly, so their own `Guid[]`
     is checked against the target TMDB id.
   - **TV**: `recentlyAdded` on a show-type section returns *episodes*, and an
@@ -271,10 +271,22 @@ of those five source files, add or update the matching test in the same change.
     is resolved instead via its `grandparentRatingKey` and a follow-up
     `/library/metadata/{ratingKey}?includeGuids=1` call, which returns the
     series' own `Guid[]` to match against.
+  - **Retry window sized for real scan latency, not just churn**: the
+    original ~60s window (immediate/+15s/+45s) was too short in practice —
+    confirmed live in production where a 1080p import into a large section
+    (~971 items) missed the window, while a 4K version of the same title
+    imported into a much smaller section (~43 items) caught it immediately.
+    The bottleneck isn't PlexPulse's section-iteration (it correctly checks
+    every section of the relevant type every attempt) or the `recentlyAdded`
+    item cap — it's that Plex itself hadn't finished scanning the file into
+    its catalog yet by the time the short window elapsed. Larger/busier
+    sections can take Plex meaningfully longer than a minute to actually
+    index a newly-imported file via Autopulse's triggered partial scan. The
+    ~5.3 minute window gives that realistic latency more room, while still
+    being vastly faster than the 24h fallback.
   - **Remaining fallback window**: Plex's own scanning has its own lag
-    independent of PlexPulse — if Plex hasn't picked up the file within that
-    ~60s retry window (e.g. a large/slow library, agent metadata lookups
-    taking longer, etc.), the title stays at "Requested" until the next 24h
-    scheduled scan or an admin's manual "Rescan Now" catches it. Same safety
-    net as before this feature existed — now a rare edge case instead of the
-    common path.
+    independent of PlexPulse — if Plex still hasn't picked up the file within
+    that ~5.3 minute retry window, the title stays at "Requested" until the
+    next 24h scheduled scan or an admin's manual "Rescan Now" catches it. Same
+    safety net as before this feature existed — now a rarer edge case than
+    before, but not eliminated.
