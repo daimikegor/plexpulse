@@ -109,12 +109,14 @@ describe('POST /api/webhooks/arr-import', () => {
     );
     expect(res.status).toBe(200);
 
-    // Flush the immediate attempt, then advance through both backoff delays.
+    // Flush the immediate attempt, then advance through all four backoff delays.
     await vi.advanceTimersByTimeAsync(0);
     await vi.advanceTimersByTimeAsync(15_000);
     await vi.advanceTimersByTimeAsync(45_000);
+    await vi.advanceTimersByTimeAsync(90_000);
+    await vi.advanceTimersByTimeAsync(180_000);
 
-    expect(checkPlexLibraryLiveMock).toHaveBeenCalledTimes(3);
+    expect(checkPlexLibraryLiveMock).toHaveBeenCalledTimes(5);
     expect(markMediaAvailableMock).not.toHaveBeenCalled();
   });
 

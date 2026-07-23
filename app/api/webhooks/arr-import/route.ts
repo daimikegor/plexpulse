@@ -5,12 +5,16 @@ import { getTmdbIdFromTvdb } from '@/lib/tmdb';
 import { checkPlexLibraryLive } from '@/lib/plex-library';
 
 // Bounded retry for the live Plex check: Radarr/Sonarr reporting an import as
-// done doesn't mean Plex has scanned the file in yet. Immediate check, then
-// two short backoffs — never blocks the webhook's response. If Plex still
+// done doesn't mean Plex has scanned the file in yet. Plex only picks it up
+// once Autopulse triggers a partial scan AND Plex actually completes it —
+// confirmed in production that this can take well over a minute on a large
+// library section (e.g. ~971 items), even though a small section (e.g. 43
+// items) completes in seconds. Immediate check, then four backoffs spanning
+// ~5 minutes total — never blocks the webhook's response. If Plex still
 // hasn't picked it up within this window, status stays whatever
 // refreshMediaStatus already set (typically 'requested') until the 24h scan
 // or a manual rescan catches it.
-const LIVE_CHECK_DELAYS_MS = [0, 15_000, 45_000];
+const LIVE_CHECK_DELAYS_MS = [0, 15_000, 45_000, 90_000, 180_000];
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
