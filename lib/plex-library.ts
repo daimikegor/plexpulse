@@ -184,6 +184,111 @@ async function scanOneMediaType(mediaType: 'movie' | 'tv'): Promise<void> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Live single-item lookup — used by the arr-import webhook fast path to check
+// Plex directly instead of waiting on the periodic full-library scan/snapshot
+// above. Deliberately does not read or write plexLibraryScan in any way.
+// ---------------------------------------------------------------------------
+
+function extractTmdbIdFromGuids(guids: { id: string }[] | undefined): string | null {
+  const tmdbGuid = guids?.find((g) => (g.id || '').includes('tmdb://'));
+  if (!tmdbGuid) return null;
+  const match = tmdbGuid.id.match(/tmdb:\/\/(\d+)/);
+  return match ? match[1] : null;
+}
+
+async function getRelevantSectionKeys(
+  serverUrl: string,
+  token: string,
+  mediaType: 'movie' | 'tv',
+): Promise<string[]> {
+  const sectionsRes = await fetch(`${serverUrl}/library/sections`, {
+    headers: { 'Accept': 'application/json', 'X-Plex-Token': token },
+  });
+  if (!sectionsRes.ok) return [];
+
+  const sectionsData = await sectionsRes.json();
+  const sections = sectionsData.MediaContainer?.Directory || [];
+  const targetType = mediaType === 'movie' ? 'movie' : 'show';
+  return sections.filter((s: any) => s.type === targetType).map((s: any) => s.key);
+}
+
+/**
+ * Checks Plex directly for a single tmdbId, without touching the
+ * plexLibraryScan snapshot. Only looks at each relevant section's most
+ * recently added items (bounded, not a full library walk) — appropriate for
+ * checking "did the title I just imported show up in Plex yet", not for
+ * general library membership checks (use checkPlexLibrary for that).
+ *
+ * TV note: Plex's recentlyAdded for a show-type section returns episodes,
+ * whose own Guids are episode-level TMDB ids, not the series'. Each unique
+ * episode's parent show is resolved via its own metadata lookup to get the
+ * series-level Guid instead.
+ */
+export async function checkPlexLibraryLive(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<boolean> {
+  const serverUrl = process.env.PLEX_SERVER_URL;
+  const token = process.env.PLEX_SERVER_TOKEN;
+
+  if (!serverUrl || !token) {
+    console.error('[plex-live-check] PLEX_SERVER_URL or PLEX_SERVER_TOKEN not configured');
+    return false;
+  }
+
+  try {
+    const sectionKeys = await getRelevantSectionKeys(serverUrl, token, mediaType);
+
+    if (mediaType === 'movie') {
+      for (const key of sectionKeys) {
+        const res = await fetch(
+          `${serverUrl}/library/sections/${key}/recentlyAdded?includeGuids=1&X-Plex-Container-Size=100&X-Plex-Container-Start=0`,
+          { headers: { 'Accept': 'application/json', 'X-Plex-Token': token } },
+        );
+        if (!res.ok) continue;
+
+        const data = await res.json();
+        const items = data.MediaContainer?.Metadata || [];
+        for (const item of items) {
+          if (extractTmdbIdFromGuids(item.Guid) === tmdbId) return true;
+        }
+      }
+      return false;
+    }
+
+    // TV: resolve each unique recently-added episode's parent show and check
+    // the show's own Guids instead of the episode's.
+    const checkedShowKeys = new Set<string>();
+    for (const key of sectionKeys) {
+      const res = await fetch(
+        `${serverUrl}/library/sections/${key}/recentlyAdded?includeGuids=1&X-Plex-Container-Size=100&X-Plex-Container-Start=0`,
+        { headers: { 'Accept': 'application/json', 'X-Plex-Token': token } },
+      );
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      const episodes = data.MediaContainer?.Metadata || [];
+
+      for (const episode of episodes) {
+        const showKey = episode.grandparentRatingKey;
+        if (!showKey || checkedShowKeys.has(showKey)) continue;
+        checkedShowKeys.add(showKey);
+
+        const showRes = await fetch(`${serverUrl}/library/metadata/${showKey}?includeGuids=1`, {
+          headers: { 'Accept': 'application/json', 'X-Plex-Token': token },
+        });
+        if (!showRes.ok) continue;
+
+        const showData = await showRes.json();
+        const show = showData.MediaContainer?.Metadata?.[0];
+        if (show && extractTmdbIdFromGuids(show.Guid) === tmdbId) return true;
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error('[plex-live-check] error:', error);
+    return false;
+  }
+}
+
 async function finalizeScan(
   mediaType: 'movie' | 'tv',
   guids: string[],

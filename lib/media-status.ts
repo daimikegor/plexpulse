@@ -40,6 +40,27 @@ export async function refreshMediaStatus(tmdbId: string, mediaType: 'movie' | 't
   return status;
 }
 
+/**
+ * Force-writes a single item's status to 'available', bypassing the normal
+ * Plex/Radarr/Sonarr checks in refreshMediaStatus. Used by the arr-import
+ * webhook's live Plex check, which confirms availability directly rather
+ * than through the periodic full-library scan.
+ */
+export async function markMediaAvailable(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<void> {
+  const id = makeKey(mediaType, tmdbId);
+
+  await db.insert(mediaStatus).values({
+    id,
+    tmdbId,
+    mediaType,
+    status: 'available',
+    lastChecked: new Date(),
+  }).onConflictDoUpdate({
+    target: mediaStatus.id,
+    set: { status: 'available', lastChecked: new Date() },
+  });
+}
+
 export async function getCachedMediaStatus(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<'none' | 'requested' | 'available' | null> {
   const id = `${mediaType}-${tmdbId}`;
   const result = await db.select().from(mediaStatus).where(eq(mediaStatus.id, id)).get();

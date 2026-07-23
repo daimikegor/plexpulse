@@ -1,7 +1,41 @@
 import { NextResponse } from 'next/server';
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-import { refreshMediaStatus } from '@/lib/media-status';
+import { refreshMediaStatus, markMediaAvailable } from '@/lib/media-status';
 import { getTmdbIdFromTvdb } from '@/lib/tmdb';
+import { checkPlexLibraryLive } from '@/lib/plex-library';
+
+// Bounded retry for the live Plex check: Radarr/Sonarr reporting an import as
+// done doesn't mean Plex has scanned the file in yet. Immediate check, then
+// two short backoffs — never blocks the webhook's response. If Plex still
+// hasn't picked it up within this window, status stays whatever
+// refreshMediaStatus already set (typically 'requested') until the 24h scan
+// or a manual rescan catches it.
+const LIVE_CHECK_DELAYS_MS = [0, 15_000, 45_000];
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function checkAvailableWithRetry(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<void> {
+  for (const delay of LIVE_CHECK_DELAYS_MS) {
+    if (delay > 0) await sleep(delay);
+    try {
+      if (await checkPlexLibraryLive(tmdbId, mediaType)) {
+        await markMediaAvailable(tmdbId, mediaType);
+        return;
+      }
+    } catch (err) {
+      console.error('[arr-import webhook] live Plex check failed:', err);
+    }
+  }
+}
+
+async function handleImport(tmdbId: string, mediaType: 'movie' | 'tv'): Promise<void> {
+  await refreshMediaStatus(tmdbId, mediaType).catch((err) =>
+    console.error(`[arr-import webhook] refreshMediaStatus (${mediaType}) failed:`, err),
+  );
+  await checkAvailableWithRetry(tmdbId, mediaType);
+}
 
 export async function POST(request: Request) {
   const rl = await rateLimit(request, RATE_LIMITS['arr-import']);
@@ -41,8 +75,8 @@ export async function POST(request: Request) {
 
   if (body.movie?.tmdbId != null) {
     const tmdbId = String(body.movie.tmdbId);
-    refreshMediaStatus(tmdbId, 'movie').catch((err) =>
-      console.error('[arr-import webhook] refreshMediaStatus (movie) failed:', err),
+    handleImport(tmdbId, 'movie').catch((err) =>
+      console.error('[arr-import webhook] handleImport (movie) failed:', err),
     );
   } else if (body.series?.tvdbId != null) {
     const tvdbId = String(body.series.tvdbId);
@@ -52,9 +86,9 @@ export async function POST(request: Request) {
           console.warn(`[arr-import webhook] Could not resolve TMDB id for TVDB id ${tvdbId}`);
           return;
         }
-        return refreshMediaStatus(tmdbId, 'tv');
+        return handleImport(tmdbId, 'tv');
       })
-      .catch((err) => console.error('[arr-import webhook] refreshMediaStatus (tv) failed:', err));
+      .catch((err) => console.error('[arr-import webhook] handleImport (tv) failed:', err));
   } else {
     console.warn('[arr-import webhook] Download event with neither movie nor series field:', body);
   }

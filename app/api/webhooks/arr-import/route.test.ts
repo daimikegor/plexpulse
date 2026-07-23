@@ -7,9 +7,17 @@ interface RateLimitResult {
   retryAfter?: number;
 }
 
-const { refreshMediaStatusMock, getTmdbIdFromTvdbMock, rateLimitMock } = vi.hoisted(() => ({
+const {
+  refreshMediaStatusMock,
+  markMediaAvailableMock,
+  getTmdbIdFromTvdbMock,
+  checkPlexLibraryLiveMock,
+  rateLimitMock,
+} = vi.hoisted(() => ({
   refreshMediaStatusMock: vi.fn(async () => 'requested' as const),
+  markMediaAvailableMock: vi.fn(async () => undefined),
   getTmdbIdFromTvdbMock: vi.fn(async () => '9999'),
+  checkPlexLibraryLiveMock: vi.fn(async () => false),
   rateLimitMock: vi.fn<(...args: any[]) => Promise<RateLimitResult>>(async () => ({
     allowed: true,
     limit: 120,
@@ -19,10 +27,15 @@ const { refreshMediaStatusMock, getTmdbIdFromTvdbMock, rateLimitMock } = vi.hois
 
 vi.mock('@/lib/media-status', () => ({
   refreshMediaStatus: refreshMediaStatusMock,
+  markMediaAvailable: markMediaAvailableMock,
 }));
 
 vi.mock('@/lib/tmdb', () => ({
   getTmdbIdFromTvdb: getTmdbIdFromTvdbMock,
+}));
+
+vi.mock('@/lib/plex-library', () => ({
+  checkPlexLibraryLive: checkPlexLibraryLiveMock,
 }));
 
 vi.mock('@/lib/rate-limit', () => ({
@@ -50,13 +63,17 @@ describe('POST /api/webhooks/arr-import', () => {
   beforeEach(() => {
     process.env.ARR_WEBHOOK_SECRET = SECRET;
     refreshMediaStatusMock.mockClear();
+    markMediaAvailableMock.mockClear();
     getTmdbIdFromTvdbMock.mockClear();
+    checkPlexLibraryLiveMock.mockClear();
+    checkPlexLibraryLiveMock.mockResolvedValue(false);
     rateLimitMock.mockClear();
     rateLimitMock.mockResolvedValue({ allowed: true, limit: 120, remaining: 119 });
   });
 
   afterEach(() => {
     process.env.ARR_WEBHOOK_SECRET = originalSecret;
+    vi.useRealTimers();
   });
 
   it('refreshes movie status on a Radarr Download event', async () => {
@@ -67,6 +84,38 @@ describe('POST /api/webhooks/arr-import', () => {
     await vi.waitFor(() => {
       expect(refreshMediaStatusMock).toHaveBeenCalledWith('603', 'movie');
     });
+  });
+
+  it('marks the item available immediately when the live Plex check finds it on the first try', async () => {
+    checkPlexLibraryLiveMock.mockResolvedValueOnce(true);
+    const res = await POST(
+      makeRequest({ eventType: 'Download', movie: { tmdbId: 603 } }),
+    );
+    expect(res.status).toBe(200);
+    await vi.waitFor(() => {
+      expect(checkPlexLibraryLiveMock).toHaveBeenCalledWith('603', 'movie');
+      expect(markMediaAvailableMock).toHaveBeenCalledWith('603', 'movie');
+    });
+    // Only the immediate (no-delay) attempt should have run.
+    expect(checkPlexLibraryLiveMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up after the bounded retry window if Plex never confirms it', async () => {
+    vi.useFakeTimers();
+    checkPlexLibraryLiveMock.mockResolvedValue(false);
+
+    const res = await POST(
+      makeRequest({ eventType: 'Download', movie: { tmdbId: 603 } }),
+    );
+    expect(res.status).toBe(200);
+
+    // Flush the immediate attempt, then advance through both backoff delays.
+    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(15_000);
+    await vi.advanceTimersByTimeAsync(45_000);
+
+    expect(checkPlexLibraryLiveMock).toHaveBeenCalledTimes(3);
+    expect(markMediaAvailableMock).not.toHaveBeenCalled();
   });
 
   it('converts TVDB to TMDB and refreshes tv status on a Sonarr Download event', async () => {
@@ -80,6 +129,18 @@ describe('POST /api/webhooks/arr-import', () => {
     });
   });
 
+  it('runs the live Plex check with the converted tmdbId on a Sonarr Download event', async () => {
+    checkPlexLibraryLiveMock.mockResolvedValueOnce(true);
+    const res = await POST(
+      makeRequest({ eventType: 'Download', series: { tvdbId: 12345 } }),
+    );
+    expect(res.status).toBe(200);
+    await vi.waitFor(() => {
+      expect(checkPlexLibraryLiveMock).toHaveBeenCalledWith('9999', 'tv');
+      expect(markMediaAvailableMock).toHaveBeenCalledWith('9999', 'tv');
+    });
+  });
+
   it('no-ops on a Grab event', async () => {
     const res = await POST(
       makeRequest({ eventType: 'Grab', movie: { tmdbId: 603 } }),
@@ -87,6 +148,7 @@ describe('POST /api/webhooks/arr-import', () => {
     expect(res.status).toBe(200);
     expect(refreshMediaStatusMock).not.toHaveBeenCalled();
     expect(getTmdbIdFromTvdbMock).not.toHaveBeenCalled();
+    expect(checkPlexLibraryLiveMock).not.toHaveBeenCalled();
   });
 
   it('no-ops on a Test event', async () => {
