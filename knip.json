@@ -5,7 +5,8 @@
     "app/**/layout.tsx",
     "app/**/route.ts",
     "next.config.{js,ts,mjs}",
-    "migrate.js"
+    "migrate.js",
+    "scripts/setup-arr-webhooks.js"
   ],
   "project": ["**/*.{ts,tsx,js,jsx}"],
   "ignore": [".claude/**"],
