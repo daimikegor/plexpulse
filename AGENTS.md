@@ -1,5 +1,9 @@
 # PlexPulse - Project Context
 
+> **Note:** This document is for developers and maintainers working on PlexPulse code. If you're trying to **deploy and run PlexPulse**, see [README.md](./README.md) and [QUICKSTART.md](./QUICKSTART.md) instead. For configuration details, see [SETUP.md](./SETUP.md).
+
+---
+
 ## Overview
 Self-hosted media discovery and request app for Plex servers. Users browse trending/popular/top-rated/upcoming movies & TV, search live, and one-click request titles to their Plex watchlist. Status tracking (Requested/Available) checked against Radarr, Sonarr, and Plex library via [Pulsarr](https://github.com/jamcalli/Pulsarr) for actual downloads.
 

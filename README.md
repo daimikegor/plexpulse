@@ -1,36 +1,23 @@
 # PlexPulse
 
-A self-hosted media discovery and request app for your Plex server, built with
-Next.js 14. Browse trending, popular, and top-rated movies/TV, search with live
-results as you type, and request titles directly to your Plex watchlist — with
-real-time status tracking (Requested / Available) checked against your actual
-Radarr, Sonarr, and Plex library.
+A self-hosted media discovery and request app for your Plex server, built with Next.js 14. Browse trending, popular, and top-rated movies/TV, search with live results as you type, and request titles directly to your Plex watchlist — with real-time status tracking (Requested / Available) checked against your actual Radarr, Sonarr, and Plex library.
 
 ## Features
 
-- Plex OAuth login (PIN-based, no password entry)
-- Browse trending, popular, top rated, and upcoming movies/series
-- Genre browsing with real backdrop artwork
-- Infinite scroll on every list
-- Live-as-you-type search across movies, TV shows, and people
-- One-click request → adds to your Plex watchlist automatically
-- Requests work by adding titles to your Plex watchlist — routing them to
-  Radarr/Sonarr is handled by [Pulsarr](https://github.com/jamcalli/Pulsarr),
-  which watches your watchlist and routes new items automatically. PlexPulse
-  doesn't talk to Sonarr/Radarr to *add* things directly (only to check status)
-  — Pulsarr (or a similar tool) is required for requests to actually be routed.
-- Live Requested/Available status, checked against Radarr, Sonarr, and your Plex
-  library directly (supports multiple instances of each)
-- Optional webhook fast-path: Radarr/Sonarr can notify PlexPulse the instant an
-  import/upgrade completes — status flips to "Requested" immediately and
-  "Available" within a few minutes via a live Plex check, instead of waiting
-  on the next scheduled scan — see SETUP.md
-- Personal request history ("My Requests")
-- Admin dashboard showing every user's request history
-- Automatic daily Plex library scan (configurable, survives container restarts)
-  to keep "Available" status accurate without manual refreshes
-- Fully responsive — dedicated mobile layout with bottom navigation
-- Real Plex avatar shown in the header
+- **Plex OAuth login** — PIN-based, no password entry
+- **Browse content** — trending, popular, top-rated, and upcoming movies/series
+- **Genre browsing** — with real backdrop artwork
+- **Infinite scroll** — on every list
+- **Live search** — results as you type across movies, TV shows, and people
+- **One-click requests** — adds titles to your Plex watchlist automatically
+- **Real-time status tracking** — "Requested" or "Available" checked against Radarr, Sonarr, and your Plex library
+- **Webhook fast-path** — Radarr/Sonarr notify PlexPulse instantly when imports complete (see SETUP.md)
+- **Request history** — "Requests" tab showing all your submitted requests
+- **Admin dashboard** — view every user's request history, manually rescan movies and series, and rescan all media at once
+- **Admin settings** — dedicated settings tab with rescan controls
+- **Automatic daily scans** — keeps "Available" status accurate without manual refreshes
+- **Fully responsive** — dedicated mobile layout with bottom navigation
+- **User profiles** — click the Plex avatar in the header to access the admin dashboard (if you have admin access)
 
 ## How It Works
 
@@ -50,6 +37,12 @@ Routed to Radarr / Sonarr
 PlexPulse status updates: Requested → Available
 ```
 
+**Note:** Pulsarr, Radarr, and Sonarr are **required** for PlexPulse to work. Without them:
+- PlexPulse cannot route requests to download services
+- Status tracking (Requested/Available) won't function properly
+
+Learn more about Pulsarr at https://github.com/jamcalli/pulsarr — it's the bridge between your Plex watchlist and download managers.
+
 ## Screenshots
 
 **Dashboard** — trending, popular, and top-rated shelves at a glance
@@ -66,102 +59,66 @@ PlexPulse status updates: Requested → Available
 
 ## Tech Stack
 
-Next.js 14 (App Router), TypeScript, Tailwind CSS, Drizzle ORM with libSQL
-(SQLite), Redis, TMDB API, Plex API, Radarr/Sonarr APIs.
+Next.js 14 (App Router), TypeScript, Tailwind CSS, Drizzle ORM with libSQL (SQLite), Redis, TMDB API, Plex API, Radarr/Sonarr APIs.
 
 ## Prerequisites
 
-- A Plex Media Server
-- A [TMDB API key](https://www.themoviedb.org/settings/api) (free)
-- Docker (or Podman)
-- Optionally: Radarr and/or Sonarr instances, for request status tracking
+Before you start, make sure you have:
 
-## Installation
+- **Plex Media Server** (v1.32 or later) — running and accessible on your local network
+- **TMDB API key** (free) — get one at https://www.themoviedb.org/settings/api
+- **Radarr** — for movie request routing and status tracking
+- **Sonarr** — for TV series request routing and status tracking
+- **Pulsarr** — for automatic watchlist-to-Radarr/Sonarr routing (see https://github.com/jamcalli/pulsarr)
+- **Docker** or **Docker Compose** (if using the container deployment options below)
 
-### Option 1: Docker Compose
+## Quick Start
 
-1. Clone this repository
-2. Copy `.env.example` to `.env` and fill in your values (see SETUP.md for
-   where to find each one)
-3. Run:
-```bash
-   docker compose up -d --build
-```
-4. Visit `http://localhost:3000` (the default port mapping in `docker-compose.yml`
-   — if you've changed the `ports:` mapping there, check with
-   `docker port plexpulse-app` rather than assuming 3000)
+For copy-paste setup instructions (Docker Compose, Unraid, or manual Docker), see **[QUICKSTART.md](./QUICKSTART.md)**.
 
-### Option 2: Unraid
+For detailed configuration, environment variables, and troubleshooting, see **[SETUP.md](./SETUP.md)**.
 
-Two Unraid Community Applications-style templates are included in the
-`unraid-templates/` folder — one for the app, one for a dedicated Redis instance.
+## What's Next?
 
-1. Copy both `.xml` files from `unraid-templates/` into
-   `/boot/config/plugins/dockerMan/templates-user/` on your Unraid server
-2. In the Unraid UI, start `plexpulse-redis` first from the Docker tab's
-   template dropdown
-3. SSH into Unraid, clone this repo, and build the app image locally (this
-   image is not published to a registry):
-```bash
-   git clone <your-fork-or-this-repo-url> plexpulse-src
-   cd plexpulse-src
-   docker build -t plexpulse-app:latest .
-```
-4. Start `plexpulse-app` from the Docker tab's template dropdown, filling in
-   your environment variables (see SETUP.md for the full list and where to
-   find each value). The template's default host port is 3000, but you can
-   (and may need to) map it to a different host port at add-container time —
-   check the actual mapping afterward with `docker port plexpulse-app` rather
-   than assuming 3000, especially if anything else on your server already
-   uses it
+Once PlexPulse is running:
 
-**Important:** whenever you rebuild the image after pulling new code, use
-Unraid's "Force Update" (or stop/remove and re-add the container) — a plain
-restart does not pick up a newly built image. See SETUP.md for details.
-
-### Option 3: Manual Docker
-
-Build and run the app and Redis containers manually using the Dockerfile
-included in this repo, supplying the same environment variables documented in
-`.env.example` and SETUP.md.
+1. **Log in with Plex** — use your Plex PIN (no password required)
+2. **Browse and search** — explore trending/popular content
+3. **Request titles** — click the request button; titles are added to your Plex watchlist
+4. **Monitor requests** — check the "Requests" tab to see your submission history
+5. **Verify Pulsarr routing** — confirm that watchlist items are being routed to Radarr/Sonarr (see Pulsarr docs at https://github.com/jamcalli/pulsarr)
+6. **(Admin only) Manage and rescan** — click your Plex avatar to access the admin dashboard and manually trigger library rescans if needed
 
 ## Security
 
-Since PlexPulse handles Plex auth tokens and talks to your Radarr/Sonarr/Plex
-instances, it's had a dedicated hardening pass:
+Since PlexPulse handles Plex auth tokens and talks to your Radarr/Sonarr/Plex instances, it's had a dedicated hardening pass:
 
-- Origin validation on state-changing requests (watchlist adds) — rejects any
-  request whose Origin/Referer doesn't match your configured app URL
+- Origin validation on state-changing requests (watchlist adds)
 - OAuth callback postMessage locked to your app's origin, not broadcast wildcard
-- Nonce-based CSRF protection with one-time-use replay protection on the auth flow
-- Redis-backed rate limiting (fails open on Redis outage, so an outage never
-  locks out real users)
-- Encrypted session storage (with legacy-format back-compat)
+- Nonce-based CSRF protection with one-time-use replay protection
+- Redis-backed rate limiting (fails open on Redis outage)
+- Encrypted session storage with legacy-format back-compat
 - Redis requires a password (`--requirepass`) rather than running open
-- A Vitest suite (`npm run test`) covers all of the above — see AGENTS.md for
-  the full list of what's tested
+- Comprehensive test suite (`npm run test`) covering all of the above
 
-## Configuration
-
-See [SETUP.md](./SETUP.md) for:
-- The full list of environment variables and where to find each value
-- Which variables must be set at build time vs. runtime (important, easy to
-  get wrong)
-- Database migration notes (this project uses a hand-written migration script,
-  not Drizzle's built-in migration runner)
-- Sonarr's TVDB ID requirement and how this project handles it
-- Cloudflare Tunnel setup for external access
-- Setting up the Radarr/Sonarr webhook fast-path (`scripts/setup-arr-webhooks.js`)
-- Running the test suite (`npm run test`)
+See [AGENTS.md](./AGENTS.md) for the full technical details and known gotchas.
 
 ## Acknowledgments
 
-- [Seerr](https://github.com/seerr-team/seerr) (formerly known as Overseerr) — design and feature inspiration for the request/discovery flow
+- [Seerr](https://github.com/seerr-team/seerr) (formerly Overseerr) — design and feature inspiration
 - [TMDB](https://www.themoviedb.org/) — movie/TV metadata and artwork
 - [Plex](https://www.plex.tv/) — media server and watchlist integration
 - [Radarr](https://radarr.video/) / [Sonarr](https://sonarr.tv/) — status tracking for your requests
-- [Pulsarr](https://github.com/jamcalli/Pulsarr) — watches the Plex watchlist and routes requests to Radarr/Sonarr
+- [Pulsarr](https://github.com/jamcalli/pulsarr) — watches the Plex watchlist and routes requests to Radarr/Sonarr
 
 ## License
 
 MIT License — see [LICENSE](./LICENSE) file.
+
+---
+
+## For Developers
+
+- **Project context & architecture:** See [AGENTS.md](./AGENTS.md)
+- **Security details & known bugs:** See [AGENTS.md](./AGENTS.md) "Known Gotchas" section
+- **Contributing:** Open an issue or PR with your ideas
